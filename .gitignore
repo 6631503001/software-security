@@ -37,6 +37,9 @@ sbom.json
 sbom.xml
 *.sig
 
+# Large wordlists (student-supplied prerequisite, ~133 MB — never commit)
+rockyou.txt
+
 # Secrets — never commit
 .env
 *.pem
