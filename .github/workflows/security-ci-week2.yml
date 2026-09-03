@@ -1,0 +1,157 @@
+# Week 2 — Task 6: security CI gate (student exercise)
+#
+# Adapted from labs/week15-devsecops-pipeline/security-ci.yml (the course's
+# sandbox template) for Worksheet 2, Task 6.
+#
+# What it does
+#   - Semgrep  (SAST)          -> insecure code patterns  (OWASP rulesets)
+#   - Trivy    (SCA)           -> vulnerable dependencies (HIGH/CRITICAL)
+#   - Gitleaks (secret scan)   -> hard-coded secrets
+#   Each tool runs TWICE on purpose:
+#     1) report step  -> writes SARIF and uploads it to the Security tab
+#        (uses `if: always()` + exit 0 so findings upload even when the
+#         build is about to fail),
+#     2) gate step    -> re-runs and FAILS the build on HIGH/CRITICAL (or any
+#        secret). A real gate has to be able to say "no".
+#
+# Why the gate targets the exercise code
+#   This repo deliberately ships intentionally-vulnerable material
+#   (labs/week*/vulnerable-repo, project/starter-app). The repo's own
+#   maintained CI (.github/workflows/security-ci.yml) is designed to NOT gate
+#   on those folders — it uses .semgrepignore / .gitleaks.toml / Trivy
+#   skip-dirs so the course stays green. THIS exercise is the opposite: you
+#   point a gate at the vulnerable code and watch it go red. So:
+#     * Semgrep removes .semgrepignore before scanning the vulnerable target
+#       (otherwise the root ignore file suppresses every finding),
+#     * Gitleaks scans the vulnerable folder with --no-git -s so the root
+#       .gitleaks.toml allowlist does not swallow the planted secrets,
+#     * Trivy scans the repo (no skip-dirs) so the old pins fail the build.
+#   A red build here is the EXPECTED, graded outcome.
+#
+# Use it (do NOT overwrite the repo's real security-ci.yml):
+#   push this file to YOUR OWN fork (or a scratch repo) at
+#     .github/workflows/security-ci-week2.yml
+#   then open the Actions tab -> the run fails -> screenshot it for Task 6.
+#   Locally: install act (neale/act) and run `act -j semgrep` etc.
+
+name: security-ci-week2
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:        # lets you click "Run workflow" manually
+
+permissions:
+  contents: read
+  security-events: write    # upload SARIF to the Security tab
+
+jobs:
+  # ---------------------------------------------------------------
+  # 1) SAST — Semgrep
+  # ---------------------------------------------------------------
+  semgrep:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    container: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Semgrep scan -> SARIF (report, never fails)
+        run: |
+          semgrep scan \
+            --config p/default \
+            --config p/owasp-top-ten \
+            --sarif --output semgrep.sarif \
+            --error || true
+
+      - name: Upload Semgrep SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3  # v4.37.6
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+      - name: Gate — fail on Semgrep findings (HIGH/CRITICAL)
+        run: |
+          # The repo's .semgrepignore excludes labs/week*/ by design; drop it so
+          # this gate really scans the intentionally-vulnerable target and fails.
+          rm -f .semgrepignore
+          semgrep scan \
+            --config p/default \
+            --config p/owasp-top-ten \
+            --error \
+            labs/week02-sdlc-tooling/vulnerable-repo \
+            project/starter-app
+
+  # ---------------------------------------------------------------
+  # 2) SCA — Trivy (filesystem: dependency + Dockerfile misconfig)
+  # ---------------------------------------------------------------
+  trivy:
+    name: SCA (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Trivy fs -> SARIF (report, never fails)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
+        with:
+          scan-type: fs
+          scanners: vuln,misconfig
+          format: sarif
+          output: trivy.sarif
+          severity: HIGH,CRITICAL
+          limit-severities-for-sarif: true   # only HIGH/CRITICAL in the SARIF
+          exit-code: "0"
+
+      - name: Upload Trivy SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3  # v4.37.6
+        with:
+          sarif_file: trivy.sarif
+          category: trivy
+
+      - name: Gate — fail on HIGH/CRITICAL (SCA + misconfig)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
+        with:
+          scan-type: fs
+          scanners: vuln,misconfig
+          severity: HIGH,CRITICAL
+          exit-code: "1"                     # real failure semantics
+
+  # ---------------------------------------------------------------
+  # 3) Secrets — Gitleaks
+  # ---------------------------------------------------------------
+  gitleaks:
+    name: Secrets (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0                     # full history available if needed
+
+      - name: Gitleaks scan -> SARIF (report, never fails)
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/repo" -w /repo \
+            zricethezav/gitleaks:latest detect \
+            --no-git -s /repo/labs/week02-sdlc-tooling/vulnerable-repo \
+            --report-format sarif --report-path /repo/gitleaks.sarif \
+            --exit-code 0 -v || true
+
+      - name: Upload Gitleaks SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3  # v4.37.6
+        with:
+          sarif_file: gitleaks.sarif
+          category: gitleaks
+
+      - name: Gate — fail if any secret found
+        run: |
+          # --no-git + -s on the vulnerable folder: the root .gitleaks.toml
+          # allowlists these planted secrets for the repo's own CI, so scanning
+          # the folder directly is what makes them fire (exit 1).
+          docker run --rm -v "${{ github.workspace }}:/repo" -w /repo \
+            zricethezav/gitleaks:latest detect \
+            --no-git -s /repo/labs/week02-sdlc-tooling/vulnerable-repo \
+            --exit-code 1 -v

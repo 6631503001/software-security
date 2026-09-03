@@ -1,0 +1,245 @@
+==> Semgrep (SAST)
+Unable to find image 'semgrep/semgrep:latest' locally
+latest: Pulling from semgrep/semgrep
+e6f31ffc071e: Pulling fs layer
+a7f609957223: Pulling fs layer
+bd9ddc54bea9: Pulling fs layer
+04134ac3cee4: Pulling fs layer
+752844d0badd: Pulling fs layer
+4cba3f320f0e: Pulling fs layer
+14a5f3aa9c10: Pulling fs layer
+51faf4b23e93: Pulling fs layer
+ce1953bf6b5f: Pulling fs layer
+c882f4176378: Pulling fs layer
+8a209fb93304: Pulling fs layer
+275daf23c963: Pulling fs layer
+e69fb0ba2e72: Pulling fs layer
+14a5f3aa9c10: Waiting
+51faf4b23e93: Waiting
+ce1953bf6b5f: Waiting
+8a209fb93304: Waiting
+275daf23c963: Waiting
+c882f4176378: Waiting
+04134ac3cee4: Waiting
+752844d0badd: Waiting
+e69fb0ba2e72: Waiting
+4cba3f320f0e: Waiting
+bd9ddc54bea9: Download complete
+e6f31ffc071e: Verifying Checksum
+e6f31ffc071e: Download complete
+e6f31ffc071e: Pull complete
+04134ac3cee4: Verifying Checksum
+04134ac3cee4: Download complete
+a7f609957223: Verifying Checksum
+a7f609957223: Download complete
+a7f609957223: Pull complete
+bd9ddc54bea9: Pull complete
+04134ac3cee4: Pull complete
+14a5f3aa9c10: Verifying Checksum
+14a5f3aa9c10: Download complete
+51faf4b23e93: Download complete
+ce1953bf6b5f: Verifying Checksum
+ce1953bf6b5f: Download complete
+c882f4176378: Verifying Checksum
+c882f4176378: Download complete
+8a209fb93304: Verifying Checksum
+8a209fb93304: Download complete
+275daf23c963: Verifying Checksum
+275daf23c963: Download complete
+e69fb0ba2e72: Verifying Checksum
+e69fb0ba2e72: Download complete
+752844d0badd: Verifying Checksum
+752844d0badd: Download complete
+752844d0badd: Pull complete
+4cba3f320f0e: Verifying Checksum
+4cba3f320f0e: Download complete
+4cba3f320f0e: Pull complete
+14a5f3aa9c10: Pull complete
+51faf4b23e93: Pull complete
+ce1953bf6b5f: Pull complete
+c882f4176378: Pull complete
+8a209fb93304: Pull complete
+275daf23c963: Pull complete
+e69fb0ba2e72: Pull complete
+Digest: sha256:b94b53d02fd4a022f9eac4e2af1380f5c3c4c21400e79d3336bdff1d1db5e796
+Status: Downloaded newer image for semgrep/semgrep:latest
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 2 files tracked by git with 1144 Code rules:
+                                                                                                                        
+  Language      Rules   Files          Origin      Rules                                                                
+ ─────────────────────────────        ───────────────────                                                               
+  <multilang>      49       2          Community    1144                                                                
+  python          273       1                                                                                           
+                                                                                                                        
+                    
+                    
+┌──────────────────┐
+│ 10 Code Findings │
+└──────────────────┘
+               
+    /src/app.py
+    ❯❱ python.django.security.injection.sql.sql-injection-using-db-cursor-execute.sql-injection-db-cursor-execute
+          ❰❰ Blocking ❱❱
+          User-controlled data from a request is passed to 'execute()'. This could lead to a SQL injection and
+          therefore protected information could be leaked. Instead, use django's QuerySets, which are built   
+          with query parameterization and therefore not vulnerable to sql injection. For example, you could   
+          use `Entry.objects.filter(date=2006)`.                                                              
+          Details: https://sg.run/qx7y                                                                        
+                                                                                                              
+           16┆ name = request.args.get("name", "")
+           17┆ con = sqlite3.connect("app.db")
+           18┆ # CWE-89: SQL injection (string formatting into query)
+           19┆ q = "SELECT * FROM users WHERE name = '%s'" % name
+           20┆ return str(con.execute(q).fetchall())
+   
+   ❯❯❱ python.django.security.injection.tainted-sql-string.tainted-sql-string
+          ❰❰ Blocking ❱❱
+          Detected user input used to manually construct a SQL string. This is usually bad practice because 
+          manual construction could accidentally result in a SQL injection. An attacker could use a SQL     
+          injection to steal or modify contents of the database. Instead, use a parameterized query which is
+          available by default in most database engines. Alternatively, consider using the Django object-   
+          relational mappers (ORM) instead of raw SQL queries.                                              
+          Details: https://sg.run/PbZp                                                                      
+                                                                                                            
+           19┆ q = "SELECT * FROM users WHERE name = '%s'" % name
+   
+   ❯❯❱ python.flask.security.injection.tainted-sql-string.tainted-sql-string
+          ❰❰ Blocking ❱❱
+          Detected user input used to manually construct a SQL string. This is usually bad practice because 
+          manual construction could accidentally result in a SQL injection. An attacker could use a SQL     
+          injection to steal or modify contents of the database. Instead, use a parameterized query which is
+          available by default in most database engines. Alternatively, consider using an object-relational 
+          mapper (ORM) such as SQLAlchemy which will protect your queries.                                  
+          Details: https://sg.run/JxZj                                                                      
+                                                                                                            
+           19┆ q = "SELECT * FROM users WHERE name = '%s'" % name
+   
+    ❯❱ python.lang.security.audit.formatted-sql-query.formatted-sql-query
+          ❰❰ Blocking ❱❱
+          Detected possible formatted SQL query. Use parameterized queries instead.
+          Details: https://sg.run/EkWw                                             
+                                                                                   
+           20┆ return str(con.execute(q).fetchall())
+   
+   ❯❯❱ python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+          ❰❰ Blocking ❱❱
+          Avoiding SQL string concatenation: untrusted input concatenated with raw SQL query can result in SQL
+          Injection. In order to execute raw query safely, prepared statement should be used. SQLAlchemy      
+          provides TextualSQL to easily used prepared statement with named parameters. For complex SQL        
+          composition, use SQL Expression Language or Schema Definition Language. In most cases, SQLAlchemy   
+          ORM will be a better option.                                                                        
+          Details: https://sg.run/2b1L                                                                        
+                                                                                                              
+           20┆ return str(con.execute(q).fetchall())
+   
+   ❯❯❱ python.flask.security.injection.subprocess-injection.subprocess-injection
+          ❰❰ Blocking ❱❱
+          Detected user input entering a `subprocess` call unsafely. This could result in a command injection 
+          vulnerability. An attacker could use this vulnerability to execute arbitrary commands on the host,  
+          which allows them to download malware, scan sensitive data, or run any command they wish on the     
+          server. Do not let users choose the command to run. In general, prefer to use Python API versions of
+          system commands. If you must use subprocess, use a dictionary to allowlist a set of commands.       
+          Details: https://sg.run/5gW3                                                                        
+                                                                                                              
+           26┆ return subprocess.check_output("ping -c 1 " + host, shell=True)
+   
+   ❯❯❱ python.lang.security.dangerous-subprocess-use.dangerous-subprocess-use
+          ❰❰ Blocking ❱❱
+          Detected subprocess function 'check_output' with user controlled data. A malicious actor could
+          leverage this to perform command injection. You may consider using 'shlex.escape()'.          
+          Details: https://sg.run/NWxp                                                                  
+                                                                                                        
+           26┆ return subprocess.check_output("ping -c 1 " + host, shell=True)
+   
+   ❯❯❱ python.lang.security.audit.subprocess-shell-true.subprocess-shell-true
+          ❰❰ Blocking ❱❱
+          Found 'subprocess' function 'check_output' with 'shell=True'. This is dangerous because this call 
+          will spawn the command using a shell process. Doing so propagates current shell settings and      
+          variables, which makes it much easier for a malicious actor to execute commands. Use 'shell=False'
+          instead.                                                                                          
+          Details: https://sg.run/J92w                                                                      
+                                                                                                            
+           ▶▶┆ Autofix ▶ False
+           26┆ return subprocess.check_output("ping -c 1 " + host, shell=True)
+   
+    ❯❱ python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5
+          ❰❰ Blocking ❱❱
+          Detected MD5 hash algorithm which is considered insecure. MD5 is not collision resistant and is
+          therefore not suitable as a cryptographic signature. Use SHA256 or SHA3 instead.               
+          Details: https://sg.run/vYrY                                                                   
+                                                                                                         
+           30┆ return hashlib.md5(pw.encode()).hexdigest()
+   
+    ❯❱ python.flask.security.audit.debug-enabled.debug-enabled
+          ❰❰ Blocking ❱❱
+          Detected Flask app with debug=True. Do not deploy to production with this flag enabled as it will   
+          leak sensitive information. Instead, consider using Flask configuration variables or setting 'debug'
+          using system environment variables.                                                                 
+          Details: https://sg.run/dKrd                                                                        
+                                                                                                              
+           33┆ app.run(debug=True)  # CWE-489: debug mode in production
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 10 (10 blocking)
+ • Rules run: 322
+ • Targets scanned: 2
+ • Parsed lines: ~100.0%
+ • No ignore information available
+Ran 322 rules on 2 files: 10 findings.
+
+==> Gitleaks (secret scanning)
+Unable to find image 'zricethezav/gitleaks:latest' locally
+latest: Pulling from zricethezav/gitleaks
+d49a2dee86fb: Pulling fs layer
+d92b655ae8e2: Pulling fs layer
+61fdfd7c0175: Pulling fs layer
+a43ab0c74cc4: Pulling fs layer
+a43ab0c74cc4: Waiting
+d49a2dee86fb: Verifying Checksum
+d49a2dee86fb: Download complete
+d49a2dee86fb: Pull complete
+d92b655ae8e2: Verifying Checksum
+d92b655ae8e2: Download complete
+d92b655ae8e2: Pull complete
+61fdfd7c0175: Verifying Checksum
+61fdfd7c0175: Download complete
+61fdfd7c0175: Pull complete
+a43ab0c74cc4: Verifying Checksum
+a43ab0c74cc4: Download complete
+a43ab0c74cc4: Pull complete
+Digest: sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+Status: Downloaded newer image for zricethezav/gitleaks:latest
+
+    ○
+    │╲
+    │ ○
+    ○ ░
+    ░    gitleaks
+
+Finding:     AWS_SECRET_ACCESS_KEY = "[1;3;mhK8pQ2mN5vX9wZ3rT6yU1sA4bC7dE0fG2hJ5kL8[0m"
+Secret:      [1;3;mhK8pQ2mN5vX9wZ3rT6yU1sA4bC7dE0fG2hJ5kL8[0m
+RuleID:      generic-api-key
+Entropy:     5.080274
+File:        /repo/app.py
+Line:        11
+Fingerprint: /repo/app.py:generic-api-key:11
+
+Finding:     DB_PASSWORD = "[1;3;mxQ7mK2pL9wR4tY6u[0m"
+Secret:      [1;3;mxQ7mK2pL9wR4tY6u[0m
+RuleID:      generic-api-key
+Entropy:     4.000000
+File:        /repo/app.py
+Line:        12
+Fingerprint: /repo/app.py:generic-api-key:12
+
+[90m6:09AM[0m [32mINF[0m [1mscanned ~1139 bytes (1.14 KB) in 37.5ms[0m
+[90m6:09AM[0m [33mWRN[0m [1mleaks found: 2[0m
