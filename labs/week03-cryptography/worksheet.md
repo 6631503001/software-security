@@ -9,23 +9,29 @@
 ## Part 1 — Student Information
 | Name | Student ID | Date | Group |
 |---|---|---|---|
-| Gritthaphat Intaraprasit | 6631503001 | 16/08/2026 | |
-| | | | |
+| Gritthaphat Intaraprasit | 6631503001 | 16/08/2026 |  |
 
 ## Part 2 — Lecture Questions
 Answer in your own words (2–4 sentences each).
 1. Distinguish hashing, encryption, and encoding — and give one job each is the wrong tool for.
+
+*answer* A hash is a one-way digest: the same input always gives the same output, but you cannot recover the input from it — so it is the wrong tool when you need the data back (that needs encryption). Encryption is reversible with a key and gives confidentiality — so it is the wrong tool for password storage (that needs a hash). Encoding (base64/hex/UTF-8) is just a reversible representation change with no key or secrecy — it is the wrong tool whenever you need actual protection, because anyone can decode it.
+
 2. Why is a fast hash like MD5/SHA-1 a bad choice for storing passwords, and what should be used instead?
+
+*answer* MD5/SHA-1 run in nanoseconds, so an attacker can try billions of guesses per second and also match against precomputed tables — a stolen hash file becomes plaintext quickly. Use a slow, memory-hard, salted KDF such as **argon2id** (or bcrypt/scrypt), which deliberately costs time and memory for every guess so mass cracking becomes impractical.
+
 3. What is a salt, what attack does it defeat, and why must it be unique per password?
+
+*answer* A salt is random data mixed into the password before hashing, so the same password produces a different hash for each user. It defeats precomputed rainbow tables and stops two users with the same password from having identical hashes. It must be unique (long and random) per password — otherwise equal passwords still hash the same and precomputation stays useful.
+
 4. Why does AES-ECB leak structure, and what does an authenticated mode like AES-GCM add?
+
+*answer* AES-ECB encrypts each 16-byte block independently, so identical plaintext blocks produce identical ciphertext blocks — that leaks structure (repeated blocks, message layout) and lets an attacker reorder or cut-and-paste blocks. AES-GCM is authenticated encryption: a unique random nonce makes the same message encrypt differently every time, and an authentication tag makes any modification fail verification on decrypt.
+
 5. What's the difference between `random` and a CSPRNG (e.g. `secrets`), and where does it matter?
 
-*Answer*
-1. Hashing is an algorithm that once turn into cipher text, it's can't turn back to plain text. Encryption is an algorithm that you can turn back to plain text using key. encoding is transfer data into different form(for example: turn base64 file to base16 file) which can be easily transfer between type.
-2. MD5/SHA-1 using 128bit and a simple algoritm which can be easily brute force by most of the compute power in present time.
-3. Salt is the random data/text use to mix in during encryption algorithm to make it harder to trace the algorithm back.
-4. Once you know the encrypt algorithm. By AES-ECB principle, it's can easily be decoded. For AES-GCM, It's add a little bit of data in each chunk before encrpt that represent the key. So it's can be detect if it's get modifile and the only person who could decrypt the file correctly has to have key.
-5. random have fixed algorithm which can be trace back easily but CSPRNG using random noise in computer which is unpredictable and super hard to trace even if you know what it's use.
+*answer* Python's `random` is a deterministic PRNG (Mersenne Twister) with a recoverable internal state — given enough outputs, an attacker can predict past or future values. A CSPRNG such as `secrets` draws from operating-system entropy and is unpredictable. That matters everywhere a guessable value defeats a control: tokens, nonces, keys, and salts.
 
 ![Four paired rows showing that password storage, cipher mode, randomness and key source are four separate crypto decisions: MD5 (CWE-916/327) becomes argon2id, AES-ECB with a hardcoded key (CWE-327) becomes AES-GCM with a nonce and tag, a 6-digit random.choice token (CWE-330) becomes secrets.token_urlsafe, and HARDCODED_KEY (CWE-798) becomes a key injected from the environment — so naming AES answers none of the four questions.](img/crypto-misuse.svg)
 
