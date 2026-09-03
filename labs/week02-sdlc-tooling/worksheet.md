@@ -16,21 +16,20 @@
 Answer in your own words (2–4 sentences each).
 1. Distinguish SAST, DAST, and SCA — what does each see, and when in the SDLC does each run?
 
-*answer* SAST analyzes source code statically (no execution) and flags bug patterns(Dry-test). DAST probes the running application over HTTP and shows what an attacker can actually reach(Dynamic-test) SCA scans dependencies to find valunabilities(Third-party-test)
+*answer* SAST reads the source code without running it and matches bug patterns (a "dry" test) — it sees flaws in my own code such as string-built SQL or `shell=True`, and it runs as soon as code is written. DAST probes the running application over HTTP and shows what an attacker can actually reach (a "dynamic" test), so it runs near or after deploy. SCA scans my third-party dependencies against CVE databases and runs at build time. In short: SAST = my code, DAST = deployed behaviour, SCA = my libraries.
 
 2. What is secret scanning, and why do hardcoded secrets keep ending up in repos?
 
-*answer*Secret scanning detects high-entropy strings and known credential formats (keys, tokens,
-passwords) in code and git history
+*answer* Secret scanning detects high-entropy strings and known credential formats (keys, tokens, passwords) both in the current source and across the whole git history, including old commits. Secrets keep ending up in repos because pasting a key is the fastest way to test while developing and then it is forgotten; and because git keeps every commit forever, deleting the line later does not remove the secret from older snapshots where scanners and scrapers can still find it.
 3. What does "shift-left / DevSecOps" mean in practice for a CI pipeline?
 
-*answer*instead of as a final review phase. In practice the pipeline runs SAST, secret scanning, SCA and fuzzing and fails the build on HIGH/CRITICAL findings, so vulnerabilities block the merge rather than reaching production.
+*answer* It means moving the security checks to run early and automatically — in the CI pipeline on every pull request — instead of as a final review phase. In practice the pipeline runs SAST, secret scanning, SCA and fuzzing and fails the build on HIGH/CRITICAL findings, so vulnerabilities block the merge rather than reaching production. The DevSecOps part is the culture: developers own the fix and the tooling runs continuously, not once at the end.
 4. Why is coverage-guided fuzzing considered the dominant modern bug-finding technique?
 
-*answer*It feeds a program many mutated inputs and retains only those that exercise new code paths
+*answer* Because it feeds a program many mutated inputs and keeps only the ones that exercise new code paths (coverage feedback), so it automatically explores deep, hard-to-reach logic where memory bugs hide — with no pattern list to write and no prior idea of where the bug is. That is exactly why it found our harness's out-of-bounds read that a linter/SAST pass over the same lines never flags: that bug only exists at runtime, and static tools never execute the code.
 5. Define true positive vs. false positive in scanner triage, and why misclassifying both directions is costly.
 
-*answer*A true positive is a real, exploitable flaw; a false positive is a finding that is not actually a bug.
+*answer* A true positive is a real, exploitable flaw; a false positive is a finding that is not actually a bug. Over-trusting false positives burns developer time and teaches people to ignore the tool, while dismissing true positives lets real vulnerabilities ship. Because the triage score is true positives minus misclassified findings, getting each classification right matters more than the raw number of findings.
 
 ![A left to right SDLC pipeline showing SAST at write code, secret scanning at commit, SCA and fuzzing at build, and DAST at deploy, with what each tool cannot see written underneath it.](img/sdlc-gates.svg)
 
@@ -96,6 +95,8 @@ Justification: 5 true positives are real exploitable flaws (the two injection bu
 | Semgrep | `Dockerfile:12` | CWE-250 container runs as root |
 
 *Secret scan (Gitleaks):* `no leaks found` (0 findings) — NoteVault's `SECRET`/`TEAM_SALT` are low-entropy, so entropy rules miss them (this is my Task 7 blind-spot lesson too).
+
+*SCA (Trivy `fs`) on `requirements.txt`:* 12 HIGH / 0 CRITICAL (CWE-1035 vulnerable component) — `Flask==2.0.1` → CVE-2023-30861; `Werkzeug==2.0.1` → CVE-2023-25577, CVE-2024-34069; `PyJWT==1.7.1` → CVE-2022-29217, CVE-2026-32597, CVE-2026-48526; `urllib3==1.26.4` → CVE-2021-33503, CVE-2023-43804, CVE-2025-66418, CVE-2025-66471, CVE-2026-21441, CVE-2026-44431. Fix by upgrading to Flask ≥ 2.3.2, Werkzeug ≥ 3.0.3, PyJWT ≥ 2.13.0, urllib3 ≥ 2.x.
 
 **Task 6 — Build a security CI gate (25 min)** · *Goal:* automate the scan (previews Week 15). *Steps:* adapt `../week15-devsecops-pipeline/security-ci.yml` into a workflow that runs Semgrep + Trivy + Gitleaks and **fails on HIGH/CRITICAL**; run it locally (`act`) or commit to your fork and read the Actions log. *Deliverable:* the workflow file + a screenshot of a failing run.
 
@@ -220,6 +221,8 @@ Safety does not come from the string-building style at all — it comes from sen
 ## 🧠 Comprehension & Prompt (required)
 
 **A. Explain in Plain English (EiPE).** In 2–3 sentences, in your own words, describe what this week's vulnerable code/endpoint actually *does* and *why it is exploitable* — explain the mechanism, don't dump jargon.
+
+*answer* The `/ping` endpoint takes whatever text the user types after "host=" and glues it onto the command `ping -c 1 `, then hands that whole string to the operating-system shell to run. Because the shell treats special characters as instructions, an attacker who sends `127.0.0.1; id` doesn't get a ping — the shell also runs `id` as a second command, so the user's text stops being data and becomes code the server executes.
 
 **B. Prompt Problem.** Write a **single prompt** that makes an AI produce a *correct, secure* fix for one finding. Run it: does the exploit now fail? If not, refine the prompt and try again. Submit the **final prompt + the verified result**.
 *Graded on the prompt's precision and your verification — this trains problem decomposition and AI literacy (Denny et al. 2024).*
