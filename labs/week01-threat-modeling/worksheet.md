@@ -141,13 +141,13 @@ trust-boundary
 
 | # | Threat | Element | Likelihood × Impact | Mitigation |
 |---|---|---|---|---|
-| 1 | Arbitrary file write via `../` filename | `/upload` | High × High | `secure_filename()` + extension allow-list (**implemented**, commit `827093e`) |
+| 1 | Arbitrary file write via `../` filename | `/upload` | High × High | `secure_filename()` + extension allow-list (**implemented**, commit [`827093e`](https://github.com/6631503001/software-security/commit/827093e)) |
 | 2 | Unauthenticated read of all notes | `/notes` GET | High × High | Authenticate callers; scope reads to the session owner |
 | 3 | Spoofable `owner` | `/notes` POST | High × Medium | Bind `owner` server-side from the session |
 | 4 | No audit trail | app-wide | Medium × Medium | Request logging (actor + timestamp) |
 | 5 | No size / rate limits | `/upload` | Medium × Medium | Upload size cap + rate limiting |
 
-*answer — implemented fix (commit `827093e` on `wk01`):* the diff in `sample-app/app.py`:
+*answer — implemented fix (commit [`827093e`](https://github.com/6631503001/software-security/commit/827093e) on `wk01`):* the diff in `sample-app/app.py`:
 ```diff
 +from werkzeug.utils import secure_filename
 +
@@ -169,8 +169,8 @@ trust-boundary
 ```
 
 *answer — evidence it works (verified by running before/after):*
-- **Before:** `curl -X POST localhost:8080/upload -F "file=@demo.txt;filename=../../evil.sh"` → `{"saved":"../../evil.sh"}`, and the file was written to `/evil.sh` (outside `/app/uploads`, which stayed empty).
-- **After:** the same request → `{"error":"filename rejected"}` (HTTP 400). A traversal `.txt` (`../../notes_backup.txt`) is now stored sanitized as `notes_backup.txt` inside `/app/uploads` — nothing escapes.
+- **Before:** `curl -X POST localhost:8080/upload -F "file=@demo.txt;filename=../../evil.sh"` → `{"saved":"../../evil.sh"}`, and the file was written to `/evil.sh`
+- **After:** the same request → `{"error":"filename rejected"}` (HTTP 400). A traversal `.txt` (`../../notes_backup.txt`) is now stored sanitized as `notes_backup.txt`
 
 *answer — class vs instance:* this closes the **class**: `secure_filename()` strips `..` and separators before the join, so no client-supplied string can ever become a path component, and the allow-list caps what may be stored at all — not just this one payload. What could still break it: a name collision inside the store, a symlink planted in `uploads/`, or another endpoint (e.g. `/notes`) that still trusts client input.
 
