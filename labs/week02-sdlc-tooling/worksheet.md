@@ -48,6 +48,7 @@ Target under scan: `vulnerable-repo/app.py` (plus `requirements.txt`). It contai
 **What to submit per task:** the command/payload run + a screenshot of the finding + a 2–3 sentence mitigation.
 
 **Task 0 — Onboarding (5 min)** · *Goal:* confirm tooling. *Steps:* run `bash scan.sh`; confirm both Semgrep and Gitleaks sections produce output. *Deliverable:* screenshot showing both tools ran.
+![alt text](image-6.png)
 
 **Task 1 — SAST sweep with Semgrep (25 min)** · *Goal:* find code flaws. *Steps:* read the Semgrep output; locate the SQL injection in `/user` (CWE-89, string-formatted query), the OS command injection in `/ping` (CWE-78, `shell=True`), the weak `md5` password hash (CWE-327), and `debug=True` (CWE-489). *Deliverable:* one screenshot per finding with the file:line.
 ![alt text](image-1.png)
@@ -75,6 +76,21 @@ Justification: 5 true positives are real exploitable flaws (the two injection bu
 **Task 4 — Fuzzing intro (10 min)** · *Goal:* see coverage-guided fuzzing find a bug SAST won't. *Steps:* in the `labs/toolbox` container (Apple clang has no libFuzzer runtime), build `clang -g -fsanitize=address,fuzzer harness.c -o fuzz`, then **seed the corpus** and run it:
 `mkdir -p corpus && printf 'FUZ' > corpus/seed && ./fuzz corpus`. It crashes almost immediately with an AddressSanitizer heap-buffer-overflow at `harness.c:23` (the `data[3]` read with no `size > 3` check). Seeding matters: an unseeded `./fuzz` has to rediscover the magic bytes by chance and often finds nothing for minutes — that unpredictability is itself worth a sentence in your write-up. (The deep fuzzing+exploit lab is Week 11.) *Deliverable:* the ASan crash output (or a screenshot) + a 2-sentence note on why fuzzing finds this bug when a linter/SAST pass over the same 4-line check would not.
 
+**My fuzz run (ASan output, verified):**
+```
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1690887195
+INFO: 1 files found in corpus
+==1==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x502000000053
+READ of size 1 at 0x502000000053
+    #0 ... in LLVMFuzzerTestOneInput /work/harness.c:23:21
+SUMMARY: AddressSanitizer: heap-buffer-overflow /work/harness.c:23:21 in LLVMFuzzerTestOneInput
+Test unit written to ./crash-0eb8e4ed029b774d80f2b66408203801cb982a60
+Base64: RlVa   (= "FUZ")
+```
+
+*answer — why fuzzing finds it:* seeded with the 3-byte input `FUZ`, the harness reaches the missing `size > 3` check and reads `data[3]` one byte past the buffer, so AddressSanitizer reports a heap-buffer-overflow at `harness.c:23`. A linter/SAST pass over the same line never flags it because the bug only exists at runtime for a specific input size — coverage-guided fuzzing actually executes the code and proves it by crashing, and the seed matters because without `FUZ` the fuzzer must rediscover the magic bytes by mutation, which can take minutes.
+
 **Task 5 — Scan the project target (40 min)** · *Goal:* apply the tools to your term project. *Steps:* run Semgrep + Gitleaks against **NoteVault** (`../../project/starter-app`); also run an SCA scan: `docker run --rm -v "$PWD/../../project/starter-app:/src" aquasec/trivy fs /src`. *Deliverable:* a findings list (tool, file:line/CVE, CWE) — reuse it in your project vuln report.
 
 **My findings list — NoteVault (`project/starter-app`):**
@@ -99,6 +115,15 @@ Justification: 5 true positives are real exploitable flaws (the two injection bu
 *SCA (Trivy `fs`) on `requirements.txt`:* 12 HIGH / 0 CRITICAL (CWE-1035 vulnerable component) — `Flask==2.0.1` → CVE-2023-30861; `Werkzeug==2.0.1` → CVE-2023-25577, CVE-2024-34069; `PyJWT==1.7.1` → CVE-2022-29217, CVE-2026-32597, CVE-2026-48526; `urllib3==1.26.4` → CVE-2021-33503, CVE-2023-43804, CVE-2025-66418, CVE-2025-66471, CVE-2026-21441, CVE-2026-44431. Fix by upgrading to Flask ≥ 2.3.2, Werkzeug ≥ 3.0.3, PyJWT ≥ 2.13.0, urllib3 ≥ 2.x.
 
 **Task 6 — Build a security CI gate (25 min)** · *Goal:* automate the scan (previews Week 15). *Steps:* adapt `../week15-devsecops-pipeline/security-ci.yml` into a workflow that runs Semgrep + Trivy + Gitleaks and **fails on HIGH/CRITICAL**; run it locally (`act`) or commit to your fork and read the Actions log. *Deliverable:* the workflow file + a screenshot of a failing run.
+
+*answer — workflow file:* `.github/workflows/security-ci-week2.yml`, adapted from the Week-15 template — three jobs (Semgrep, Trivy, Gitleaks), each report→SARIF→gate, failing on HIGH/CRITICAL (and any secret). It is committed and pushed on `wk02` (commit `f3ffc59`).
+
+*answer — gate verified to fail (as it should against this code):*
+- Semgrep gate → 10 findings (SQLi, OS command injection, md5, debug…) → `--error` exits non-zero.
+- Gitleaks gate → 2 secrets (`AWS_SECRET_ACCESS_KEY`, `DB_PASSWORD`, rule `generic-api-key`) → exit 1.
+- Trivy gate → 12 HIGH CVEs in `project/starter-app/requirements.txt` → exit 1.
+
+*(Failing-run screenshot to insert here — open `github.com/6631503001/software-security/pull/new/wk02` and watch the `security-ci-week2` check go red, or run the three gate commands locally under your identity stamp.)*
 
 **Task 7 — SAST blind spots (20 min)** · *Goal:* see what scanners miss. *Steps:* find one real bug in `vulnerable-repo/app.py` (or NoteVault) that Semgrep did **not** flag, and explain why a pattern-based tool missed it. *Deliverable:* the bug + a 2-sentence explanation.
 
