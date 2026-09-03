@@ -119,7 +119,9 @@ trust-boundary
 2. **Spoofing / Elevation of privilege — forged session token.** The JWT is decoded with `alg=none` allowed and signed with a hard-coded secret, so anyone can mint an "admin" token — and `/admin` then dumps the user table including MD5 password hashes.
 3. **Information disclosure — weak credential storage + missing authz on reads.** Passwords are MD5-hashed, and `/api/notes/<id>` checks only that *someone* is logged in, not that they own the note, so any user can read notes by id.
 
-*(DFD image for NoteVault: draw web client → Flask app → SQLite; boundary at the app.)*
+*(NoteVault DFD below — add your identity stamp: capture it with your stamped terminal in the same frame.)*
+
+![DFD — NoteVault](dfd-notevault.svg)
 
 **Task 7 — Security requirements (15 min)** · *Goal:* turn threats into testable requirements. *Steps:* write 3 security requirements as acceptance criteria ("the system must … so that …"), each mapped to a threat from Task 2 or Task 6. *Deliverable:* 3 testable security requirements.
 

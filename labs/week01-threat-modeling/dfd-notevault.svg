@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arw2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <!-- trust boundary (dashed) -->
+  <rect x="270" y="50" width="450" height="320" fill="#eef3fa" stroke="#888" stroke-width="2" stroke-dasharray="9 6" rx="8"/>
+  <text x="495" y="80" font-size="13" fill="#556" text-anchor="middle">trust boundary — Internet → app</text>
+
+  <!-- external entity -->
+  <rect x="30" y="170" width="180" height="80" rx="6" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text x="120" y="202" font-size="15" text-anchor="middle">Web client</text>
+  <text x="120" y="222" font-size="11" fill="#666" font-style="italic" text-anchor="middle">external entity</text>
+
+  <!-- process -->
+  <rect x="360" y="170" width="170" height="80" rx="6" fill="#d9ead3" stroke="#333" stroke-width="2"/>
+  <text x="445" y="202" font-size="15" text-anchor="middle">NoteVault (Flask)</text>
+  <text x="445" y="222" font-size="11" fill="#555" font-style="italic" text-anchor="middle">process</text>
+
+  <!-- data store -->
+  <rect x="620" y="185" width="110" height="60" rx="6" fill="#fff7e0" stroke="#333" stroke-width="2"/>
+  <text x="675" y="211" font-size="13" text-anchor="middle">notevault.db</text>
+  <text x="675" y="229" font-size="10" fill="#666" font-style="italic" text-anchor="middle">data store</text>
+
+  <!-- flows -->
+  <line x1="210" y1="210" x2="355" y2="210" stroke="#444" stroke-width="2" marker-end="url(#arw2)"/>
+  <text x="282" y="196" font-size="11" fill="#333" text-anchor="middle">/login /register /notes /search /api/notes/&lt;id&gt; /admin /export</text>
+
+  <line x1="530" y1="210" x2="615" y2="210" stroke="#444" stroke-width="2" marker-end="url(#arw2)"/>
+  <text x="572" y="200" font-size="11" fill="#333" text-anchor="middle">SQL (query / write)</text>
+
+  <text x="495" y="400" font-size="11" fill="#888" text-anchor="middle">Threat model — NoteVault (project target, Week 1 Task 6) · Gritthaphat Intaraprasit · 6631503001</text>
+</svg>

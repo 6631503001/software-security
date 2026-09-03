@@ -5,9 +5,12 @@
 > (Replace the DFD placeholder below with YOUR drawn DFD image — identity-stamped.)
 
 ## 1. Data-flow diagram
-(Insert your DFD image here. Mark the Internet→app trust boundary with a dashed line.)
+![DFD — sample-app](dfd-sample-app.svg)
+*Identity stamp to add: capture this diagram with your stamped terminal in the same frame, or overlay the stamp.*
 
-Recommended drawing (draw.io / paper): three boxes + one store pair —
+Marked on the diagram: Web client (external entity) → Flask app (process) → `notes.db` + `uploads/` (stores), with the Internet→app trust boundary shown as a dashed line.
+
+Reference layout (draw.io / paper): three boxes + two stores —
 - **Web client** (external entity, left, *outside* the dashed boundary)
 - **Flask app** (process, centre, *inside* the boundary)
 - **`notes.db`** and **`uploads/`** (data stores, right, inside the boundary)
