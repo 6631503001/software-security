@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS submit_codes (
   assignment_id INTEGER NOT NULL REFERENCES assignments(id) ON DELETE CASCADE,
   student_id    TEXT NOT NULL,
   issued_at     TEXT NOT NULL,
+  redeemed_at   TEXT,              -- NULL = still a live, unredeemed code
   UNIQUE (assignment_id, student_id)
 );
 

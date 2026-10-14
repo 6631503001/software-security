@@ -235,10 +235,45 @@ def test_a_student_can_still_read_feedback_after_the_deadline(conn, uploads):
 
 # --- codes -----------------------------------------------------------------
 
-def test_a_code_reopens_the_same_submission(conn, uploads):
+def test_a_code_is_burned_after_its_first_redemption(conn, uploads):
+    # redeem() used to be reusable forever ("a code reopens the same
+    # submission" — the old version of this test). That made a one-time paper
+    # code a permanent bearer credential: anyone who ever saw it (a classmate,
+    # a photo of the printed slip) could redeem it themselves at any later
+    # time — even after the real student submitted, even after the deadline —
+    # and get full read/write access to that student's submission (delete
+    # files, edit the note, read released grades). The code must work exactly
+    # once; everything after that goes through the session it established.
     aid = make(conn)
     sub, code = open_sub(conn, aid)
-    assert S.redeem(conn, code, T0)["id"] == sub["id"]
+    with pytest.raises(S.SubmitError, match="isn't valid"):
+        S.redeem(conn, code, T0)
+    # marked spent, not deleted — gradebook_rows() still enumerates this
+    # student by this row (see the regression this guards: a submitted
+    # student must never silently drop off the gradebook)
+    row = conn.execute("SELECT redeemed_at FROM submit_codes WHERE code = ?", (code,)).fetchone()
+    assert row is not None and row["redeemed_at"] is not None
+    # the submission itself is untouched — only the bearer code was burned
+    still_there = conn.execute("SELECT * FROM submissions WHERE id = ?", (sub["id"],)).fetchone()
+    assert still_there["id"] == sub["id"]
+
+
+def test_reissuing_a_burned_code_resumes_the_same_submission_not_a_new_one(conn, uploads):
+    # The recovery path for "I lost my session" (new device, cleared cookies):
+    # the teacher re-runs the exact same issue_codes() call they'd use for a
+    # late enrollee. Since the old row is gone, this mints a fresh code — but
+    # it must reopen the SAME submission (matched on assignment+student, not
+    # on the code string), not create a duplicate that fragments the marks.
+    aid = make(conn)
+    sub, code = open_sub(conn, aid)
+    S.store_file(conn, sub, display_name="evidence.pdf", data=b"x", now=T0, upload_dir=uploads)
+
+    new_codes = S.issue_codes(conn, aid, ["65310001"], T0)
+    assert new_codes["65310001"] != code, "a burned code must not be re-issued unchanged"
+
+    resumed = S.redeem(conn, new_codes["65310001"], T0)
+    assert resumed["id"] == sub["id"]
+    assert len(S.list_files(conn, resumed["id"])) == 1  # the earlier upload survived
 
 
 def test_codes_are_idempotent_and_avoid_misread_glyphs(conn):

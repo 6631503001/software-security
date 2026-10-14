@@ -122,7 +122,15 @@ def total_points(row) -> float:
 
 def issue_codes(conn, assignment_id, student_ids, now):
     """Idempotent, like the quiz: adding a late enrolment must not invalidate
-    slips already handed out."""
+    slips already handed out.
+
+    Also the recovery path for a student who already redeemed and then lost
+    their session (new device, cleared cookies): their row's `redeemed_at` is
+    set, so this mints them a fresh, unredeemed code rather than handing back
+    the old (now-useless) one. The row itself is never replaced — `code` is
+    the PRIMARY KEY and `(assignment_id, student_id)` the UNIQUE pair other
+    tables may eventually reference, so a reissue UPDATEs it in place.
+    """
     # Issuing slips IS the enrolment event — this is the one moment a real class
     # list passes through the platform. Registering it here means the roster
     # cannot drift from who actually holds a code, and it needs no second step a
@@ -139,9 +147,9 @@ def issue_codes(conn, assignment_id, student_ids, now):
     out = {}
     for sid in student_ids:
         row = conn.execute(
-            "SELECT code FROM submit_codes WHERE assignment_id = ? AND student_id = ?",
+            "SELECT code, redeemed_at FROM submit_codes WHERE assignment_id = ? AND student_id = ?",
             (assignment_id, sid)).fetchone()
-        if row:
+        if row and row["redeemed_at"] is None:
             out[sid] = row["code"]
             continue
         while True:
@@ -150,8 +158,17 @@ def issue_codes(conn, assignment_id, student_ids, now):
             # comment in assessment.issue_codes().
             if not codes.is_taken(conn, code):
                 break
-        conn.execute("INSERT INTO submit_codes (code, assignment_id, student_id,"
-                     " issued_at) VALUES (?,?,?,?)", (code, assignment_id, sid, now))
+        if row:
+            # Reissue: same (assignment_id, student_id) row, fresh code, clear
+            # the burn marker. UPDATE not DELETE+INSERT — `code` is the primary
+            # key, so this is the only way to change it without a window where
+            # the row (and the student's place in gradebook_rows()) is absent.
+            conn.execute("UPDATE submit_codes SET code = ?, issued_at = ?,"
+                         " redeemed_at = NULL WHERE assignment_id = ? AND student_id = ?",
+                         (code, now, assignment_id, sid))
+        else:
+            conn.execute("INSERT INTO submit_codes (code, assignment_id, student_id,"
+                         " issued_at) VALUES (?,?,?,?)", (code, assignment_id, sid, now))
         out[sid] = code
     conn.commit()
     return out
@@ -160,30 +177,42 @@ def issue_codes(conn, assignment_id, student_ids, now):
 # --- the student side ------------------------------------------------------
 
 def redeem(conn, code, now):
-    """Open (or reopen) this student's submission. Returns the submission row.
+    """Open (or create) this student's submission, then burn the code.
 
-    Unlike a quiz code this does not burn: a student must be able to come back
-    and replace a bad upload before the deadline. After the deadline the row is
-    still returned so they can read their feedback — `can_upload` is what gates
-    writing.
+    Used to be reusable forever ("come back and replace a bad upload before
+    the deadline, or read feedback after it") — but a code that NEVER expires
+    is a permanent bearer credential: anyone who ever saw the printed slip
+    (a classmate, a photo) could redeem it themselves at any later point —
+    even after the real student submitted, even after the deadline — and get
+    the same read/write access (delete files, edit the note, read released
+    grades). The legitimate "come back later" need is real, so it still
+    works — just through the Flask session this redemption establishes
+    (made permanent in routes_submit.py/routes_code.py), not through the
+    code staying valid forever. Losing that session (new device, cleared
+    cookies) is recovered the same way a late enrollment already is: the
+    teacher re-runs issue_codes() for that student — it mints a fresh code
+    since the old row is gone, and redeem() finds the SAME submission by
+    (assignment_id, student_id), never by the code string.
     """
     row = conn.execute("SELECT * FROM submit_codes WHERE code = ?",
                        ((code or "").strip().upper(),)).fetchone()
-    if row is None:
+    if row is None or row["redeemed_at"] is not None:
         raise SubmitError("That code isn't valid.")
 
     sub = conn.execute(
         "SELECT * FROM submissions WHERE assignment_id = ? AND student_id = ?",
         (row["assignment_id"], row["student_id"])).fetchone()
-    if sub is not None:
-        return sub
+    if sub is None:
+        cur = conn.execute(
+            "INSERT INTO submissions (assignment_id, student_id, created_at)"
+            " VALUES (?,?,?)", (row["assignment_id"], row["student_id"], now))
+        sub = conn.execute("SELECT * FROM submissions WHERE id = ?",
+                           (cur.lastrowid,)).fetchone()
 
-    cur = conn.execute(
-        "INSERT INTO submissions (assignment_id, student_id, created_at)"
-        " VALUES (?,?,?)", (row["assignment_id"], row["student_id"], now))
+    conn.execute("UPDATE submit_codes SET redeemed_at = ? WHERE code = ?",
+                 (now, row["code"]))
     conn.commit()
-    return conn.execute("SELECT * FROM submissions WHERE id = ?",
-                        (cur.lastrowid,)).fetchone()
+    return sub
 
 
 def can_upload(conn, submission, now) -> bool:

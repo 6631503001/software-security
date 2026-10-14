@@ -34,6 +34,13 @@ def connect(path):
 # submission.create_assignment), so a bad value is rejected at the boundary
 # rather than tolerated in storage.
 _ADDED_COLUMNS = (
+    # (table, column, type) — a submit_code used to be redeemable forever,
+    # a permanent bearer credential for anyone who ever saw the printed slip.
+    # NULL means "still a live, unredeemed code"; once set, redeem() refuses
+    # the code string itself (gradebook_rows() still enumerates this row by
+    # student_id either way, so a graded student never drops off the
+    # gradebook just because their code is spent — see submission.py).
+    ("submit_codes", "redeemed_at", "TEXT"),
     # (table, column, type) — graded artifacts must know which course they belong
     # to. Without this a teacher of several courses gets one flat list of every
     # quiz they have ever set, and per-course grades cannot be totalled at all.

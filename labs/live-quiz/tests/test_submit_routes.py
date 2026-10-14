@@ -105,6 +105,35 @@ def test_an_unknown_code_on_submit_is_still_refused_plainly(client, published):
     assert "valid" in page.lower()
 
 
+def test_a_leaked_code_cannot_be_redeemed_a_second_time_by_someone_else(
+        client, appmod, published):
+    # The actual exploit Codex's security review flagged: submission codes
+    # never burned, so a classmate who saw/photographed the printed code
+    # could redeem it themselves at any later point and get the same
+    # read/write access as the real student — including deleting their
+    # files or reading grades after release. First redemption must still
+    # work; a second redemption of the SAME code, from a fresh browser with
+    # no cookies at all, must now be refused rather than silently handing
+    # over the workspace.
+    wid, codes = published
+    code = codes["65310001"]
+
+    html = client.get("/submit").get_data(as_text=True)
+    r = client.post("/submit", data={"csrf_token": _csrf(html), "code": code},
+                    follow_redirects=False)
+    assert r.status_code in (302, 303)
+    assert "/submit/work" in r.headers["Location"]
+
+    attacker = appmod.app.test_client()  # fresh client: no cookies, no session
+    html2 = attacker.get("/submit").get_data(as_text=True)
+    r2 = attacker.post("/submit", data={"csrf_token": _csrf(html2), "code": code},
+                       follow_redirects=False)
+    assert r2.status_code not in (302, 303), (
+        "a second redemption of the same code must not reach the workspace"
+    )
+    assert "valid" in r2.get_data(as_text=True).lower()
+
+
 def test_a_fresh_colliding_code_does_not_silently_authenticate_into_the_workspace(
         client, appmod, published):
     # Mirror of the same case in test_assess_routes.py: a code that is a

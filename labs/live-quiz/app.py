@@ -51,6 +51,14 @@ if app.config["SECRET_KEY"] == "dev-not-secret-override-in-prod":
 
 # Harden the session cookie: never readable from JS, and not sent on cross-site requests.
 app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
+# Worksheet submission codes now burn on first redemption (submission.py's
+# redeem() — see its docstring): the bearer code can't be the "come back
+# later" mechanism any more, so the session it establishes has to actually
+# last. 180 days comfortably outlives one course run. Routes opt in
+# explicitly (session.permanent = True in routes_submit.py/routes_code.py)
+# rather than this applying platform-wide — a teacher's own login session
+# isn't meant to extend just because this got longer.
+app.config["PERMANENT_SESSION_LIFETIME"] = datetime.timedelta(days=180)
 # Request-body ceiling is set once, further down, next to the upload config that
 # determines it — a second value here would silently lose to whichever assignment
 # ran last. (It used to be 256 KB, sized for the markdown editor; worksheet

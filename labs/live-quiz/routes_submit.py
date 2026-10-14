@@ -325,8 +325,17 @@ def entry():
     if kind != "submit":
         return render_template("submit_entry.html", csrf_token=_csrf(),
                                error="That code isn't valid.", code=raw), 200
-    sub = S.redeem(_db(), raw, _now())
+    # redeem() used to be unable to fail here (find_kind() just confirmed the
+    # row exists) — now it can, if the code was already burned by an earlier
+    # redemption (see submission.py's redeem() for why that's the fix, not
+    # a bug). That failure must reach the page as a plain refusal, not a 500.
+    try:
+        sub = S.redeem(_db(), raw, _now())
+    except S.SubmitError as exc:
+        return render_template("submit_entry.html", csrf_token=_csrf(),
+                               error=str(exc), code=raw), 200
     session["submission_id"] = sub["id"]
+    session.permanent = True
     return redirect(url_for("submit.workspace"))
 
 

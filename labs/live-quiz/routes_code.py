@@ -2,8 +2,9 @@
 code. /quiz and /submit still exist and still work on their own; this page
 just removes the need to know in advance which kind of code you're holding.
 Routes by table membership (codes.find_kind), then lets the matching domain
-module's own redeem() apply its own rules — the two codes keep their separate
-semantics (burn vs. no-burn, timed window vs. none) underneath.
+module's own redeem() apply its own rules — both kinds burn on redemption now
+(submission.py's redeem() used to be the one exception; see its docstring),
+but a quiz code also has a timed attempt window a submit code does not.
 """
 from __future__ import annotations
 
@@ -57,10 +58,18 @@ def entry():
 
     if kind == "submit":
         import submission as S
-        sub = S.redeem(_db(), raw, _now())   # cannot itself fail once find_kind
-                                              # confirms the code is there — see
-                                              # codes.py.
+        # Used to be unable to fail here (find_kind() just confirmed the row
+        # exists) — now it can, if the code was already burned by an earlier
+        # redemption (submission.py's redeem() no longer stays valid forever;
+        # see its docstring for why). Mirror the quiz branch above: a plain
+        # refusal on the page, not a 500.
+        try:
+            sub = S.redeem(_db(), raw, _now())
+        except S.SubmitError as exc:
+            return render_template("code_entry.html", csrf_token=_csrf(),
+                                   error=str(exc), code=raw), 200
         session["submission_id"] = sub["id"]
+        session.permanent = True
         return redirect(url_for("submit.workspace"))
 
     return render_template("code_entry.html", csrf_token=_csrf(),
