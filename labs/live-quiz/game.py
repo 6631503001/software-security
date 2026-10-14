@@ -2,7 +2,9 @@
 """In-memory game state for one live-quiz session. No database: a game is short-lived
 (one class period) and this project's expected scale (dozens-to-~200 concurrent players)
 doesn't need persistence beyond the end-of-game CSV export (see export_results)."""
+import hmac
 import random
+import secrets
 import string
 import time
 
@@ -22,6 +24,12 @@ class Player:
         self.correct_count = 0
         self.response_times_ms = []
         self.connected = True
+        # Proves which caller may act as this nickname again. Nicknames are
+        # plaintext and broadcast to the whole lobby (_broadcast_lobby in
+        # app.py), so without this, anyone who simply saw "alice" there could
+        # call join("alice") themselves and take over her scoring — see
+        # GameSession.join's docstring.
+        self.token = secrets.token_urlsafe(16)
 
 
 class GameSession:
@@ -36,12 +44,26 @@ class GameSession:
         self.answers_this_round = {}
         self.finished = False
 
-    def join(self, nickname):
-        if nickname not in self.players:
-            self.players[nickname] = Player(nickname)
-        else:
-            self.players[nickname].connected = True
-        return self.players[nickname]
+    def join(self, nickname, token=None):
+        """Create a new player, or reclaim an EXISTING one if `token` matches
+        that player's own reconnect token (issued as `player.token` on their
+        first join). A dropped wifi connection or a backgrounded phone tab
+        must still let the real student rejoin — that is what `token` is
+        for — but reclaiming an in-use nickname WITHOUT it is refused:
+        raises PermissionError. Without this, a classmate who merely saw the
+        nickname in the lobby could call join() themselves and take over
+        scoring for it (the caller, app.py's on_player_join, turns this into
+        a plain join_error rather than a 500).
+        """
+        existing = self.players.get(nickname)
+        if existing is None:
+            player = Player(nickname)
+            self.players[nickname] = player
+            return player
+        if token and hmac.compare_digest(str(token).encode(), existing.token.encode()):
+            existing.connected = True
+            return existing
+        raise PermissionError(f"nickname already in use: {nickname}")
 
     def disconnect(self, nickname):
         if nickname in self.players:

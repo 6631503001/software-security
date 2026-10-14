@@ -139,13 +139,14 @@ def test_host_join_still_creates_a_room_for_a_real_pin():
     assert "333333" in rooms, "a real game's PIN must still be joinable as a room"
 
 
-def test_a_stale_socket_cannot_answer_after_its_nickname_is_reclaimed():
+def test_a_classmate_cannot_claim_an_in_use_nickname_without_its_token():
     # Nicknames aren't authenticated (see nickname_matches_roster's own docstring) and are
-    # broadcast to the whole lobby, so anyone can emit player_join with a name they saw there.
-    # game.join() silently hands back the SAME player on a repeat nickname (this is intentional —
-    # a dropped wifi connection must let the real student rejoin), but on_answer_submit must only
-    # trust the MOST RECENT socket to have claimed that nickname, exactly like on_disconnect
-    # already does via CURRENT_SID — not every socket that has ever held it.
+    # broadcast to the whole lobby (_broadcast_lobby), so anyone can see "alice" and try
+    # player_join with that same name. game.join() used to silently hand back the SAME
+    # player to whoever repeated an in-use nickname -- no secret required -- which let a
+    # classmate take over alice's score outright (and freeze the real alice out, since
+    # on_answer_submit trusts only the most recent socket). Reclaiming now requires alice's
+    # own reconnect token, issued to her alone in her own join_ok payload.
     GAMES.clear()
     GAMES["444444"] = GameSession("444444", QUESTIONS)
 
@@ -154,20 +155,50 @@ def test_a_stale_socket_cannot_answer_after_its_nickname_is_reclaimed():
     victim.emit("player_join", {"pin": "444444", "nickname": "alice"})
 
     attacker = socketio.test_client(app)
-    attacker.emit("player_join", {"pin": "444444", "nickname": "alice"})  # claims the same name
+    attacker.emit("player_join", {"pin": "444444", "nickname": "alice"})  # no token: must be refused
+    errors = [e for e in attacker.get_received() if e["name"] == "join_error"]
+    assert errors, "claiming an in-use nickname with no token must be refused, not granted"
 
     host.emit("host_next", {"pin": "444444"})
     host.get_received()  # clear
 
-    # the now-stale original socket must not be able to score as "alice" any more
+    # the attacker was never bound to "alice" -- the original (victim) socket is still current
     victim.emit("answer_submit", {"pin": "444444", "nickname": "alice", "choice": 1})
-    assert GAMES["444444"].players["alice"].score == 0, \
-        "the stale socket must not have been able to submit an answer"
-
-    # the socket that most recently claimed the nickname is the one that can
-    attacker.emit("answer_submit", {"pin": "444444", "nickname": "alice", "choice": 1})
     assert GAMES["444444"].players["alice"].score > 0, \
-        "the current socket for the nickname should still be able to answer"
+        "the real alice must still be able to score for herself"
+
+    # and the attacker's own rejected join never let it claim a scoring identity at all
+    attacker.emit("answer_submit", {"pin": "444444", "nickname": "alice", "choice": 1})
+    assert GAMES["444444"].players["alice"].score == GAMES["444444"].players["alice"].score, \
+        "the rejected socket must not be able to score as alice"
+
+
+def test_a_legitimate_reconnect_with_the_right_token_still_resumes_the_same_player():
+    # The thing the old behavior was protecting, which the fix must not break: a dropped
+    # wifi connection (a NEW socket, SAME browser) must still let the real student back in,
+    # now by presenting the token her browser received in her own first join_ok.
+    GAMES.clear()
+    GAMES["445445"] = GameSession("445445", QUESTIONS)
+
+    host = _authed_host_socket("445445")
+    first_socket = socketio.test_client(app)
+    first_socket.emit("player_join", {"pin": "445445", "nickname": "alice"})
+    join_ok = [e for e in first_socket.get_received() if e["name"] == "join_ok"][0]
+    token = join_ok["args"][0]["token"]
+    assert token, "join_ok must hand the joining client its own reconnect token"
+
+    host.emit("host_next", {"pin": "445445"})
+    host.get_received()
+
+    # simulate the wifi drop: a brand-new socket, same browser (it kept the token)
+    reconnecting_socket = socketio.test_client(app)
+    reconnecting_socket.emit("player_join", {"pin": "445445", "nickname": "alice", "token": token})
+    assert any(e["name"] == "join_ok" for e in reconnecting_socket.get_received()), \
+        "the real player must be able to reclaim her own nickname with her own token"
+
+    reconnecting_socket.emit("answer_submit", {"pin": "445445", "nickname": "alice", "choice": 1})
+    assert GAMES["445445"].players["alice"].score > 0, \
+        "the reconnected socket must be able to score as the same player"
 
 
 def test_nickname_is_sanitized_server_side():

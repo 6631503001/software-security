@@ -27,6 +27,23 @@ const socket = io();
 let pin = null;
 let nickname = null;
 let joined = false;
+let myToken = null; // proves to the server a later player_join is ME reclaiming my own
+                     // nickname, not a classmate who just saw it in the lobby
+
+// sessionStorage: survives a page reload in this tab (phone backgrounded hard
+// enough to kill the JS vars), never leaves this tab, never sent anywhere but
+// back to this same server on our own next join. Wrapped in try/catch: a
+// private window or blocked site data must not break joining, only reconnect.
+function saveIdentity() {
+  try { sessionStorage.setItem("lq_identity", JSON.stringify({ pin, nickname, token: myToken })); }
+  catch (e) { /* storage unavailable — reconnect just won't survive a reload */ }
+}
+function loadIdentity() {
+  try {
+    const raw = sessionStorage.getItem("lq_identity");
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
 let score = 0;
 let answered = false;
 let pickedIndex = null;
@@ -44,12 +61,20 @@ $("join-form").addEventListener("submit", (e) => {
   if (!n) { $("join-error").textContent = "Pick a nickname (not your real name)."; return; }
   $("join-error").textContent = "";
   pin = p; nickname = n;
-  socket.emit("player_join", { pin, nickname });
+  // A page reload (not just a dropped socket) lands here with fresh JS vars —
+  // if this tab already holds a token for this exact pin+nickname, send it so
+  // a genuine reload-reconnect doesn't get told "nickname taken" like a
+  // stranger would. A different nickname, or no saved identity, sends none.
+  const saved = loadIdentity();
+  myToken = (saved && saved.pin === pin && saved.nickname === nickname) ? saved.token : null;
+  socket.emit("player_join", { pin, nickname, token: myToken });
 });
 
 socket.on("join_ok", (data) => {
   joined = true;
   nickname = data.nickname; // the server may have trimmed/normalized it
+  myToken = data.token;     // ours alone — proves a later reclaim of this nickname is us
+  saveIdentity();
   $("join").hidden = true;
   $("game").hidden = false;
   $("p-name").textContent = nickname;
@@ -71,7 +96,7 @@ socket.on("join_error", (data) => {
 
 // resume the same identity (and score) after a dropped connection
 socket.on("connect", () => {
-  if (joined) socket.emit("player_join", { pin, nickname });
+  if (joined) socket.emit("player_join", { pin, nickname, token: myToken });
 });
 socket.on("disconnect", () => showNetbar("Reconnecting…"));
 socket.io.on("reconnect", () => hideNetbar());

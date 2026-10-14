@@ -669,12 +669,21 @@ def on_player_join(data):
     if not nickname:
         emit("join_error", {"message": "pick a nickname"})
         return
-    game.join(nickname)
+    token = str(data.get("token") or "")[:64] or None
+    try:
+        player = game.join(nickname, token=token)
+    except PermissionError:
+        emit("join_error", {"message": "That nickname is already taken — pick another."})
+        return
     join_room(data["pin"])
     SID_TO_PLAYER[request.sid] = (data["pin"], nickname)
     CURRENT_SID[(data["pin"], nickname)] = request.sid
     id_mismatch = not nickname_matches_roster(get_db(), game.course_slug, nickname)
-    emit("join_ok", {"nickname": nickname, "id_mismatch": id_mismatch})
+    # the client must hold onto this and send it back on any later player_join for
+    # this nickname (a dropped wifi connection, a backgrounded tab) — it is the
+    # only thing that lets game.join() tell a legitimate reconnect apart from a
+    # classmate who merely saw the nickname in the lobby. Never broadcast.
+    emit("join_ok", {"nickname": nickname, "id_mismatch": id_mismatch, "token": player.token})
     # if a question is already live, show it to this (re)joining player instead of a blank wait
     q = game.current_question()
     if q is not None and not getattr(game, "_revealed_this_round", False):

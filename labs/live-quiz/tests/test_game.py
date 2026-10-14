@@ -34,16 +34,41 @@ def test_course_slug_is_stored_when_given():
     assert game.course_slug == "software-security"
 
 
-def test_rejoin_with_same_nickname_resumes_existing_score():
+def test_rejoin_with_the_right_token_resumes_existing_score():
     game = GameSession("123456", QUESTIONS)
-    game.join("alice")
+    alice = game.join("alice")  # first join: no token to prove, always allowed
     game.next_question()
     game.submit_answer("alice", 1)  # correct, Q1
-    score_before = game.players["alice"].score
+    score_before = alice.score
     assert score_before > 0
 
-    rejoined = game.join("alice")  # simulate reconnect
+    # simulate reconnect: same person, proves it with the token issued at first join
+    rejoined = game.join("alice", token=alice.token)
+    assert rejoined is alice
     assert rejoined.score == score_before  # NOT reset to zero
+
+
+def test_rejoin_with_no_token_is_refused_not_silently_granted():
+    # The actual exploit Codex's security review flagged: nicknames are shown
+    # in the lobby to everyone (see _broadcast_lobby in app.py), and join()
+    # used to hand back the SAME player to anyone who repeated an in-use
+    # nickname -- no secret required. A classmate who saw "alice" in the
+    # lobby could claim her identity and both tamper with her score and
+    # block her from scoring herself (see the socketio-level reproduction in
+    # test_app_socketio.py for the end-to-end version). Reclaiming an
+    # existing nickname must prove it with that player's own token.
+    game = GameSession("123456", QUESTIONS)
+    game.join("alice")
+    try:
+        game.join("alice")  # no token at all
+        assert False, "expected PermissionError"
+    except PermissionError:
+        pass
+    try:
+        game.join("alice", token="not-the-real-token")
+        assert False, "expected PermissionError"
+    except PermissionError:
+        pass
 
 
 def test_next_question_advances_index_and_returns_question():
