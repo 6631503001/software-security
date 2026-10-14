@@ -117,6 +117,22 @@ def test_submit_answer_twice_in_same_round_ignores_second_submission():
     assert game.players["alice"].score == first["points"]  # unchanged
 
 
+def test_round_results_keep_each_players_result_until_the_next_round():
+    # app.py withholds a player's result until the round is revealed, so the model has to
+    # remember it: submit_answer's return value is consumed at submit time and thrown away.
+    game = GameSession("123456", QUESTIONS)
+    game.join("alice")
+    game.join("bob")
+    game.next_question()
+    first = game.submit_answer("alice", 1)                        # correct
+    game.submit_answer("bob", 0)                                  # wrong
+    game.submit_answer("alice", 0)                                # ignored duplicate: must not overwrite
+    assert game.round_results["alice"] == first
+    assert game.round_results["bob"] == {"correct": False, "points": 0}
+    game.next_question()
+    assert game.round_results == {}                               # a fresh round starts empty
+
+
 def test_submit_answer_for_unknown_player_raises():
     game = GameSession("123456", QUESTIONS)
     game.next_question()

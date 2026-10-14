@@ -169,7 +169,8 @@ socket.on("question:show", (data) => {
   startTimer(data.time_limit);
 });
 
-// personal result: the banner waits for the reveal, but the score is authoritative now
+// personal result: the server sends it only once the round has closed, immediately before
+// question:results — hold it for that handler, and take the authoritative score from it
 socket.on("answer:feedback", (data) => {
   pendingFeedback = data;
   if (typeof data.score === "number") {

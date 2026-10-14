@@ -165,6 +165,10 @@ def test_answer_submit_ignores_spoofed_nickname(tmp_path, monkeypatch):
 
     assert appmod.GAMES[pin].players["attacker"].score > 0          # scored under the socket's OWN identity
     assert appmod.GAMES[pin].players["victim"].score == 0           # victim's real score untouched by the spoof
+    # the result itself is withheld while the round is open (victim hasn't answered), and is
+    # delivered to the attacker's own socket -- with its own score -- once the round closes
+    assert not [e for e in attacker_sock.get_received() if e["name"] == "answer:feedback"]
+    appmod._reveal_results(pin)
     fb = [e for e in attacker_sock.get_received() if e["name"] == "answer:feedback"]
     assert fb and fb[0]["args"][0]["score"] == appmod.GAMES[pin].players["attacker"].score
 

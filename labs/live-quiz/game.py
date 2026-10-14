@@ -42,6 +42,9 @@ class GameSession:
         self.players = {}
         self.question_start_time = None
         self.answers_this_round = {}
+        # nickname -> {"correct", "points"} for the current round. Kept so the server can hand
+        # each player their own result when the round closes; see submit_answer.
+        self.round_results = {}
         self.finished = False
 
     def join(self, nickname, token=None):
@@ -77,6 +80,7 @@ class GameSession:
     def next_question(self):
         self.current_index += 1
         self.answers_this_round = {}
+        self.round_results = {}
         self.question_start_time = time.time()
         self._revealed_this_round = False
         if self.current_index >= len(self.questions):
@@ -85,6 +89,12 @@ class GameSession:
         return self.current_question()
 
     def submit_answer(self, nickname, choice_index):
+        """Record and score one answer. The returned {"correct", "points"} is for the SERVER
+        layer only: it must not reach the answering player until the round is revealed.
+        Whether a choice is right is exactly what the other nicknames in the room are trying
+        to learn, and the one-answer limit is per nickname, so a student with N throwaway
+        nicknames can probe N options and read the key off the first "correct" (see
+        on_answer_submit / _reveal_results in app.py, which hold it until the round closes)."""
         if nickname not in self.players:
             raise ValueError(f"unknown player: {nickname}")
         if nickname in self.answers_this_round:
@@ -105,7 +115,9 @@ class GameSession:
         if correct:
             player.correct_count += 1
         player.response_times_ms.append(time_taken * 1000)
-        return {"correct": correct, "points": points}
+        result = {"correct": correct, "points": points}
+        self.round_results[nickname] = result
+        return result
 
     def all_answered(self):
         connected = [n for n, p in self.players.items() if p.connected]
