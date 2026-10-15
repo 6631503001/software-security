@@ -670,11 +670,25 @@ def on_player_join(data):
         emit("join_error", {"message": "pick a nickname"})
         return
     token = str(data.get("token") or "")[:64] or None
-    try:
-        player = game.join(nickname, token=token)
-    except PermissionError:
-        emit("join_error", {"message": "That nickname is already taken — pick another."})
+    # One socket, one identity. SID_TO_PLAYER holds a single (pin, nickname) per socket, so a
+    # socket that joined several names could only ever release the last on disconnect and the
+    # rest stayed "connected" forever, blocking the early reveal. Refusing here also means a
+    # socket cannot walk a list of candidate IDs and read each one's id_mismatch from join_ok.
+    bound = SID_TO_PLAYER.get(request.sid)
+    if bound is not None and bound != (data["pin"], nickname):
+        emit("join_error", {"message": "This device is already playing as another player. "
+                                       "Reload the page to join as someone else."})
         return
+    # The same socket asking again for the identity it already holds (a double-tapped Join:
+    # the second emit leaves before join_ok has handed the client its token) already proved it
+    # owns the name, so it needs no token. A DIFFERENT socket still does.
+    player = game.players.get(nickname) if bound is not None else None
+    if player is None:
+        try:
+            player = game.join(nickname, token=token)
+        except PermissionError:
+            emit("join_error", {"message": "That nickname is already taken — pick another."})
+            return
     join_room(data["pin"])
     SID_TO_PLAYER[request.sid] = (data["pin"], nickname)
     CURRENT_SID[(data["pin"], nickname)] = request.sid

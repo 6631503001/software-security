@@ -579,6 +579,86 @@ def test_the_round_is_already_closed_when_private_results_go_out_and_a_second_re
 
 
 
+def test_one_socket_cannot_hold_two_identities():
+    # SID_TO_PLAYER maps a socket to ONE (pin, nickname), but CURRENT_SID let the same socket
+    # own any number of them, so on_disconnect could only ever release the last. One socket now
+    # holds one identity. A refused join also answers nothing about the nickname it asked for
+    # (join_ok carries id_mismatch, which says whether a name is an enrolled student ID), so a
+    # socket can no longer walk a list of candidate IDs.
+    GAMES.clear()
+    GAMES["555020"] = GameSession("555020", QUESTIONS)
+    GAMES["555021"] = GameSession("555021", QUESTIONS)
+    s = socketio.test_client(app)
+    s.emit("player_join", {"pin": "555020", "nickname": "first"})
+    s.get_received()
+
+    s.emit("player_join", {"pin": "555020", "nickname": "second"})          # another name, same game
+    s.emit("player_join", {"pin": "555021", "nickname": "first"})           # same name, another game
+    got = s.get_received()
+
+    assert [e["name"] for e in got].count("join_error") == 2
+    assert not [e for e in got if e["name"] == "join_ok"], "a refused join must not look like a success"
+    assert "id_mismatch" not in _payload_keys(got), "a refusal must not answer the roster question"
+    assert set(GAMES["555020"].players) == {"first"} and not GAMES["555021"].players
+    # ...and the identity it already had is untouched and still scores for it
+    host = _authed_host_socket("555020")
+    host.emit("host_next", {"pin": "555020"})
+    s.emit("answer_submit", {"pin": "555020", "nickname": "first", "choice": 1})
+    assert GAMES["555020"].players["first"].score > 0
+
+
+def test_a_socket_that_tried_several_names_leaves_no_ghosts_blocking_the_early_reveal():
+    # The reveal fires early once every CONNECTED player has answered. A socket that joined
+    # several nicknames and then dropped used to leave all but the last one "connected" for
+    # good, so a real class could never get the early reveal and always waited out the timer.
+    GAMES.clear()
+    GAMES["555022"] = GameSession("555022", QUESTIONS)
+    host = _authed_host_socket("555022")
+    ghosty = socketio.test_client(app)
+    for name in ("gh0", "gh1", "gh2"):
+        ghosty.emit("player_join", {"pin": "555022", "nickname": name})
+    real = socketio.test_client(app)
+    real.emit("player_join", {"pin": "555022", "nickname": "real"})
+    host.emit("host_next", {"pin": "555022"})
+    host.get_received()
+
+    ghosty.disconnect()
+    assert [n for n, p in GAMES["555022"].players.items() if p.connected] == ["real"], \
+        "a dropped socket must leave nothing behind marked connected"
+
+    real.emit("answer_submit", {"pin": "555022", "nickname": "real", "choice": 1})
+    assert any(e["name"] == "question:results" for e in host.get_received()), \
+        "the only connected player answered, so the round must reveal without waiting for the timer"
+
+
+def test_a_double_tapped_join_on_the_same_socket_is_not_refused():
+    # A phone's Join button easily fires twice before join_ok comes back. The second emit
+    # carries no token yet (the client only has one after join_ok), and since #127 a tokenless
+    # claim on an in-use nickname is refused -- bouncing a player who is already in back to the
+    # join screen with "nickname taken". The socket already proved it owns the name.
+    GAMES.clear()
+    GAMES["555023"] = GameSession("555023", QUESTIONS)
+    s = socketio.test_client(app)
+    s.emit("player_join", {"pin": "555023", "nickname": "alice"})
+    s.emit("player_join", {"pin": "555023", "nickname": "alice"})
+    got = s.get_received()
+    oks = [e["args"][0] for e in got if e["name"] == "join_ok"]
+    assert not [e for e in got if e["name"] == "join_error"], "a repeat of its own join was refused"
+    assert len(oks) == 2 and oks[0]["token"] == oks[1]["token"], "same identity, same token"
+    assert list(GAMES["555023"].players) == ["alice"]
+
+
+def test_a_different_socket_still_cannot_take_an_in_use_name_without_the_token():
+    # The #127 property must survive the idempotent rejoin above: it is per SOCKET, not per name.
+    GAMES.clear()
+    GAMES["555024"] = GameSession("555024", QUESTIONS)
+    owner = socketio.test_client(app)
+    owner.emit("player_join", {"pin": "555024", "nickname": "alice"})
+    thief = socketio.test_client(app)
+    thief.emit("player_join", {"pin": "555024", "nickname": "alice"})
+    assert [e["name"] for e in thief.get_received()] == ["join_error"]
+
+
 def test_nickname_is_sanitized_server_side():
     GAMES.clear()
     GAMES["555555"] = GameSession("555555", QUESTIONS)
