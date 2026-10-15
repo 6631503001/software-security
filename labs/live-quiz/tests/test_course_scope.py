@@ -98,6 +98,42 @@ def test_migration_is_idempotent(tmp_path):
     dbmod.migrate(conn, default_course="software-security")
 
 
+@pytest.mark.parametrize("column_already_there", [False, True])
+def test_the_migration_never_burns_worksheet_codes_that_are_already_out(tmp_path, column_already_there):
+    """The backfill above exists to give NULL course_slug rows a course. It loops over
+    every column in _ADDED_COLUMNS, and submit_codes.redeemed_at is one of them -- but there
+    NULL is the meaning ("a live, unredeemed code"), not a gap to fill. Backfilled, every code
+    already handed out is stamped as spent at the first boot of the new image: no student can
+    redeem a slip they were given, and the teacher has to re-issue all of them.
+
+    Nothing caught it while the tests only migrated databases with no codes in them. Run it
+    both ways production can look: the column missing (the real old DB) and already present."""
+    conn = _pre_migration_db(tmp_path)
+    if not column_already_there:
+        conn.execute("ALTER TABLE submit_codes DROP COLUMN redeemed_at")
+    conn.execute("INSERT INTO teachers (username, password_hash, created_at)"
+                 " VALUES ('t','x','now')")
+    tid = conn.execute("SELECT id FROM teachers").fetchone()["id"]
+    conn.execute("INSERT INTO assignments (teacher_id, title, week_slug, instructions, due_at,"
+                 " rubric_json, released, created_at) VALUES (?,'W10 worksheet',NULL,'',NULL,'[]',0,'now')",
+                 (tid,))
+    aid = conn.execute("SELECT id FROM assignments").fetchone()["id"]
+    for student, code in (("6401001", "AAAA-1111"), ("6401002", "BBBB-2222"), ("6401003", "CCCC-3333")):
+        conn.execute("INSERT INTO submit_codes (code, assignment_id, student_id, issued_at)"
+                     " VALUES (?,?,?,'now')", (code, aid, student))
+    conn.commit()
+
+    dbmod.migrate(conn, default_course="software-security")
+
+    assert "redeemed_at" in dbmod._column_names(conn, "submit_codes")
+    spent = conn.execute("SELECT COUNT(*) c FROM submit_codes WHERE redeemed_at IS NOT NULL").fetchone()["c"]
+    assert spent == 0, f"{spent} of 3 codes were burned by the migration itself"
+    dbmod.migrate(conn, default_course="software-security")          # every boot, not just the first
+    assert conn.execute("SELECT COUNT(*) c FROM submit_codes WHERE redeemed_at IS NOT NULL").fetchone()["c"] == 0
+    # the backfill it IS meant to do must still happen
+    assert conn.execute("SELECT course_slug FROM assignments").fetchone()["course_slug"] == "software-security"
+
+
 def test_migration_backfills_existing_rows_so_they_do_not_vanish(tmp_path):
     """The row-loss case. A pre-existing quiz gets course_slug NULL, and NULL
     fails `WHERE course_slug = ?` — the teacher's quiz would disappear from the

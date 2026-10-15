@@ -128,6 +128,11 @@ def migrate(conn, default_course=None):
                      f"{_ident(column)} {_ident(coltype)}")
     if default_course:
         for table, column, _ in _ADDED_COLUMNS:
+            if column != "course_slug":
+                # Only course_slug is a gap to fill. For submit_codes.redeemed_at NULL IS
+                # the meaning ("still a live code"): backfilling it would stamp every code
+                # already handed out as spent on the first boot of the new image.
+                continue
             if column in _column_names(conn, table):
                 # Only the identifiers are interpolated. `default_course` is the
                 # sole untrusted value here and it is bound, not formatted.
