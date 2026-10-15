@@ -17,6 +17,12 @@ labs/**/.pytest_cache
 labs/**/*.pyc
 labs/**/node_modules
 labs/live-quiz/*.db
+# Student uploads belong on the /data volume, never in the image. This directory is where a
+# local run (or a stray test) drops them, and it is baked in TWICE (COPY labs/live-quiz/ and
+# COPY labs/). Git-ignored, so only an in-place build from a working tree can pick it up; the
+# 2026-10-09 production image shipped with a leftover file from here. The app creates its
+# upload dir itself (os.makedirs in submission.py), so excluding it breaks nothing.
+labs/live-quiz/uploads
 labs/week11-memory-safety-exploitation/vuln
 labs/week11-memory-safety-exploitation/vuln-*
 labs/week11-memory-safety-exploitation/fuzz
