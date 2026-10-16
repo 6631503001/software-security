@@ -261,6 +261,15 @@ def test_export_results_shape():
     assert row["correct_count"] == 1
     assert row["total_score"] > 0
     assert row["avg_response_time_ms"] >= 0
+    assert row["roster_match"] == ""          # no roster handed in: nothing was checked
+
+
+def test_export_marks_which_nicknames_are_on_the_roster():
+    game = GameSession("123456", QUESTIONS)
+    game.join("6631503001")
+    game.join("someone else")
+    rows = {r["nickname"]: r["roster_match"] for r in game.export_results(enrolled_ids={"6631503001"})}
+    assert rows == {"6631503001": "yes", "someone else": "no"}
 
 
 def test_export_neutralizes_csv_formula_injection():

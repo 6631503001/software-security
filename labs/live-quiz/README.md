@@ -100,9 +100,13 @@ marks for an instant answer, half marks for one submitted right at the 20-second
 
 ## Data handling
 
-Player nicknames are pseudonymous by design — never map them to a real student roster inside
-this tool. Results export as a CSV (`nickname, total_score, correct_count, avg_response_time_ms`)
-that the instructor manually joins against the real roster afterward, same as CTFd's flow.
+Player nicknames are pseudonymous by design. A player is never told whether their nickname
+matches the course roster: players are unauthenticated, so that answer would let anyone who can
+reach a game probe which student IDs are enrolled. Results export as a CSV (`nickname, total_score,
+correct_count, avg_response_time_ms, roster_match`) that only the teacher who created the game can
+pull. `roster_match` is `yes`/`no` against that course's roster (the player typed their own Student
+ID as a nickname or didn't) and blank when the course has no roster yet; the instructor still joins
+the rest against the real roster afterward, same as CTFd's flow.
 
 ## Graded weekly quiz (`/assess`) — replaces Google Forms
 

@@ -1,4 +1,6 @@
 # tests/test_app_socketio.py
+import csv
+import io
 import json
 import os
 import sys
@@ -143,7 +145,7 @@ def test_host_join_still_creates_a_room_for_a_real_pin():
 
 
 def test_a_classmate_cannot_claim_an_in_use_nickname_without_its_token():
-    # Nicknames aren't authenticated (see nickname_matches_roster's own docstring) and are
+    # Nicknames aren't authenticated (see _enrolled_ids's docstring in app.py) and are
     # broadcast to the whole lobby (_broadcast_lobby), so anyone can see "alice" and try
     # player_join with that same name. game.join() used to silently hand back the SAME
     # player to whoever repeated an in-use nickname -- no secret required -- which let a
@@ -583,8 +585,8 @@ def test_one_socket_cannot_hold_two_identities():
     # SID_TO_PLAYER maps a socket to ONE (pin, nickname), but CURRENT_SID let the same socket
     # own any number of them, so on_disconnect could only ever release the last. One socket now
     # holds one identity. A refused join also answers nothing about the nickname it asked for
-    # (join_ok carries id_mismatch, which says whether a name is an enrolled student ID), so a
-    # socket can no longer walk a list of candidate IDs.
+    # (join_ok used to carry id_mismatch, which said whether a name is an enrolled student ID), so
+    # a socket cannot walk a list of candidate IDs.
     GAMES.clear()
     GAMES["555020"] = GameSession("555020", QUESTIONS)
     GAMES["555021"] = GameSession("555021", QUESTIONS)
@@ -687,51 +689,77 @@ def test_joining_mid_question_shows_the_active_question():
     assert shown[0]["args"][0]["stem"] == "Q1?"
 
 
-def test_nickname_matching_a_real_enrolled_id_is_not_flagged():
+def test_join_ok_never_says_whether_a_nickname_is_an_enrolled_id():
+    # join_ok used to carry id_mismatch -- "that nickname is not an enrolled student ID" -- to the
+    # joining client. Players are unauthenticated and the PIN is shown on the projector, so that
+    # was an oracle: join with a candidate ID, read the flag, repeat. A player must be sent exactly
+    # the same thing whether or not the nickname they typed is on the roster.
     GAMES.clear()
     slug = _enroll(["6631503001", "6631503002"])
     GAMES["444401"] = GameSession("444401", QUESTIONS, course_slug=slug)
-
-    real = socketio.test_client(app)
-    real.emit("player_join", {"pin": "444401", "nickname": "6631503001"})
-    ok = [e for e in real.get_received() if e["name"] == "join_ok"]
-    assert ok and not ok[0]["args"][0]["id_mismatch"]
-
-
-def test_nickname_not_matching_any_enrolled_id_is_flagged():
-    GAMES.clear()
-    slug = _enroll(["6631503003", "6631503004"])
-    GAMES["444402"] = GameSession("444402", QUESTIONS, course_slug=slug)
-
-    typo = socketio.test_client(app)
-    typo.emit("player_join", {"pin": "444402", "nickname": "some nickname"})
-    ok = [e for e in typo.get_received() if e["name"] == "join_ok"]
-    assert ok and ok[0]["args"][0]["id_mismatch"] is True
+    seen = {}
+    for label, nick in (("enrolled", "6631503001"), ("not enrolled", "some nickname")):
+        s = socketio.test_client(app)
+        s.emit("player_join", {"pin": "444401", "nickname": nick})
+        got = s.get_received()
+        assert "id_mismatch" not in _payload_keys(got), f"{label}: the roster answer reached the player"
+        seen[label] = [(e["name"], sorted(e["args"][0]) if e["args"] and isinstance(e["args"][0], dict) else None)
+                       for e in got]
+    assert seen["enrolled"] == seen["not enrolled"], \
+        "what a player is sent must not depend on whether their nickname is on the roster"
 
 
-def test_mismatch_warning_does_not_block_joining():
-    # the whole point is a nudge, not a gate — a mismatched nickname still gets in
+def test_an_unrecognised_nickname_still_joins():
     GAMES.clear()
     slug = _enroll(["6631503005"])
     GAMES["444403"] = GameSession("444403", QUESTIONS, course_slug=slug)
 
     typo = socketio.test_client(app)
     typo.emit("player_join", {"pin": "444403", "nickname": "definitely not an id"})
-    ok = [e for e in typo.get_received() if e["name"] == "join_ok"]
-    assert ok  # still joined despite the mismatch
-    assert "444403" in GAMES and "definitely not an id" in GAMES["444403"].players
+    assert [e for e in typo.get_received() if e["name"] == "join_ok"]
+    assert "definitely not an id" in GAMES["444403"].players
 
 
-def test_no_enrollment_data_skips_validation_entirely(tmp_path):
-    # A course nobody has issued slips for yet must not flag anyone — graceful
-    # degradation, same principle as the ledger's unmatched-row handling. This
-    # exercises nickname_matches_roster directly against a freshly isolated DB
-    # (no enrollments possible) rather than the shared cross-test app DB, which
-    # by this point in the suite already has real enrollments from the tests
-    # above — a real "empty roster" state can't be relied on there.
-    from app import nickname_matches_roster
+def _teacher_client(pin):
+    username = f"host_{pin}"
+    t = dbmod.get_teacher_by_username(get_db(), username)
+    tid = t["id"] if t else dbmod.create_teacher(get_db(), username, "unused-hash", now="t")
+    GAME_OWNER[pin] = tid
+    client = app.test_client()
+    with client.session_transaction() as sess:
+        sess["teacher_id"] = tid
+    return client
 
-    conn = dbmod.connect(str(tmp_path / "empty.db"))
-    dbmod.init_db(conn, default_course=C.COURSES[0]["slug"])
-    assert nickname_matches_roster(conn, C.COURSES[0]["slug"], "whatever i typed")
 
+def _export_rows(client, pin):
+    r = client.get(f"/host/{pin}/export")
+    assert r.status_code == 200
+    return list(csv.DictReader(io.StringIO(r.get_data(as_text=True))))
+
+
+def test_the_export_tells_the_teacher_which_nicknames_are_enrolled_ids():
+    # The signal the player no longer sees goes where only the game's owner can read it. It is
+    # computed from the raw nickname (the CSV column is quote-prefixed against formula injection).
+    GAMES.clear()
+    slug = _enroll(["6631503003", "6631503004"])
+    game = GameSession("444402", QUESTIONS, course_slug=slug)
+    GAMES["444402"] = game
+    for nick in ("6631503003", "typo nickname", "=1+1"):
+        game.join(nick)
+    rows = _export_rows(_teacher_client("444402"), "444402")
+
+    assert list(rows[0])[-1] == "roster_match", "new column goes last so existing readers are unaffected"
+    assert {r["nickname"].lstrip("'"): r["roster_match"] for r in rows} == \
+        {"6631503003": "yes", "typo nickname": "no", "=1+1": "no"}
+
+
+def test_the_export_leaves_roster_match_blank_when_the_course_has_no_roster(monkeypatch):
+    # An empty roster means "nothing to check against", not "nobody matches": blank, never "no".
+    import app as appmod
+    monkeypatch.setattr(appmod.roster, "enrolled", lambda conn, slug: [])
+    GAMES.clear()
+    game = GameSession("444404", QUESTIONS)
+    GAMES["444404"] = game
+    game.join("whoever")
+    rows = _export_rows(_teacher_client("444404"), "444404")
+    assert [r["roster_match"] for r in rows] == [""]

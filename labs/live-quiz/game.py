@@ -142,16 +142,26 @@ class GameSession:
                 return i + 1
         return None
 
-    def export_results(self):
+    def export_results(self, enrolled_ids=None):
+        """One row per player, for the game's owner. `enrolled_ids` is the course roster's student
+        IDs, or None when there is nothing to check against (then roster_match is blank, which is
+        not the same as "no"). Whether a nickname is on the roster is deliberately NOT something
+        a player can be told: players are unauthenticated, so that answer lets anyone probe which
+        student IDs are enrolled. It lives here, in a teacher-only export, instead."""
         rows = []
         for p in self.players.values():
             avg_ms = sum(p.response_times_ms) / len(p.response_times_ms) if p.response_times_ms else 0
+            if enrolled_ids is None:
+                roster_match = ""
+            else:
+                roster_match = "yes" if p.nickname in enrolled_ids else "no"
             rows.append(
                 {
                     "nickname": _csv_safe(p.nickname),
                     "total_score": p.score,
                     "correct_count": p.correct_count,
                     "avg_response_time_ms": round(avg_ms),
+                    "roster_match": roster_match,
                 }
             )
         return rows

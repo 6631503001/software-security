@@ -432,10 +432,10 @@ def host_export(pin):
         return "not found", 404                      # unknown OR not this teacher's game
     buf = io.StringIO()
     writer = csv.DictWriter(
-        buf, fieldnames=["nickname", "total_score", "correct_count", "avg_response_time_ms"]
+        buf, fieldnames=["nickname", "total_score", "correct_count", "avg_response_time_ms", "roster_match"]
     )
     writer.writeheader()
-    writer.writerows(game.export_results())
+    writer.writerows(game.export_results(enrolled_ids=_enrolled_ids(game.course_slug)))
     mem = io.BytesIO(buf.getvalue().encode("utf-8"))
     return send_file(mem, mimetype="text/csv", as_attachment=True, download_name=f"quiz-{pin}-results.csv")
 
@@ -642,19 +642,16 @@ def on_host_join(data):
         HOST_SIDS[pin] = request.sid
 
 
-def nickname_matches_roster(conn, course_slug, nickname):
-    """True if `nickname` looks like it belongs, OR there's nothing to check
-    against yet. live-quiz players have no accounts (see roster.py) — the only
-    way to tie a session back to a real student is the player having typed
-    their own Student ID as their nickname, so this can only ever nudge, never
-    gate: a course nobody has issued slips for yet (empty roster) must not
-    block or flag anyone, same principle as the ledger's unmatched-row
-    handling elsewhere in this platform.
-    """
-    enrolled_ids = {r["student_id"] for r in roster.enrolled(conn, course_slug)}
-    if not enrolled_ids:
-        return True
-    return nickname in enrolled_ids
+def _enrolled_ids(course_slug):
+    """The course roster's student IDs, or None when nobody is enrolled yet.
+
+    live-quiz players have no accounts (see roster.py): the only way to tie a session back to a
+    real student is the player having typed their own Student ID as their nickname. An empty
+    roster means "nothing to check against" (None), so a course nobody has issued slips for yet
+    flags no one. Used ONLY for the owner's CSV export -- never sent to a player, because the
+    answer would tell anyone who can reach a game which student IDs are enrolled."""
+    ids = {r["student_id"] for r in roster.enrolled(get_db(), course_slug)}
+    return ids or None
 
 
 @socketio.on("player_join")
@@ -672,8 +669,7 @@ def on_player_join(data):
     token = str(data.get("token") or "")[:64] or None
     # One socket, one identity. SID_TO_PLAYER holds a single (pin, nickname) per socket, so a
     # socket that joined several names could only ever release the last on disconnect and the
-    # rest stayed "connected" forever, blocking the early reveal. Refusing here also means a
-    # socket cannot walk a list of candidate IDs and read each one's id_mismatch from join_ok.
+    # rest stayed "connected" forever, blocking the early reveal.
     bound = SID_TO_PLAYER.get(request.sid)
     if bound is not None and bound != (data["pin"], nickname):
         emit("join_error", {"message": "This device is already playing as another player. "
@@ -692,12 +688,11 @@ def on_player_join(data):
     join_room(data["pin"])
     SID_TO_PLAYER[request.sid] = (data["pin"], nickname)
     CURRENT_SID[(data["pin"], nickname)] = request.sid
-    id_mismatch = not nickname_matches_roster(get_db(), game.course_slug, nickname)
     # the client must hold onto this and send it back on any later player_join for
     # this nickname (a dropped wifi connection, a backgrounded tab) — it is the
     # only thing that lets game.join() tell a legitimate reconnect apart from a
     # classmate who merely saw the nickname in the lobby. Never broadcast.
-    emit("join_ok", {"nickname": nickname, "id_mismatch": id_mismatch, "token": player.token})
+    emit("join_ok", {"nickname": nickname, "token": player.token})
     # if a question is already live, show it to this (re)joining player instead of a blank wait
     q = game.current_question()
     if q is not None and not getattr(game, "_revealed_this_round", False):
