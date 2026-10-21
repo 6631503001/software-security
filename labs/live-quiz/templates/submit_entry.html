@@ -7,8 +7,12 @@
     <form class="lx-form" method="post" action="/submit"> <!-- nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -->
       <p class="lx-eyebrow">Submit your work</p>
       <h1 class="lx-h1">Enter your code</h1>
-      <p class="lx-lead">Use the submission code on your slip or table. You can come back
-        with the same code until the deadline.</p>
+      <p class="lx-lead">Use the submission code on your slip or table. A code opens your
+        worksheet once, in the browser you use now — after that you come back to it here
+        without the code, until the deadline. Switched device or cleared your browser? Ask
+        your teacher to re-issue it.</p>
+      {% if resume %}<p class="lx-hint"><b>Already opened a worksheet in this browser?</b> You do not
+        need the code again — <a class="lx-link" href="/submit/work">go back to your worksheet</a>.</p>{% endif %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       {% if error %}<div class="lx-err" id="form-error" role="alert">{{ error }}</div>{% endif %}
       <div class="lx-field"><label class="lx-label" for="code">Submission code</label>

@@ -29,10 +29,17 @@ def _check_csrf():
     current_app.config["CHECK_CSRF"]()
 
 
+def _entry_page(**ctx):
+    """`resume` links back to a worksheet this browser already has open (see routes_submit)."""
+    import routes_submit
+    return render_template("code_entry.html", csrf_token=_csrf(),
+                           resume=routes_submit._current() is not None, **ctx)
+
+
 @bp.route("/code", methods=["GET", "POST"])
 def entry():
     if request.method == "GET":
-        return render_template("code_entry.html", csrf_token=_csrf(), error=None)
+        return _entry_page(error=None)
     _check_csrf()
     raw = request.form.get("code")
 
@@ -51,8 +58,7 @@ def entry():
         try:
             att = A.redeem(_db(), raw, _now())
         except A.AttemptError as exc:
-            return render_template("code_entry.html", csrf_token=_csrf(),
-                                   error=str(exc), code=raw), 200
+            return _entry_page(error=str(exc), code=raw), 200
         session["attempt_id"] = att["id"]
         return redirect(url_for("assess.quiz_take"))
 
@@ -66,11 +72,9 @@ def entry():
         try:
             sub = S.redeem(_db(), raw, _now())
         except S.SubmitError as exc:
-            return render_template("code_entry.html", csrf_token=_csrf(),
-                                   error=str(exc), code=raw), 200
-        session["submission_id"] = sub["id"]
-        session.permanent = True
+            return _entry_page(error=str(exc), code=raw), 200
+        import routes_submit
+        routes_submit.remember_submission(sub)
         return redirect(url_for("submit.workspace"))
 
-    return render_template("code_entry.html", csrf_token=_csrf(),
-                           error="That code isn't valid.", code=raw), 200
+    return _entry_page(error="That code isn't valid.", code=raw), 200

@@ -256,7 +256,7 @@ def download(file_id):
         abort(404)
 
     is_teacher = auth.current_teacher_id() == row["teacher_id"]
-    is_owner = session.get("submission_id") == row["sub_id"]
+    is_owner = row["sub_id"] in owned_submission_ids()
     if not (is_teacher or is_owner):
         abort(404)
 
@@ -286,6 +286,39 @@ def download(file_id):
 
 # --- student ---------------------------------------------------------------
 
+def owned_submission_ids():
+    """Every worksheet submission this browser has opened, oldest first.
+
+    A code opens its worksheet ONCE (submission.redeem burns it), so the browser has to
+    remember each one it opened: with W10-12 due on the same day a student opens all three,
+    and remembering only the latest stranded the earlier ones with no code left to get back in.
+    Sessions from before the list existed carry just `submission_id`; that still counts.
+    """
+    ids = list(session.get("submission_ids") or [])
+    cur = session.get("submission_id")
+    if cur is not None and cur not in ids:
+        ids.append(cur)
+    return ids
+
+
+def remember_submission(sub):
+    """Put `sub` on screen and keep it, with the other worksheets this STUDENT opened here.
+
+    One browser may be a shared lab PC: a different student's code starts a fresh list, so
+    the next person never inherits the previous one's work.
+    """
+    keep = []
+    for sid in owned_submission_ids():
+        row = _db().execute("SELECT student_id FROM submissions WHERE id = ?", (sid,)).fetchone()
+        if row is not None and row["student_id"] == sub["student_id"]:
+            keep.append(sid)
+    if sub["id"] not in keep:
+        keep.append(sub["id"])
+    session["submission_ids"] = keep
+    session["submission_id"] = sub["id"]
+    session.permanent = True
+
+
 def _current():
     sid = session.get("submission_id")
     if sid is None:
@@ -293,10 +326,30 @@ def _current():
     return _db().execute("SELECT * FROM submissions WHERE id = ?", (sid,)).fetchone()
 
 
+def _open_worksheets():
+    """The worksheets held by this browser, for the switcher, in assignment order."""
+    rows = []
+    for sid in owned_submission_ids():
+        r = _db().execute(
+            "SELECT s.id, s.submitted_at, a.id AS assignment_id, a.title"
+            " FROM submissions s JOIN assignments a ON a.id = s.assignment_id"
+            " WHERE s.id = ?", (sid,)).fetchone()
+        if r is not None:
+            rows.append(r)
+    return sorted(rows, key=lambda r: r["assignment_id"])
+
+
+def _entry_page(**ctx):
+    """The code-entry page. `resume` shows a way back to a worksheet this browser already has
+    open — the usual reason someone types a used code again is that they are still signed in."""
+    return render_template("submit_entry.html", csrf_token=_csrf(),
+                           resume=_current() is not None, **ctx)
+
+
 @bp.route("/submit", methods=["GET", "POST"])
 def entry():
     if request.method == "GET":
-        return render_template("submit_entry.html", csrf_token=_csrf(), error=None)
+        return _entry_page(error=None)
     _check_csrf()
     raw = request.form.get("code")
     # Classify BEFORE attempting either table's redeem() — see the mirror of
@@ -318,13 +371,11 @@ def entry():
         try:
             att = A.redeem(_db(), raw, _now())
         except A.AttemptError as quiz_exc:
-            return render_template("submit_entry.html", csrf_token=_csrf(),
-                                   error=str(quiz_exc), code=raw), 200
+            return _entry_page(error=str(quiz_exc), code=raw), 200
         session["attempt_id"] = att["id"]
         return redirect(url_for("assess.quiz_take"))
     if kind != "submit":
-        return render_template("submit_entry.html", csrf_token=_csrf(),
-                               error="That code isn't valid.", code=raw), 200
+        return _entry_page(error="That code isn't valid.", code=raw), 200
     # redeem() used to be unable to fail here (find_kind() just confirmed the
     # row exists) — now it can, if the code was already burned by an earlier
     # redemption (see submission.py's redeem() for why that's the fix, not
@@ -332,10 +383,20 @@ def entry():
     try:
         sub = S.redeem(_db(), raw, _now())
     except S.SubmitError as exc:
-        return render_template("submit_entry.html", csrf_token=_csrf(),
-                               error=str(exc), code=raw), 200
-    session["submission_id"] = sub["id"]
-    session.permanent = True
+        return _entry_page(error=str(exc), code=raw), 200
+    remember_submission(sub)
+    return redirect(url_for("submit.workspace"))
+
+
+@bp.route("/submit/work/switch", methods=["POST"])
+def switch():
+    """Bring another worksheet this browser has already opened onto the screen. The id comes
+    from the form, so it is only ever honoured if the (signed) session already holds it."""
+    _check_csrf()
+    target = request.form.get("submission_id", type=int)
+    if target is None or target not in owned_submission_ids():
+        abort(404)
+    session["submission_id"] = target
     return redirect(url_for("submit.workspace"))
 
 
@@ -384,4 +445,5 @@ def workspace():
         score=(earned, possible, complete) if a["released"] else None,
         max_mb=S.MAX_FILE_BYTES // (1024 * 1024),
         max_files=S.MAX_FILES_PER_SUBMISSION,
-        csrf_token=_csrf(), error=error, saved_action=saved_action)
+        csrf_token=_csrf(), error=error, saved_action=saved_action,
+        worksheets=_open_worksheets())

@@ -14,11 +14,29 @@
     {% if error %}<div class="join-err">{{ error }}</div>{% endif %}
     {% if saved_action == 'note' %}<div class="join-ok">✓ Note saved.</div>
     {% elif saved_action == 'delete' %}<div class="join-ok">✓ File removed.</div>
-    {% elif saved_action %}<div class="join-ok">✓ Saved — you can come back with your code and
-      add or change files any time before the deadline.</div>{% endif %}
+    {% elif saved_action %}<div class="join-ok">✓ Saved — you can come back to this page in this
+      browser and add or change files any time before the deadline.</div>{% endif %}
     {% if not can_upload %}<p class="lead"><b>The deadline has passed.</b> You can still
       read your feedback here.</p>{% endif %}
   </div>
+
+  {% if worksheets|length > 1 %}
+  <div class="join-card">
+    <h1>Your worksheets</h1>
+    <p class="lead">You opened these in this browser. Pick one to work on — you do not need
+      the code again.</p>
+    <ul class="ws-list">{% for w in worksheets %}
+      <li>{% if w.id == sub.id %}<b>{{ w.title }}</b>
+        {%- else %}
+        <form class="form-inline" method="post" action="/submit/work/switch"> <!-- nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="submission_id" value="{{ w.id }}">
+          <button class="btn" type="submit">{{ w.title }}</button>
+        </form>{% endif %}
+        <span class="sub">{% if w.id == sub.id %}open now · {% endif %}{% if w.submitted_at %}file uploaded{% else %}nothing uploaded yet{% endif %}</span></li>
+    {% endfor %}</ul>
+  </div>
+  {% endif %}
 
   <div class="join-card">
     <h1>Files</h1>

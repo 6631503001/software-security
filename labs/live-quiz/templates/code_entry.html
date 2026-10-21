@@ -10,6 +10,8 @@
       <p class="lx-lead">Works for either code on your slip or table — the quiz code or the
         submission code. We'll take you to the right place. (Got a game PIN instead? That's
         for <a href="/play">Live game</a>, not here.)</p>
+      {% if resume %}<p class="lx-hint"><b>Already opened a worksheet in this browser?</b> You do not
+        need the code again — <a class="lx-link" href="/submit/work">go back to your worksheet</a>.</p>{% endif %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       {% if error %}<div class="lx-err" id="form-error" role="alert">{{ error }}</div>{% endif %}
       <div class="lx-field"><label class="lx-label" for="code">Code</label>

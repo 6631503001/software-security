@@ -93,6 +93,10 @@ body {
 .field-gap   { margin-bottom: 16px; }
 .field-gap-lg{ margin-bottom: 18px; }
 .form-inline { display: inline; }
+/* "Your worksheets" switcher on the submission workspace: one row per worksheet. */
+.ws-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
+.ws-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.ws-list .sub { font: 500 13px/1.3 var(--sans); color: var(--muted); }
 .in-narrow   { max-width: 6rem; }
 .card-gap    { margin-top: 1rem; }
 /* display:contents so the wrapper adds no box of its own. [hidden] above is
