@@ -19,9 +19,9 @@ Software Security · Nutthakorn Chalaemwongwan
 - OWASP **LLM Top 10 (2025)**
 - Prompt injection (direct + indirect)
 - Agentic-AI / MCP risks
-- 🎮 Game: **Gandalf Challenge**
+- 🎮 Game: **Gandalf Challenge** — now on Lakera Agent Breaker
 
-<!-- Roadmap, 1 min. Big idea: prompt injection IS injection (W4) — untrusted data interpreted as instructions. Everything they learned applies. Lab = beat Gandalf, then add guardrails. -->
+<!-- Roadmap, 1 min. Big idea: prompt injection IS injection (W4) — untrusted data interpreted as instructions. Everything they learned applies. Lab = attack Lakera's Agent Breaker apps (the old Gandalf site now redirects there), then see guardrails stop the same attacks. -->
 
 ---
 
@@ -56,10 +56,10 @@ Software Security · Nutthakorn Chalaemwongwan
 
 > Untrusted text overrides the system's instructions — injection, again.
 
-- **Direct:** user tells the bot to ignore its rules — this week's hands-on lab (Gandalf + Tasks 1-2)
+- **Direct:** user tells the bot to ignore its rules — this week's hands-on lab (Task 1 + Agent Breaker in Task 4)
 - **Indirect:** malicious instructions hidden in a fetched doc / web page (RAG) — **discussed, not built:** the lab's mock LLM has no RAG/retrieval, so this is a thought experiment (worksheet Task 3), not something you'll exploit yourself today
 
-<!-- The core concept — say "this is W4 injection in a new interpreter (the LLM)." Direct = the Gandalf game + graded Tasks 1-2, fully hands-on. Indirect is the scary one conceptually, but be upfront that this lab can't demonstrate it live — no retrieval pipeline exists to poison. ~6 min. -->
+<!-- The core concept — say "this is W4 injection in a new interpreter (the LLM)." Direct = graded Task 1 + Agent Breaker (Task 4), fully hands-on; Task 2 is LLM05 (unescaped output), not injection. Indirect is the scary one conceptually, but be upfront that this lab can't demonstrate it live — no retrieval pipeline exists to poison. ~6 min. -->
 
 ---
 
@@ -134,11 +134,11 @@ prompt-guard
 
 ## 🧙 Game — Gandalf Challenge
 
-1. Beat Gandalf levels via **direct prompt injection** → exfiltrate the secret (real external service, leaderboard by level)
-2. **Round 2 (graded):** replay your winning injection + the reflected-XSS payload against the **guarded** bot — does it still land?
+1. Attack **Lakera Agent Breaker** apps via **prompt injection** (real external service; each attempt scored 0–100, 75+ unlocks the next level)
+2. **Round 2 (graded):** replay your Task 1 injection + the Task 2 XSS payload against the **guarded** bot — does it still land?
 3. **Written only:** tool poisoning / excessive agency on an MCP-style agent (worksheet Q5) — no agent exists in this lab to demo live
 
-<!-- Gandalf (Lakera) is genuinely fun and free — students compete to climb levels. Round 2 (Task 5: replay against guarded_chatbot.py) is graded — the point is that guardrails/redaction/escaping visibly stop what worked before. Don't promise a live tool-poisoning demo; it's a discussion question. The weekly quiz no longer asks for the injection/guardrail-failure/flag (dropped — quiz runs before the lab) — that's required in the worksheet instead. ~3 min. -->
+<!-- Lakera retired the Gandalf site: https://gandalf.lakera.ai/ now redirects to https://play.lakera.ai/agent-breaker (checked 22 Oct 2026). Still free; students compete on score — start with Cycling Coach (direct: extract the system prompt), then Trippy Planner (indirect: the attack hides in a web page). Round 2 (Task 5: replay against guarded_chatbot.py) is graded — the point is that guardrails/redaction/escaping visibly stop what worked before. Don't promise a live tool-poisoning demo; it's a discussion question. The weekly quiz no longer asks for the injection/guardrail-failure/flag (dropped — quiz runs before the lab) — that's required in the worksheet instead. ~3 min. -->
 
 ---
 
@@ -148,7 +148,7 @@ prompt-guard
 
 - Attack log: prompt-injection disclosure (Task 1) + reflected-XSS from unescaped output (Task 2)
 - Written: indirect-injection thought experiment (Task 3)
-- Gandalf leaderboard result (Task 4)
+- Agent Breaker scores — app, level, score, prompt (Task 4)
 - Mitigations + re-test results against the guarded bot (Task 5)
 - Written: least-privilege agent/MCP tool design (Part 2 Q5 — reflection, not a build)
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)

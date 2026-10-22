@@ -86,9 +86,12 @@ iam-scope
 ## Container image hardening
 
 ```bash
-docker run --rm -v "$PWD:/src" aquasec/trivy config /src                    # misconfig
+# misconfig scan (Dockerfiles)
+docker run --rm -v "${PWD}:/src" aquasec/trivy:latest \
+  config --severity MEDIUM,HIGH,CRITICAL /src
+# image CVE scan
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-  aquasec/trivy image week13-hardened:lab                              # image CVEs
+  aquasec/trivy:latest image --severity HIGH,CRITICAL week13-hardened:lab
 ```
 
 - Multi-stage build: `python:3.11-slim@sha256:...` (compiles) → **distroless** `gcr.io/distroless/python3-debian12@sha256:...` (runs) — a smaller runtime image with no shell/package manager, `USER 65532:65532` (non-root)
