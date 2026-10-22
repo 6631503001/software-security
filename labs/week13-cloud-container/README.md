@@ -19,8 +19,8 @@
 ## 🔍 Signature game — "Misconfig Hunt" (CloudGoat-style)
 Scavenger hunt: each misconfiguration you find **and** fix = a flag — **9 flags, two categories**.
 ```bash
-docker run --rm -v "$PWD:/src" aquasec/trivy config /src     # IaC/Dockerfile misconfig
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image week13-hardened:lab  # image CVEs
+docker run --rm -v "${PWD}:/src" aquasec/trivy:latest config --severity MEDIUM,HIGH,CRITICAL /src     # IaC/Dockerfile misconfig ("${PWD}" also works in PowerShell)
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL week13-hardened:lab  # image CVEs
 ```
 1. **Container (6):** `:latest` tag, root user, secret-in-`ENV`, `COPY . .`, `chmod -R 777`, unpinned `pip install`. Only 3 of the 6 map to a Trivy rule — the rest need manual review.
 2. **IAM (3):** given an over-permissive policy (`Action:"*"`, `Resource:"*"`), fix `Resource:"*"` (CWE-732), `Action:"*"` (CWE-269), and add a missing `Condition` scope. Trivy does not parse standalone IAM JSON — entirely manual review.

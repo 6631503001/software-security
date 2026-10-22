@@ -17,8 +17,8 @@
 - Add guardrails: input/output validation, least-privilege tools, output handling.
 
 ## 🧙 Signature game — "Gandalf Challenge"
-Leaderboard by level reached.
-1. **Direct prompt injection:** override the system prompt to reveal a hidden secret (Gandalf-style levels).
+Played on Lakera Agent Breaker (https://play.lakera.ai/agent-breaker — the old Gandalf address redirects there); leaderboard by score.
+1. **Direct prompt injection:** override the system prompt to reveal a hidden secret (the local bots in Tasks 1–2, then Agent Breaker's levels).
 2. **Indirect injection:** plant a malicious instruction in a document the bot ingests (RAG) and trigger it.
 3. **Improper output handling:** show model output flowing unsanitized into a downstream action (XSS/command).
 4. **Agentic-AI / MCP risks (current, post-Oct 2025):** demo **tool poisoning** and **excessive agency** in an agent with tools (e.g. an MCP server) — a malicious instruction makes the agent call a tool it shouldn't.
@@ -29,5 +29,5 @@ Attack log + mitigations + re-test, including the agent/MCP least-privilege desi
 
 ## References
 - https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/
-- https://gandalf.lakera.ai/
+- https://play.lakera.ai/agent-breaker — Lakera Agent Breaker (the old https://gandalf.lakera.ai/ address now redirects here)
 - MITRE ATLAS (AI/agentic attack techniques) — https://atlas.mitre.org/
