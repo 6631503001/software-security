@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 524" role="img" aria-label="Task 1b at a glance. Step one: from the lab folder, docker compose up starts two containers from the same python:3.12-slim image. Both mount the same lab folder, install Flask, and run a different file: insecure-service runs insecure_service.py on localhost port 8090, and secure-service runs secure_service.py on localhost port 8091. Step two: as Red, send the same request to both, GET /admin with no Authorization header. Port 8090 answers 200 with panel UNLOCKED and the secret FLAG, because USERS square-bracket token raises KeyError and the except branch grants access. Port 8091 answers 403 with error forbidden, because USERS dot get returns None and the code denies. Step three: read docker compose logs. The insecure service prints only the web server's access line, GET /admin HTTP/1.1 200, so the attack looks like a normal success and there is nothing to alert on, which is OWASP A09. The secure service prints a WARNING on the security logger, event=authz_failure outcome=deny src_ip and reason=unauthenticated, followed by the access line with 403. Step four, the anti-cheat check: the same request with alice-token still unlocks port 8091, and the auto-grader passes a hardened box only if every bypass is blocked and a real admin still gets in. Submit the flag, both responses, and the except line in insecure_service.py that fails open. A local run returns the public demo value; the graded flag comes from your hosted instance.">
+<title>Task 1b at a glance: one compose file, two services, the same request</title>
+<style>
+text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.mono  { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.bg    { fill: #ffffff; }
+.h1    { fill: #12232e; font-size: 20px; font-weight: 700; }
+.sub   { fill: #6b7280; font-size: 13px; }
+.step  { fill: #017BC4; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; }
+.term  { fill: #12232e; }
+.tp    { fill: #7fc2ea; font-size: 13px; }
+.tt    { fill: #e8edf2; font-size: 12.5px; }
+.tm    { fill: #9aa3ad; font-size: 11.5px; }
+.cbad  { fill: #fdeee4; stroke: #E35205; stroke-width: 1.8; }
+.cok   { fill: #e9f2f9; stroke: #017BC4; stroke-width: 1.8; }
+.hbad  { fill: #b34205; font-size: 15px; font-weight: 700; }
+.hok   { fill: #0a5f96; font-size: 15px; font-weight: 700; }
+.port  { fill: #12232e; font-size: 13px; font-weight: 700; }
+.code  { fill: #1f2933; font-size: 12px; }
+.cm    { fill: #6b7280; font-size: 11.5px; }
+.panel { fill: #ffffff; stroke: #c9d4de; stroke-width: 1.2; }
+.lbl   { fill: #6b7280; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; }
+.rbad  { fill: #b34205; font-size: 13px; font-weight: 700; }
+.rok   { fill: #017BC4; font-size: 13px; font-weight: 700; }
+.logq  { fill: #1f2933; font-size: 11.5px; }
+.logw  { fill: #b34205; font-size: 11.5px; font-weight: 700; }
+.note  { fill: #1f2933; font-size: 12px; }
+.wire  { stroke: #9fb8c9; stroke-width: 1.6; fill: none; }
+.head  { fill: #9fb8c9; }
+.strip { fill: #f5f8fa; stroke: #c9d4de; stroke-width: 1.2; }
+.st    { fill: #12232e; font-size: 13.5px; font-weight: 700; }
+.sb    { fill: #1f2933; font-size: 12.5px; }
+.sm    { fill: #6b7280; font-size: 11.5px; }
+@media (prefers-color-scheme: dark) {
+  .bg    { fill: #0f1419; }
+  .h1    { fill: #e8edf2; }
+  .sub   { fill: #9aa3ad; }
+  .step  { fill: #4aa3dd; }
+  .term  { fill: #05080b; }
+  .cbad  { fill: #3a2213; stroke: #ff7a3d; }
+  .cok   { fill: #12283a; stroke: #4aa3dd; }
+  .hbad  { fill: #ff9b63; }
+  .hok   { fill: #7fc2ea; }
+  .port  { fill: #e8edf2; }
+  .code  { fill: #dde4ea; }
+  .cm    { fill: #9aa3ad; }
+  .panel { fill: #171d24; stroke: #31404d; }
+  .lbl   { fill: #9aa3ad; }
+  .rbad  { fill: #ff9b63; }
+  .rok   { fill: #4aa3dd; }
+  .logq  { fill: #dde4ea; }
+  .logw  { fill: #ff9b63; }
+  .note  { fill: #dde4ea; }
+  .wire  { stroke: #4c6070; }
+  .head  { fill: #4c6070; }
+  .strip { fill: #141b22; stroke: #31404d; }
+  .st    { fill: #e8edf2; }
+  .sb    { fill: #dde4ea; }
+  .sm    { fill: #9aa3ad; }
+}
+</style>
+
+<rect class="bg" x="0" y="0" width="960" height="524"/>
+
+<text class="h1"  x="24" y="34">Task 1b at a glance: same request, two services</text>
+<text class="sub" x="24" y="55">Both containers use the same image and mount the same lab folder. Only the Python file they run differs.</text>
+
+<!-- step labels -->
+<text class="step" x="24"  y="88">① START BOTH</text>
+<text class="step" x="250" y="88">TWO CONTAINERS</text>
+<text class="step" x="566" y="88">② GET /admin, NO TOKEN  ·  ③ READ THE LOGS</text>
+
+<!-- ① terminal -->
+<rect class="term" x="24" y="100" width="196" height="306" rx="8"/>
+<text class="tm" x="38" y="124">in the lab folder:</text>
+<text class="tp mono" x="38" y="150">$ docker compose up</text>
+<text class="tm" x="38" y="176">pulls python:3.12-slim</text>
+<text class="tm" x="38" y="194">mounts ./ as /lab</text>
+<text class="tm" x="38" y="212">pip install flask</text>
+<text class="tt mono" x="38" y="246">--- INSECURE service</text>
+<text class="tt mono" x="38" y="264">    on :8090 ---</text>
+<text class="tt mono" x="38" y="296">--- SECURE service</text>
+<text class="tt mono" x="38" y="314">    on :8091 ---</text>
+<text class="tm" x="38" y="350">compose -p &lt;name&gt; down</text>
+<text class="tm" x="38" y="368">when you finish</text>
+
+<path class="wire" d="M220 172 H242"/>
+<polygon class="head" points="241,166.5 241,177.5 248,172"/>
+<path class="wire" d="M220 334 H242"/>
+<polygon class="head" points="241,328.5 241,339.5 248,334"/>
+
+<!-- containers -->
+<rect class="cbad" x="250" y="100" width="300" height="146" rx="8"/>
+<text class="hbad" x="264" y="124">FAILS OPEN</text>
+<text class="port mono" x="372" y="124">localhost:8090</text>
+<text class="cm mono" x="264" y="144">insecure-service · insecure_service.py</text>
+<text class="code mono" x="264" y="172">user = USERS[token]</text>
+<text class="cm" x="264" y="189">no token → KeyError</text>
+<text class="code mono" x="264" y="213">except Exception:</text>
+<text class="code mono" x="264" y="230">  return …UNLOCKED, SECRET</text>
+
+<rect class="cok" x="250" y="260" width="300" height="146" rx="8"/>
+<text class="hok" x="264" y="284">FAILS CLOSED</text>
+<text class="port mono" x="384" y="284">localhost:8091</text>
+<text class="cm mono" x="264" y="304">secure-service · secure_service.py</text>
+<text class="code mono" x="264" y="332">user = USERS.get(token)</text>
+<text class="cm" x="264" y="349">no token → None, never raises</text>
+<text class="code mono" x="264" y="373">security_log.warning(…)</text>
+<text class="code mono" x="264" y="390">return …forbidden, 403</text>
+
+<path class="wire" d="M550 172 H558"/>
+<polygon class="head" points="557,166.5 557,177.5 564,172"/>
+<path class="wire" d="M550 334 H558"/>
+<polygon class="head" points="557,328.5 557,339.5 564,334"/>
+
+<!-- results -->
+<rect class="panel" x="564" y="100" width="372" height="146" rx="8"/>
+<text class="lbl" x="578" y="122">RESPONSE</text>
+<text class="rbad mono" x="578" y="142">200 {"panel":"UNLOCKED",</text>
+<text class="rbad mono" x="578" y="160">     "secret":"FLAG{devsecops_…}"}</text>
+<text class="lbl" x="578" y="188">DOCKER COMPOSE LOGS</text>
+<text class="logq mono" x="578" y="207">"GET /admin HTTP/1.1" 200 -</text>
+<text class="note" x="578" y="232">Only the access line. The attack looks like a success (A09).</text>
+
+<rect class="panel" x="564" y="260" width="372" height="146" rx="8"/>
+<text class="lbl" x="578" y="282">RESPONSE</text>
+<text class="rok mono" x="578" y="302">403 {"error":"forbidden"}</text>
+<text class="lbl" x="578" y="330">DOCKER COMPOSE LOGS</text>
+<text class="logw mono" x="578" y="349">level=WARNING logger=security</text>
+<text class="logw mono" x="578" y="366">event=authz_failure outcome=deny</text>
+<text class="logw mono" x="578" y="383">src_ip=… reason=unauthenticated</text>
+<text class="logq mono" x="578" y="399">… "GET /admin HTTP/1.1" 403 -</text>
+
+<!-- ④ anti-cheat + evidence -->
+<rect class="strip" x="24" y="422" width="912" height="88" rx="8"/>
+<text class="step" x="40" y="446">④ PROVE THE FIX KEEPS ADMINS IN</text>
+<text class="sb" x="40" y="467">The same request with alice-token still unlocks :8091.</text>
+<text class="sb" x="40" y="484">The auto-grader passes a hardened box only if every bypass</text>
+<text class="sb" x="40" y="501">is blocked and a real admin still gets in.</text>
+<text class="st" x="620" y="446">Submit for Task 1b</text>
+<text class="sm" x="620" y="467">the flag · both responses · the except</text>
+<text class="sm" x="620" y="484">line in insecure_service.py that fails open</text>
+<text class="sm" x="620" y="501">local run = public demo flag · graded = hosted</text>
+</svg>

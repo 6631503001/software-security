@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css"></head>
+<body>
+<h1>Same request, two services: which one fails open?</h1>
+<p class="lead">Pick what goes in the <code>Authorization</code> header of <code>GET /admin</code>.
+Both of this week's real services answer at once: <code>insecure_service.py</code> on :8090 and
+<code>secure_service.py</code> on :8091. You see the status, the body, the code path that ran and the
+log lines <code>docker compose logs</code> prints. Nothing is sent anywhere. Every response and log line
+was captured from the real containers.</p>
+<div class="card">
+  <label for="token">Header sent with <code>GET /admin</code></label>
+  <select id="token" class="fo-sel">
+    <option value="none" selected>no Authorization header at all</option>
+    <option value="garbage">Authorization: garbage (a token nobody issued)</option>
+    <option value="alice-token">Authorization: alice-token (alice, an admin)</option>
+    <option value="bob-token">Authorization: bob-token (bob, a user but not an admin)</option>
+  </select>
+  <label class="fo-check"><input type="checkbox" id="xff"> also send <code>X-Forwarded-For: 203.0.113.9</code></label>
+  <div class="preset" id="presets"></div>
+</div>
+<div class="fo-panes">
+  <div class="card fo-pane" id="pane-insecure">
+    <h3>:8090 · insecure_service.py</h3>
+    <p class="fo-status" id="status-insecure"></p>
+    <div class="fo-body" id="body-insecure"></div>
+    <p class="fo-sub">Code path that ran</p>
+    <ol class="fo-trace" id="trace-insecure"></ol>
+    <p class="fo-sub">docker compose logs insecure-service</p>
+    <div class="fo-log" id="log-insecure"></div>
+  </div>
+  <div class="card fo-pane" id="pane-secure">
+    <h3>:8091 · secure_service.py</h3>
+    <p class="fo-status" id="status-secure"></p>
+    <div class="fo-body" id="body-secure"></div>
+    <p class="fo-sub">Code path that ran</p>
+    <ol class="fo-trace" id="trace-secure"></ol>
+    <p class="fo-sub">docker compose logs secure-service</p>
+    <div class="fo-log" id="log-secure"></div>
+  </div>
+</div>
+<div class="card card-gap">
+  <p class="verdict" id="verdict"></p>
+  <p id="explain"></p>
+  <p class="fo-note" id="note"></p>
+</div>
+<script src="/static/sim/fail-open.js?v={{ asset_v }}"></script>
+</body></html>

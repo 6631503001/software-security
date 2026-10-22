@@ -1,0 +1,50 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css"></head>
+<body>
+<h1>Who wrote the attack? Indirect injection through a retrieved page</h1>
+<p class="lead"><strong class="rag-inject-mock">MOCK RAG APP</strong> — this week's lab has no
+retrieval step, so this page adds one line of glue: the fetched page is pasted into the user
+turn as <code>"Doc: " + page + "\nQuestion: " + question</code>. The model, the guard and the
+redaction are this week's real code (<code>mock_llm()</code> from
+<code>vulnerable_chatbot.py</code>; <code>input_guardrail()</code> and
+<code>redact_secret()</code> from <code>guarded_chatbot.py</code>). Edit the page, keep the
+question innocent, and watch who is really giving the orders.</p>
+<div class="wrap">
+  <div class="card">
+    <label for="doc">The web page the bot retrieves (attacker-controlled)</label>
+    <textarea id="doc" rows="6" spellcheck="false"></textarea>
+    <div class="preset" id="doc-presets"></div>
+    <label>A person viewing that page sees (comments are not displayed)</label>
+    <div class="q rag-inject-human" id="human"></div>
+    <label for="q">What the user types</label>
+    <input type="text" id="q" autocomplete="off" spellcheck="false">
+    <div class="preset" id="q-presets"></div>
+    <fieldset class="mass-assign-mode">
+      <legend>Input guard</legend>
+      <label class="mass-assign-radio"><input type="radio" name="guard" id="g-none" checked> none — like <code>vulnerable_chatbot.py</code></label>
+      <label class="mass-assign-radio"><input type="radio" name="guard" id="g-user"> on the question only — what <code>guarded_chatbot.py</code> does</label>
+      <label class="mass-assign-radio"><input type="radio" name="guard" id="g-both"> on the question <em>and</em> the retrieved page</label>
+    </fieldset>
+    <label class="mass-assign-radio rag-inject-check"><input type="checkbox" id="redact"> <code>redact_secret()</code> on the reply</label>
+  </div>
+  <div class="card">
+    <h3>What ran</h3>
+    <div id="steps"></div>
+    <h3>Answer shown to the user</h3>
+    <div class="q" id="answer"></div>
+    <p class="verdict" id="verdict"></p>
+    <p id="explain"></p>
+  </div>
+</div>
+<div class="card card-gap">
+  <h3>The one string the model reads</h3>
+  <div class="q rag-inject-ctx" id="ctx"></div>
+  <p class="rag-inject-legend"><span class="rag-inject-sys">developer's system prompt</span>
+  <span class="rag-inject-doc">retrieved page</span> <span class="rag-inject-q">user's question</span>
+  <mark class="rag-inject-hit">the text that decided the outcome</mark></p>
+  <p class="hint">guarded_chatbot.py's strongest fix isn't a filter at all: its SYSTEM_PROMPT holds
+  no secret, so even a hijacked model has nothing to leak.</p>
+</div>
+<script src="/static/sim/rag-inject.js?v={{ asset_v }}"></script>
+</body></html>

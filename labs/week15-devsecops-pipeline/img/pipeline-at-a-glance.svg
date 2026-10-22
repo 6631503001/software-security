@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-label="The security-ci.yml pipeline at a glance. A push or pull request to main starts three jobs in parallel, each with the least-privilege token contents read and security-events write. Every job has the same three phases. Phase one is the report run, which never fails the build: Semgrep scans with the p/default and p/owasp-top-ten rulesets into SARIF with or-true; Trivy runs a filesystem scan with the vuln and secret scanners and a config scan of the Dockerfile and IaC, both with exit-code 0; Gitleaks scans the whole git history, because checkout uses fetch-depth 0, with exit-code 0. Phase two uploads each SARIF file with if always. All of it lands in the GitHub Security tab as code-scanning alerts, at every severity, because trivy-action drops the severity filter for SARIF unless limit-severities-for-sarif is set. Phase three is the gate, the only step that can fail the build. Semgrep's gate uses --error with no severity filter, so any finding fails. Trivy has two gates, SCA then IaC, both exit-code 1 and filtered to HIGH and CRITICAL; if the SCA gate fails, the IaC gate is skipped. Gitleaks' gate uses exit-code 1 with no severity filter, so any secret fails. Any red gate turns the build red. The report shows you everything; the gate decides.">
+<title>The security-ci.yml pipeline at a glance: report first, gate last</title>
+<style>
+text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.mono  { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.bg    { fill: #ffffff; }
+.h1    { fill: #12232e; font-size: 20px; font-weight: 700; }
+.sub   { fill: #6b7280; font-size: 13px; }
+.colh  { fill: #017BC4; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; }
+.colhg { fill: #b34205; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; }
+.cols  { fill: #6b7280; font-size: 12px; }
+.trig  { fill: #12232e; }
+.trigt { fill: #ffffff; font-size: 14px; font-weight: 700; }
+.trigs { fill: #d6dee5; font-size: 11.5px; }
+.job   { fill: #f2f6f9; stroke: #c9d4de; stroke-width: 1.2; }
+.jt    { fill: #12232e; font-size: 16px; font-weight: 700; }
+.js    { fill: #017BC4; font-size: 12.5px; font-weight: 700; }
+.jn    { fill: #6b7280; font-size: 11.5px; }
+.cell  { fill: #ffffff; stroke: #c9d4de; stroke-width: 1.2; }
+.gate  { fill: #fdeee4; stroke: #E35205; stroke-width: 1.8; }
+.ct    { fill: #1f2933; font-size: 12.5px; }
+.cb    { fill: #12232e; font-size: 12.5px; font-weight: 700; }
+.cm    { fill: #6b7280; font-size: 11.5px; }
+.ok    { fill: #017BC4; font-size: 12px; font-weight: 700; }
+.no    { fill: #b34205; font-size: 12px; font-weight: 700; }
+.wire  { stroke: #9fb8c9; stroke-width: 1.6; fill: none; }
+.wireg { stroke: #E35205; stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+.wireb { stroke: #017BC4; stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+.head  { fill: #9fb8c9; }
+.headg { fill: #E35205; }
+.headb { fill: #017BC4; }
+.sinkb { fill: #e9f2f9; stroke: #017BC4; stroke-width: 1.6; }
+.sinkg { fill: #fdeee4; stroke: #E35205; stroke-width: 1.8; }
+.st    { fill: #12232e; font-size: 14px; font-weight: 700; }
+.sb    { fill: #1f2933; font-size: 12.5px; }
+.foot  { fill: #6b7280; font-size: 11.5px; }
+@media (prefers-color-scheme: dark) {
+  .bg    { fill: #0f1419; }
+  .h1    { fill: #e8edf2; }
+  .sub   { fill: #9aa3ad; }
+  .colh  { fill: #4aa3dd; }
+  .colhg { fill: #ff9b63; }
+  .cols  { fill: #9aa3ad; }
+  .trig  { fill: #e8edf2; }
+  .trigt { fill: #0f1419; }
+  .trigs { fill: #31404d; }
+  .job   { fill: #1e262e; stroke: #31404d; }
+  .jt    { fill: #e8edf2; }
+  .js    { fill: #4aa3dd; }
+  .jn    { fill: #9aa3ad; }
+  .cell  { fill: #171d24; stroke: #31404d; }
+  .gate  { fill: #3a2213; stroke: #ff7a3d; }
+  .ct    { fill: #dde4ea; }
+  .cb    { fill: #e8edf2; }
+  .cm    { fill: #9aa3ad; }
+  .ok    { fill: #4aa3dd; }
+  .no    { fill: #ff9b63; }
+  .wire  { stroke: #4c6070; }
+  .wireg { stroke: #ff7a3d; }
+  .wireb { stroke: #4aa3dd; }
+  .head  { fill: #4c6070; }
+  .headg { fill: #ff7a3d; }
+  .headb { fill: #4aa3dd; }
+  .sinkb { fill: #12283a; stroke: #4aa3dd; }
+  .sinkg { fill: #3a2213; stroke: #ff7a3d; }
+  .st    { fill: #e8edf2; }
+  .sb    { fill: #dde4ea; }
+  .foot  { fill: #9aa3ad; }
+}
+</style>
+
+<rect class="bg" x="0" y="0" width="960" height="520"/>
+
+<text class="h1"  x="24" y="34">One push, three jobs: report first, gate last</text>
+<text class="sub mono" x="24" y="56">security-ci.yml · on: push / pull_request to main · permissions: contents: read, security-events: write</text>
+
+<!-- column headers -->
+<text class="colh"  x="306" y="88">① REPORT · never fails</text>
+<text class="cols"  x="306" y="103">scan → SARIF file</text>
+<text class="colh"  x="566" y="88">② UPLOAD</text>
+<text class="cols mono" x="566" y="103">if: always()</text>
+<text class="colhg" x="706" y="88">③ GATE · can fail the build</text>
+<text class="cols"  x="706" y="103">re-scan, exit non-zero on findings</text>
+
+<!-- trigger -->
+<rect class="trig" x="24" y="218" width="112" height="82" rx="8"/>
+<text class="trigt" x="80" y="248" text-anchor="middle">git push</text>
+<text class="trigt" x="80" y="266" text-anchor="middle">or PR</text>
+<text class="trigs" x="80" y="286" text-anchor="middle">3 jobs, parallel</text>
+<path class="wire" d="M136 259 H150 V160 H162"/>
+<path class="wire" d="M150 259 H162"/>
+<path class="wire" d="M150 259 V374 H162"/>
+<polygon class="head" points="161,154.5 161,165.5 168,160"/>
+<polygon class="head" points="161,253.5 161,264.5 168,259"/>
+<polygon class="head" points="161,368.5 161,379.5 168,374"/>
+
+<!-- vertical buses to the sinks (drawn first, cells sit on top) -->
+<path class="wireb" d="M630 196 V420"/>
+<path class="wireg" d="M820 196 V420"/>
+<polygon class="headb" points="624.5,419 635.5,419 630,426"/>
+<polygon class="headg" points="814.5,419 825.5,419 820,426"/>
+
+<!-- ============ ROW 1 : SEMGREP ============ -->
+<rect class="job"  x="170" y="116" width="124" height="88" rx="7"/>
+<text class="jt" x="182" y="142">Semgrep</text>
+<text class="js" x="182" y="160">SAST</text>
+<text class="jn" x="182" y="178">your own code</text>
+<text class="jn" x="182" y="193">p/default + owasp</text>
+
+<rect class="cell" x="302" y="116" width="246" height="88" rx="7"/>
+<text class="ct mono" x="314" y="140">semgrep scan --sarif</text>
+<text class="ct mono" x="314" y="158">  … --error || true</text>
+<text class="ok" x="314" y="190">exit 0 every time</text>
+
+<path class="wire" d="M548 160 H556"/>
+<polygon class="head" points="555,154.5 555,165.5 562,160"/>
+<rect class="cell" x="562" y="116" width="134" height="88" rx="7"/>
+<text class="cb" x="574" y="140">upload-sarif</text>
+<text class="cm mono" x="574" y="158">category:</text>
+<text class="cm mono" x="574" y="174">semgrep</text>
+
+<path class="wire" d="M696 160 H704"/>
+<polygon class="head" points="703,154.5 703,165.5 710,160"/>
+<rect class="gate" x="710" y="116" width="226" height="88" rx="7"/>
+<text class="ct mono" x="722" y="140">semgrep scan --error</text>
+<text class="cb" x="722" y="166">no severity filter</text>
+<text class="no" x="722" y="190">any finding → red</text>
+
+<!-- ============ ROW 2 : TRIVY ============ -->
+<rect class="job"  x="170" y="214" width="124" height="120" rx="7"/>
+<text class="jt" x="182" y="240">Trivy</text>
+<text class="js" x="182" y="258">SCA + IaC</text>
+<text class="jn" x="182" y="276">dependencies,</text>
+<text class="jn" x="182" y="291">secrets,</text>
+<text class="jn" x="182" y="306">Dockerfile</text>
+
+<rect class="cell" x="302" y="214" width="246" height="120" rx="7"/>
+<text class="ct mono" x="314" y="238">fs  scanners: vuln,secret</text>
+<text class="ct mono" x="314" y="256">config  (Dockerfile, IaC)</text>
+<text class="ct mono" x="314" y="276">exit-code: "0"</text>
+<text class="ok" x="314" y="300">exit 0 every time</text>
+<text class="cm" x="314" y="320">SARIF keeps every severity *</text>
+
+<path class="wire" d="M548 274 H556"/>
+<polygon class="head" points="555,268.5 555,279.5 562,274"/>
+<rect class="cell" x="562" y="214" width="134" height="120" rx="7"/>
+<text class="cb" x="574" y="238">upload-sarif ×2</text>
+<text class="cm mono" x="574" y="256">trivy-fs</text>
+<text class="cm mono" x="574" y="272">trivy-config</text>
+
+<path class="wire" d="M696 274 H704"/>
+<polygon class="head" points="703,268.5 703,279.5 710,274"/>
+<rect class="gate" x="710" y="214" width="226" height="120" rx="7"/>
+<text class="ct mono" x="722" y="238">SCA gate  fs   exit-code "1"</text>
+<text class="ct mono" x="722" y="256">IaC gate  config  "1"</text>
+<text class="cb" x="722" y="280">only HIGH,CRITICAL</text>
+<text class="no" x="722" y="302">MEDIUM passes the gate</text>
+<text class="cm" x="722" y="322">SCA red → IaC gate skipped</text>
+
+<!-- ============ ROW 3 : GITLEAKS ============ -->
+<rect class="job"  x="170" y="344" width="124" height="70" rx="7"/>
+<text class="jt" x="182" y="368">Gitleaks</text>
+<text class="js" x="182" y="386">secrets</text>
+<text class="jn" x="182" y="403">all git history</text>
+
+<rect class="cell" x="302" y="344" width="246" height="70" rx="7"/>
+<text class="ct mono" x="314" y="368">gitleaks detect</text>
+<text class="ct mono" x="314" y="386">  --exit-code 0 || true</text>
+<text class="ok" x="314" y="404">exit 0 every time</text>
+
+<path class="wire" d="M548 379 H556"/>
+<polygon class="head" points="555,373.5 555,384.5 562,379"/>
+<rect class="cell" x="562" y="344" width="134" height="70" rx="7"/>
+<text class="cb" x="574" y="368">upload-sarif</text>
+<text class="cm mono" x="574" y="386">gitleaks</text>
+
+<path class="wire" d="M696 379 H704"/>
+<polygon class="head" points="703,373.5 703,384.5 710,379"/>
+<rect class="gate" x="710" y="344" width="226" height="70" rx="7"/>
+<text class="ct mono" x="722" y="368">gitleaks --exit-code 1</text>
+<text class="cb" x="722" y="386">no severity filter</text>
+<text class="no" x="722" y="404">any secret → red</text>
+
+<!-- ============ SINKS ============ -->
+<rect class="sinkb" x="302" y="428" width="394" height="58" rx="8"/>
+<text class="st" x="316" y="451">GitHub Security tab · code-scanning alerts</text>
+<text class="sb" x="316" y="472">every finding, every severity: you SEE everything</text>
+
+<rect class="sinkg" x="710" y="428" width="226" height="58" rx="8"/>
+<text class="st" x="722" y="451">Build status</text>
+<text class="sb" x="722" y="472">any red gate = red build</text>
+
+<text class="foot" x="24" y="506">* trivy-action drops the severity filter for SARIF output unless limit-severities-for-sarif is set, so DS-0001 (MEDIUM) shows in the tab but never fails the gate.</text>
+</svg>

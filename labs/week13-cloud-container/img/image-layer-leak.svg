@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" role="img" aria-label="Where the secret in Dockerfile.insecure ends up once the image is built, from a real build of week13-insecure:lab. On the left, the image's history as a stack, newest at the top: CMD, EXPOSE 5000, RUN chmod -R 777 /app at 77.8 kB, RUN pip install at 19.1 MB, COPY dot dot at 77.8 kB, WORKDIR /app, then ENV AWS_SECRET_ACCESS_KEY and ENV API_TOKEN, each 0 bytes, and at the bottom the 11 layers of python:latest. The two ENV rows are highlighted: they are 0 bytes because the value is not a file, it is written into the image config that ships with every pull. On the right, three ways to read it back. One: plain docker history truncates the row at 45 characters but still prints sk_live_supersecret_DO_NOT_DO_ followed by an ellipsis, 30 of the token's 34 characters. Two: docker history --no-trunc prints the full ENV API_TOKEN=sk_live_supersecret_DO_NOT_DO_THIS, which is the Task 3 command. Three: docker inspect .Config.Env prints both secrets in full, and every process in the container inherits them. A fourth arrow from the COPY dot dot layer: it copied Dockerfile.insecure itself into /app, so the secret is also in a file. The fix along the bottom: never write the secret into the Dockerfile; inject it at run time from a mounted secret or secrets manager, then rotate the leaked key, because every existing copy of the image keeps it.">
+<title>One ENV line, three ways to read it back</title>
+<style>
+svg { font-family: system-ui, sans-serif; }
+.bg     { fill: #ffffff; }
+.h1     { fill: #111827; font-size: 21px; font-weight: 700; }
+.h2     { fill: #6b7280; font-size: 14px; }
+.lay    { fill: #f3f4f6; stroke: #cbd5e1; stroke-width: 1; }
+.layB   { fill: #e5e7eb; stroke: #cbd5e1; stroke-width: 1; }
+.layS   { fill: #fdece5; stroke: #E35205; stroke-width: 2; }
+.layC   { fill: #fff7ed; stroke: #E35205; stroke-width: 1.2; stroke-dasharray: 4 3; }
+.lt     { fill: #111827; font-size: 14px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.ltS    { fill: #9a3803; font-size: 14px; font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.ltM    { fill: #6b7280; font-size: 14px; font-style: italic; }
+.sz     { fill: #6b7280; font-size: 13px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.szS    { fill: #9a3803; font-size: 13px; font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.cap    { fill: #6b7280; font-size: 13px; font-weight: 700; letter-spacing: .05em; }
+.box    { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.2; }
+.cmd    { fill: #01609a; font-size: 14px; font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.out    { fill: #111827; font-size: 14px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.sec    { fill: #E35205; font-weight: 700; }
+.note   { fill: #4b5563; font-size: 13.5px; }
+.e      { stroke: #E35205; stroke-width: 2; fill: none; }
+.e2     { stroke: #E35205; stroke-width: 1.6; stroke-dasharray: 5 4; fill: none; }
+.ah     { fill: #E35205; }
+.fix    { fill: #01609a; font-size: 16px; font-weight: 700; }
+.fix2   { fill: #111827; font-size: 15px; }
+@media (prefers-color-scheme: dark) {
+  .bg     { fill: #0f1419; }
+  .h1     { fill: #e5e7eb; }
+  .h2     { fill: #9aa3ad; }
+  .lay    { fill: #161c23; stroke: #2c3742; }
+  .layB   { fill: #1f2730; stroke: #2c3742; }
+  .layS   { fill: #3a1c10; stroke: #ff7a3d; }
+  .layC   { fill: #241811; stroke: #ff7a3d; }
+  .lt     { fill: #e5e7eb; }
+  .ltS    { fill: #ff9f6e; }
+  .ltM    { fill: #9aa3ad; }
+  .sz     { fill: #9aa3ad; }
+  .szS    { fill: #ff9f6e; }
+  .cap    { fill: #9aa3ad; }
+  .box    { fill: #161c23; stroke: #3b4756; }
+  .cmd    { fill: #4aa3dd; }
+  .out    { fill: #e5e7eb; }
+  .sec    { fill: #ff7a3d; }
+  .note   { fill: #9aa3ad; }
+  .e      { stroke: #ff7a3d; }
+  .e2     { stroke: #ff7a3d; }
+  .ah     { fill: #ff7a3d; }
+  .fix    { fill: #4aa3dd; }
+  .fix2   { fill: #e5e7eb; }
+}
+</style>
+
+<rect class="bg" x="0" y="0" width="900" height="400"/>
+
+<text class="h1" x="24" y="34">One ENV line, three ways to read it back</text>
+<text class="h2" x="24" y="56">real build of week13-insecure:lab, newest layer on top · ENV rows are 0B: the value is in the image config, shipped with every pull</text>
+
+<!-- ===== layer stack (left) ===== -->
+<rect class="lay" x="24" y="78" width="360" height="26" rx="4"/>
+<text class="lt" x="34" y="96">CMD ["python" "app.py"]</text><text class="sz" x="374" y="96" text-anchor="end">0B</text>
+<rect class="lay" x="24" y="106" width="360" height="26" rx="4"/>
+<text class="lt" x="34" y="124">EXPOSE [5000/tcp]</text><text class="sz" x="374" y="124" text-anchor="end">0B</text>
+<rect class="lay" x="24" y="134" width="360" height="26" rx="4"/>
+<text class="lt" x="34" y="152">RUN chmod -R 777 /app</text><text class="sz" x="374" y="152" text-anchor="end">77.8kB</text>
+<rect class="lay" x="24" y="162" width="360" height="26" rx="4"/>
+<text class="lt" x="34" y="180">RUN pip install -r requirements…</text><text class="sz" x="374" y="180" text-anchor="end">19.1MB</text>
+<rect class="layC" x="24" y="190" width="360" height="26" rx="4"/>
+<text class="lt" x="34" y="208">COPY . .</text><text class="sz" x="374" y="208" text-anchor="end">77.8kB</text>
+<rect class="lay" x="24" y="218" width="360" height="26" rx="4"/>
+<text class="lt" x="34" y="236">WORKDIR /app</text><text class="sz" x="374" y="236" text-anchor="end">8.19kB</text>
+<rect class="layS" x="24" y="246" width="360" height="26" rx="4"/>
+<text class="ltS" x="34" y="264">ENV AWS_SECRET_ACCESS_KEY=…</text><text class="szS" x="374" y="264" text-anchor="end">0B</text>
+<rect class="layS" x="24" y="274" width="360" height="26" rx="4"/>
+<text class="ltS" x="34" y="292">ENV API_TOKEN=sk_live_…</text><text class="szS" x="374" y="292" text-anchor="end">0B</text>
+<rect class="layB" x="24" y="302" width="360" height="26" rx="4"/>
+<text class="ltM" x="34" y="320">11 layers of python:latest</text>
+
+<!-- ===== connectors ===== -->
+<path class="e" d="M384,287 C420,287 420,109 452,109"/>
+<path class="e" d="M384,287 C428,287 428,181 452,181"/>
+<path class="e" d="M384,259 C430,259 430,253 452,253"/>
+<path class="e2" d="M384,203 C414,203 414,318 452,318"/>
+<path class="ah" d="M452,103 L462,109 L452,115 Z"/>
+<path class="ah" d="M452,175 L462,181 L452,187 Z"/>
+<path class="ah" d="M452,247 L462,253 L452,259 Z"/>
+<path class="ah" d="M452,312 L462,318 L452,324 Z"/>
+
+<!-- ===== readouts (right) ===== -->
+<rect class="box" x="464" y="78" width="412" height="62" rx="8"/>
+<text class="cmd" x="476" y="99">1  docker history</text>
+<text class="out" x="476" y="121">API_TOKEN=<tspan class="sec">sk_live_supersecret_DO_NOT_DO_</tspan>…</text>
+<text class="note" x="864" y="99" text-anchor="end">30 of 34 chars</text>
+
+<rect class="box" x="464" y="150" width="412" height="62" rx="8"/>
+<text class="cmd" x="476" y="171">2  docker history --no-trunc</text>
+<text class="out" x="476" y="193">API_TOKEN=<tspan class="sec">sk_live_supersecret_DO_NOT_DO_THIS</tspan></text>
+<text class="note" x="864" y="171" text-anchor="end">Task 3</text>
+
+<rect class="box" x="464" y="222" width="412" height="62" rx="8"/>
+<text class="cmd" x="476" y="243">3  docker inspect  .Config.Env</text>
+<text class="out" x="476" y="265">both keys in full — every process gets them</text>
+
+<rect class="box" x="464" y="294" width="412" height="48" rx="8"/>
+<text class="cmd" x="476" y="314">+  COPY . . copied Dockerfile.insecure</text>
+<text class="out" x="476" y="333">into /app — the secret is in a file too</text>
+
+<!-- ===== fix ===== -->
+<text class="fix"  x="24" y="366">Fix:</text>
+<text class="fix2" x="64" y="366">never put the secret in the Dockerfile — inject it at run time (mounted secret / secrets manager).</text>
+<text class="fix2" x="64" y="388">Every image already pushed keeps the old value, so rotate the key as well.</text>
+</svg>

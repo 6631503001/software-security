@@ -1,0 +1,42 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css"></head>
+<body>
+<h1>Red team opens a PR. Which job goes red, and at which step?</h1>
+<p class="lead">Choose where the repo starts, plant one or more defects, and read the Actions run step by step,
+the way GitHub shows it for <code>security-ci.yml</code>. The outcomes come from running the workflow's own gate
+commands against the real lab files. Nothing is sent anywhere.</p>
+<div class="card">
+  <div class="rt-controls">
+    <fieldset class="rt-group">
+      <legend>The repo starts as</legend>
+      <label class="rt-radio"><input type="radio" name="start" id="start-raw" checked>
+        the untouched lab copy, as Task 2 pushes it</label>
+      <label class="rt-radio"><input type="radio" name="start" id="start-blue">
+        after Blue's Task 3 fixes: actions pinned to commit SHAs, <code># nosemgrep</code> plus a reason on
+        <code>host="0.0.0.0"</code>, and <code>.gitleaksignore</code> for the docs' false positives</label>
+    </fieldset>
+    <fieldset class="rt-group">
+      <legend>Red team's PR adds</legend>
+      <label class="rt-radio"><input type="checkbox" id="d-dep"> <code>requirements.txt</code> pinning
+        <code>urllib3==1.24.1</code></label>
+      <label class="rt-lbl" for="d-docker"><code>Dockerfile</code></label>
+      <select id="d-docker" class="rt-sel">
+        <option value="none" selected>no Dockerfile</option>
+        <option value="nouser">a Dockerfile with no USER line</option>
+        <option value="root">a Dockerfile whose last USER is root</option>
+      </select>
+      <label class="rt-radio"><input type="checkbox" id="d-token"> <code>settings.py</code> with
+        <code>GITHUB_TOKEN = "ghp_&hellip;"</code> (a GitHub-format token)</label>
+    </fieldset>
+  </div>
+  <div class="preset" id="presets"></div>
+</div>
+<div class="rt-jobs" id="jobs"></div>
+<div class="card card-gap">
+  <p class="verdict" id="verdict"></p>
+  <ul class="rt-why" id="why"></ul>
+  <p class="rt-sarif" id="sarif"></p>
+</div>
+<script src="/static/sim/red-team-pr.js?v={{ asset_v }}"></script>
+</body></html>

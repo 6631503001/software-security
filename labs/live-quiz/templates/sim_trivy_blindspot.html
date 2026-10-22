@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css?v={{ asset_v }}"></head>
+<body>
+<h1>Six defects, one scanner — which ones does Trivy see?</h1>
+<p class="lead">Fix the defects in <code>Dockerfile.insecure</code> one at a time (the fixes are the
+lines from <code>Dockerfile.hardened</code>) and watch <code>trivy config</code> re-score the file.
+The rules are Trivy 0.76.1's, checked against a real scan of every combination below — nothing is
+sent anywhere.</p>
+<div class="wrap">
+  <div class="card">
+    <h3>harden.md rows — fix each one</h3>
+    <div class="trivyb-row">
+      <label for="d-from"><b>1</b> Base image <span class="trivyb-cwe">CWE-1104 · CWE-16</span></label>
+      <select id="d-from" class="trivyb-sel">
+        <option value="latest" selected>python:latest (as shipped)</option>
+        <option value="tag">python:3.11-slim (a tag, no digest)</option>
+        <option value="digest">python:3.11-slim@sha256:… (digest pin)</option>
+      </select>
+    </div>
+    <label class="trivyb-check"><input type="checkbox" id="d-env"> <b>2</b> Remove the secrets from <code>ENV</code>
+      <span class="trivyb-cwe">CWE-526 · CWE-798 · CWE-200</span></label>
+    <label class="trivyb-check"><input type="checkbox" id="d-copy"> <b>3</b> Copy only what the app needs, not <code>COPY . .</code>
+      <span class="trivyb-cwe">CWE-538</span></label>
+    <label class="trivyb-check"><input type="checkbox" id="d-chmod"> <b>4</b> Drop <code>chmod -R 777</code>
+      <span class="trivyb-cwe">CWE-732</span></label>
+    <label class="trivyb-check"><input type="checkbox" id="d-user"> <b>5</b> Add <code>USER 65532:65532</code> (non-root)
+      <span class="trivyb-cwe">CWE-250</span></label>
+    <label class="trivyb-check"><input type="checkbox" id="d-pip"> <b>6</b> Pinned install in a venv, <code>--no-cache-dir</code>
+      <span class="trivyb-cwe">CWE-1104</span></label>
+    <label class="trivyb-check trivyb-low"><input type="checkbox" id="d-low"> Drop the <code>--severity</code> filter (show LOW too)</label>
+    <div class="preset" id="presets"></div>
+    <h3>The file Trivy scans</h3>
+    <div class="trivyb-file" id="file"></div>
+  </div>
+  <div class="card">
+    <h3>trivy config output</h3>
+    <p class="trivyb-cmd" id="cmd"></p>
+    <p class="trivyb-sum" id="summary"></p>
+    <div id="findings"></div>
+    <h3>Still in the file — no rule fires</h3>
+    <div id="manual"></div>
+    <p class="verdict" id="verdict"></p>
+    <p id="explain"></p>
+  </div>
+</div>
+<script src="/static/sim/trivy-blindspot.js?v={{ asset_v }}"></script>
+</body></html>

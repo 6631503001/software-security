@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 568" role="img" aria-label="The Break the Build game board: which gate step each change turns red, measured by running security-ci.yml's own gate commands on the real lab files. Columns are the four gate steps: the Semgrep gate (--error, any finding), the Trivy SCA gate (fs scan with the vuln and secret scanners, HIGH and CRITICAL), the Trivy IaC gate (config scan, HIGH and CRITICAL), and the Gitleaks gate (any secret). First group, Blue's baseline, which is red before Red does anything and is Task 3's job to clear: the unpinned uses at v4 and v3 action tags trip Semgrep's github-actions-mutable-action-tag; host 0.0.0.0 in the two services trips Semgrep's avoid_app_run_with_bad_host; and the docs' own curl examples that send the toy alice-token header trip Gitleaks' curl-auth-header, a false positive. Trivy is green on the untouched lab. Second group, Red's three attacks, one per pull request once Blue is green: urllib3 1.24.1 in requirements.txt trips only the Trivy SCA gate, with 7 HIGH CVEs such as CVE-2019-11324. A Dockerfile with no USER line or with USER root trips the Trivy IaC gate with DS-0002 HIGH, and also Semgrep, through missing-user or last-user-is-root: a cross-hit. A GitHub-format ghp token in settings.py trips Gitleaks with github-pat and also the Trivy SCA gate, because that step runs the secret scanner too, where it is a CRITICAL github-pat finding: another cross-hit. Third group, the decoys, which stay green: chmod 777 in a Dockerfile that keeps a non-root USER has no rule anywhere, and FROM python latest is seen by Trivy as DS-0001 MEDIUM, which the HIGH and CRITICAL filter drops. One defect per pull request: inside a job, the first failing gate skips the gates after it.">
+<title>Break the Build: which gate step each planted defect turns red</title>
+<style>
+text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.mono  { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.bg    { fill: #ffffff; }
+.h1    { fill: #12232e; font-size: 20px; font-weight: 700; }
+.sub   { fill: #6b7280; font-size: 13px; }
+.colb  { fill: #f2f6f9; stroke: #c9d4de; stroke-width: 1.2; }
+.ch    { fill: #12232e; font-size: 14px; font-weight: 700; }
+.cs    { fill: #6b7280; font-size: 11.5px; }
+.grpb  { fill: #017BC4; font-size: 12.5px; font-weight: 700; letter-spacing: 0.9px; }
+.grpr  { fill: #b34205; font-size: 12.5px; font-weight: 700; letter-spacing: 0.9px; }
+.grpg  { fill: #6b7280; font-size: 12.5px; font-weight: 700; letter-spacing: 0.9px; }
+.grps  { fill: #6b7280; font-size: 12px; }
+.row   { fill: #ffffff; stroke: #e1e7ec; stroke-width: 1; }
+.rt    { fill: #12232e; font-size: 13px; }
+.rs    { fill: #6b7280; font-size: 11.5px; }
+.hit   { fill: #fdeee4; stroke: #E35205; stroke-width: 1.6; }
+.xhit  { fill: #fdeee4; stroke: #E35205; stroke-width: 1.6; stroke-dasharray: 5 3; }
+.seen  { fill: #f5f7f9; stroke: #9aa3ad; stroke-width: 1.2; stroke-dasharray: 4 3; }
+.miss  { fill: #f8fafb; stroke: #e1e7ec; stroke-width: 1; }
+.ht    { fill: #b34205; font-size: 12px; font-weight: 700; }
+.hs    { fill: #1f2933; font-size: 11px; }
+.dot   { fill: #b7c1cb; font-size: 14px; }
+.xt    { fill: #b34205; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; }
+.st    { fill: #6b7280; font-size: 11.5px; font-weight: 700; }
+.foot  { fill: #f5f8fa; stroke: #c9d4de; stroke-width: 1.2; }
+.ft    { fill: #12232e; font-size: 13px; font-weight: 700; }
+.fs    { fill: #1f2933; font-size: 12px; }
+@media (prefers-color-scheme: dark) {
+  .bg    { fill: #0f1419; }
+  .h1    { fill: #e8edf2; }
+  .sub   { fill: #9aa3ad; }
+  .colb  { fill: #1e262e; stroke: #31404d; }
+  .ch    { fill: #e8edf2; }
+  .cs    { fill: #9aa3ad; }
+  .grpb  { fill: #4aa3dd; }
+  .grpr  { fill: #ff9b63; }
+  .grpg  { fill: #9aa3ad; }
+  .grps  { fill: #9aa3ad; }
+  .row   { fill: #171d24; stroke: #26313b; }
+  .rt    { fill: #e8edf2; }
+  .rs    { fill: #9aa3ad; }
+  .hit   { fill: #3a2213; stroke: #ff7a3d; }
+  .xhit  { fill: #3a2213; stroke: #ff7a3d; }
+  .seen  { fill: #1a2027; stroke: #6b7682; }
+  .miss  { fill: #141a20; stroke: #26313b; }
+  .ht    { fill: #ff9b63; }
+  .hs    { fill: #dde4ea; }
+  .dot   { fill: #4c5a66; }
+  .xt    { fill: #ff9b63; }
+  .st    { fill: #9aa3ad; }
+  .foot  { fill: #141b22; stroke: #31404d; }
+  .ft    { fill: #e8edf2; }
+  .fs    { fill: #dde4ea; }
+}
+</style>
+
+<rect class="bg" x="0" y="0" width="960" height="568"/>
+
+<text class="h1"  x="24" y="34">Break the Build: what each change turns red</text>
+<text class="sub" x="24" y="55">Measured by running security-ci.yml's own gate commands on the real lab files (Trivy 0.70.0 · Semgrep · Gitleaks)</text>
+
+<!-- column headers -->
+<rect class="colb" x="332" y="70" width="148" height="46" rx="6"/>
+<text class="ch" x="344" y="90">Semgrep gate</text>
+<text class="cs" x="344" y="107">--error · any finding</text>
+<rect class="colb" x="486" y="70" width="148" height="46" rx="6"/>
+<text class="ch" x="498" y="90">Trivy SCA gate</text>
+<text class="cs" x="498" y="107">vuln + secret · HIGH+</text>
+<rect class="colb" x="640" y="70" width="148" height="46" rx="6"/>
+<text class="ch" x="652" y="90">Trivy IaC gate</text>
+<text class="cs" x="652" y="107">Dockerfile · HIGH+</text>
+<rect class="colb" x="794" y="70" width="148" height="46" rx="6"/>
+<text class="ch" x="806" y="90">Gitleaks gate</text>
+<text class="cs" x="806" y="107">any secret fails</text>
+
+<!-- ================= GROUP 1 : BLUE'S BASELINE ================= -->
+<text class="grpb" x="24" y="138">BLUE'S BASELINE</text>
+<text class="grps" x="176" y="138">red before Red does anything · Task 3 clears it (fix, or justify with a reason)</text>
+
+<rect class="row" x="24" y="146" width="918" height="36" rx="5"/>
+<text class="rt mono" x="36" y="169">uses: …@v4 / @v3 tags</text>
+<rect class="hit" x="336" y="150" width="140" height="28" rx="4"/>
+<text class="ht" x="346" y="168">mutable-action-tag</text>
+<text class="dot" x="560" y="170" text-anchor="middle">·</text>
+<text class="dot" x="714" y="170" text-anchor="middle">·</text>
+<text class="dot" x="868" y="170" text-anchor="middle">·</text>
+
+<rect class="row" x="24" y="186" width="918" height="36" rx="5"/>
+<text class="rt mono" x="36" y="209">app.run(host="0.0.0.0")</text>
+<rect class="hit" x="336" y="190" width="140" height="28" rx="4"/>
+<text class="ht" x="346" y="208">bad_host ×2</text>
+<text class="dot" x="560" y="210" text-anchor="middle">·</text>
+<text class="dot" x="714" y="210" text-anchor="middle">·</text>
+<text class="dot" x="868" y="210" text-anchor="middle">·</text>
+
+<rect class="row" x="24" y="226" width="918" height="40" rx="5"/>
+<text class="rt" x="36" y="243">docs' curl examples with the</text>
+<text class="rs" x="36" y="257">toy alice-token header</text>
+<text class="dot" x="406" y="250" text-anchor="middle">·</text>
+<text class="dot" x="560" y="250" text-anchor="middle">·</text>
+<text class="dot" x="714" y="250" text-anchor="middle">·</text>
+<rect class="hit" x="798" y="230" width="140" height="32" rx="4"/>
+<text class="ht" x="808" y="244">curl-auth-header ×3</text>
+<text class="hs" x="808" y="257">false positive</text>
+
+<!-- ================= GROUP 2 : RED'S ATTACKS ================= -->
+<text class="grpr" x="24" y="290">RED'S ATTACKS</text>
+<text class="grps" x="160" y="290">on top of Blue's green baseline · one per PR</text>
+
+<rect class="row" x="24" y="298" width="918" height="40" rx="5"/>
+<text class="rt mono" x="36" y="316">urllib3==1.24.1</text>
+<text class="rs" x="36" y="331">requirements.txt</text>
+<text class="dot" x="406" y="324" text-anchor="middle">·</text>
+<rect class="hit" x="490" y="302" width="140" height="32" rx="4"/>
+<text class="ht" x="500" y="316">7 HIGH CVEs</text>
+<text class="hs" x="500" y="329">e.g. CVE-2019-11324</text>
+<text class="dot" x="714" y="324" text-anchor="middle">·</text>
+<text class="dot" x="868" y="324" text-anchor="middle">·</text>
+
+<rect class="row" x="24" y="342" width="918" height="40" rx="5"/>
+<text class="rt" x="36" y="360">Dockerfile runs as root</text>
+<text class="rs mono" x="36" y="375">no USER line, or USER root</text>
+<rect class="xhit" x="336" y="346" width="140" height="32" rx="4"/>
+<text class="ht" x="346" y="360">missing-user /</text>
+<text class="hs" x="346" y="373">last-user-is-root</text>
+<text class="dot" x="560" y="368" text-anchor="middle">·</text>
+<rect class="hit" x="644" y="346" width="140" height="32" rx="4"/>
+<text class="ht" x="654" y="360">DS-0002 HIGH</text>
+<text class="hs" x="654" y="373">root user</text>
+<text class="dot" x="868" y="368" text-anchor="middle">·</text>
+
+<rect class="row" x="24" y="386" width="918" height="40" rx="5"/>
+<text class="rt mono" x="36" y="404">GITHUB_TOKEN = "ghp_…"</text>
+<text class="rs" x="36" y="419">settings.py, a GitHub-format token</text>
+<text class="dot" x="406" y="412" text-anchor="middle">·</text>
+<rect class="xhit" x="490" y="390" width="140" height="32" rx="4"/>
+<text class="ht" x="500" y="404">github-pat</text>
+<text class="hs" x="500" y="417">secret · CRITICAL</text>
+<text class="dot" x="714" y="412" text-anchor="middle">·</text>
+<rect class="hit" x="798" y="390" width="140" height="32" rx="4"/>
+<text class="ht" x="808" y="404">github-pat</text>
+<text class="hs" x="808" y="417">settings.py:2</text>
+
+<!-- ================= GROUP 3 : DECOYS ================= -->
+<text class="grpg" x="24" y="450">DECOYS</text>
+<text class="grps" x="88" y="450">stay green (a Dockerfile that keeps a non-root USER)</text>
+
+<rect class="row" x="24" y="458" width="918" height="30" rx="5"/>
+<text class="rt mono" x="36" y="478">RUN … chmod 777</text>
+<text class="dot" x="406" y="478" text-anchor="middle">·</text>
+<text class="dot" x="560" y="478" text-anchor="middle">·</text>
+<text class="st" x="714" y="478" text-anchor="middle">no rule exists</text>
+<text class="dot" x="868" y="478" text-anchor="middle">·</text>
+
+<rect class="row" x="24" y="492" width="918" height="40" rx="5"/>
+<text class="rt mono" x="36" y="517">FROM python:latest</text>
+<text class="dot" x="406" y="517" text-anchor="middle">·</text>
+<text class="dot" x="560" y="517" text-anchor="middle">·</text>
+<rect class="seen" x="644" y="496" width="140" height="32" rx="4"/>
+<text class="st" x="654" y="510">DS-0001 MEDIUM</text>
+<text class="rs" x="654" y="523">seen, then filtered</text>
+<text class="dot" x="868" y="517" text-anchor="middle">·</text>
+
+<!-- legend / rule of the game -->
+<rect class="hit"  x="24"  y="545" width="14" height="10" rx="2"/>
+<text class="rs" x="44" y="554">gate fails</text>
+<rect class="xhit" x="118" y="545" width="14" height="10" rx="2"/>
+<text class="rs" x="138" y="554">cross-hit: the same defect also fails a second job</text>
+<text class="rs" x="470" y="554">Two defects in one job? The first red gate skips the next, so plant one per PR.</text>
+</svg>

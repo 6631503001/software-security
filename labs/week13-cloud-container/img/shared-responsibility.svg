@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" role="img" aria-label="The shared-responsibility split for this lab's S3-backed app, drawn as two panels divided by a line. The left panel, the provider, AWS, secures OF the cloud: the data centres, power and hardware; the hypervisor and host operating system; the S3 and IAM services themselves; and the global network. The right panel, you, secure what you put IN the cloud, and every artifact this lab ships sits there: the IAM policy, iam-policy-insecure.json, holds 3 Misconfig Hunt flags (Action star, Resource star, no Condition); the container image, Dockerfile.insecure, holds 6 flags including the secret baked into ENV; bucket access and encryption, public or private, are your setting; and network exposure such as 0.0.0.0/0 on a database port is your rule. The conclusion: all 9 Misconfig Hunt flags sit in your half, and none of them is a provider bug.">
+<title>Shared responsibility — every lab flag is on your side of the line</title>
+<style>
+svg { font-family: system-ui, sans-serif; }
+.bg     { fill: #ffffff; }
+.h1     { fill: #111827; font-size: 21px; font-weight: 700; }
+.h2     { fill: #6b7280; font-size: 14px; }
+.panP   { fill: #f3f4f6; stroke: #9ca3af; stroke-width: 1.6; }
+.panY   { fill: #fffaf7; stroke: #E35205; stroke-width: 2; }
+.capP   { fill: #374151; font-size: 17px; font-weight: 700; }
+.capY   { fill: #a03c05; font-size: 17px; font-weight: 700; }
+.capS   { fill: #6b7280; font-size: 14px; }
+.item   { fill: #111827; font-size: 16px; }
+.itemM  { fill: #4b5563; font-size: 16px; }
+.code   { fill: #6b7280; font-size: 14px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.rule   { stroke: #e5e7eb; stroke-width: 1; }
+.divl   { stroke: #111827; stroke-width: 2; stroke-dasharray: 6 5; fill: none; }
+.divt   { fill: #111827; font-size: 13px; font-weight: 700; }
+.pill   { fill: #E35205; }
+.pillt  { fill: #ffffff; font-size: 15px; font-weight: 700; }
+.pillO  { fill: none; stroke: #9ca3af; stroke-width: 1.3; stroke-dasharray: 4 3; }
+.pillOt { fill: #4b5563; font-size: 13px; font-weight: 700; }
+.punch  { fill: #E35205; font-size: 17px; font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .bg     { fill: #0f1419; }
+  .h1     { fill: #e5e7eb; }
+  .h2     { fill: #9aa3ad; }
+  .panP   { fill: #161c23; stroke: #4b5563; }
+  .panY   { fill: #1d1410; stroke: #ff7a3d; }
+  .capP   { fill: #d1d5db; }
+  .capY   { fill: #ff9f6e; }
+  .capS   { fill: #9aa3ad; }
+  .item   { fill: #e5e7eb; }
+  .itemM  { fill: #b6bec8; }
+  .code   { fill: #9aa3ad; }
+  .rule   { stroke: #2c3742; }
+  .divl   { stroke: #e5e7eb; }
+  .divt   { fill: #e5e7eb; }
+  .pill   { fill: #ff7a3d; }
+  .pillt  { fill: #0f1419; }
+  .pillO  { stroke: #6b7684; }
+  .pillOt { fill: #9aa3ad; }
+  .punch  { fill: #ff7a3d; }
+}
+</style>
+
+<rect class="bg" x="0" y="0" width="900" height="400"/>
+
+<text class="h1" x="24" y="34">Shared responsibility — every lab flag is on your side of the line</text>
+<text class="h2" x="24" y="56">harden.md: “The cloud provider secures of the cloud; you secure what you put in it.”</text>
+
+<!-- provider panel -->
+<rect class="panP" x="24" y="74" width="300" height="262" rx="10"/>
+<text class="capP" x="42" y="103">AWS — secures OF the cloud</text>
+<text class="capS" x="42" y="123">you rent it; you can't misconfigure it</text>
+<line class="rule" x1="42" y1="138" x2="306" y2="138"/>
+<text class="itemM" x="42" y="168">Data centres, power, hardware</text>
+<text class="itemM" x="42" y="204">Hypervisor and host OS</text>
+<text class="itemM" x="42" y="240">The S3 and IAM services</text>
+<text class="itemM" x="42" y="276">The global network</text>
+<text class="capS" x="42" y="318">a breach here is rare — and not yours</text>
+
+<!-- the line -->
+<path class="divl" d="M342,70 V340"/>
+<text class="divt" x="342" y="358" text-anchor="middle">THE LINE</text>
+
+<!-- your panel -->
+<rect class="panY" x="360" y="74" width="516" height="262" rx="10"/>
+<text class="capY" x="378" y="103">YOU — secure what you put IN it</text>
+<text class="capS" x="378" y="123">every file in this lab lives here</text>
+<line class="rule" x1="378" y1="138" x2="858" y2="138"/>
+
+<text class="item" x="378" y="166">IAM policy — who may do what</text>
+<text class="code" x="378" y="185">iam-policy-insecure.json</text>
+<rect class="pill" x="772" y="152" width="86" height="28" rx="14"/>
+<text class="pillt" x="815" y="171" text-anchor="middle">3 flags</text>
+
+<text class="item" x="378" y="222">Container image — incl. the ENV secret</text>
+<text class="code" x="378" y="241">Dockerfile.insecure</text>
+<rect class="pill" x="772" y="208" width="86" height="28" rx="14"/>
+<text class="pillt" x="815" y="227" text-anchor="middle">6 flags</text>
+
+<text class="item" x="378" y="276">Bucket access and encryption</text>
+<text class="code" x="378" y="295">public or private is your setting</text>
+<rect class="pillO" x="742" y="262" width="116" height="26" rx="13"/>
+<text class="pillOt" x="800" y="280" text-anchor="middle">not graded here</text>
+
+<text class="item" x="378" y="322">Network rules — 0.0.0.0/0 on a DB port</text>
+<rect class="pillO" x="742" y="306" width="116" height="26" rx="13"/>
+<text class="pillOt" x="800" y="324" text-anchor="middle">not graded here</text>
+
+<text class="punch" x="24" y="388">All 9 Misconfig Hunt flags sit in your half. None of them is a provider bug.</text>
+</svg>

@@ -35,6 +35,14 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ---
 
+## One push, three jobs
+
+![The security-ci.yml pipeline at a glance. A push or PR to main starts three jobs in parallel: Semgrep (SAST), Trivy (SCA plus IaC) and Gitleaks (secrets, whole git history). Each job runs the same three phases. The report step never fails (|| true or exit-code "0"). The upload step (if: always()) sends the SARIF to the GitHub Security tab, where every finding of every severity shows. The gate step re-scans and can fail the build. Semgrep's --error and Gitleaks' --exit-code 1 fail on any finding. Trivy's two gates fail only on HIGH or CRITICAL, and the IaC gate is skipped if the SCA gate already failed. The report shows everything; the gate decides.](img/pipeline-at-a-glance.svg)
+
+<!-- Walk it left to right before the YAML: ① report never fails, ② upload always runs, ③ only the gate can turn the build red — that's Part 2 Q1 in one picture. Point at the footnote: the Security tab shows MEDIUM findings like DS-0001 that the gate lets through. ~2 min. -->
+
+---
+
 ## A security gate
 
 ```yaml
@@ -144,6 +152,18 @@ gate-check
 
 ---
 
+## Try it — same request, two services
+
+Pick a token. Both real services answer, and you see what each one logs.
+
+```sim
+fail-open
+```
+
+<!-- Interactive companion to the diagram above; every response and log line was captured from the real :8090/:8091 containers. Click "no token" (8090 leaks, 8091 logs a WARNING), then "user, not admin" (both deny: the bug lives only on the error path), then "real admin" (both unlock). ~3 min. -->
+
+---
+
 ## 🔴🔵 Game — Break the Build
 
 - **Blue:** build the gate (Semgrep + Trivy + Gitleaks), fail on HIGH/CRITICAL, add security logging that fails closed
@@ -151,6 +171,34 @@ gate-check
 - **Score:** Blue per catch, Red per successful bypass; then leak the flag from the fail-open `/admin` bypass in `insecure_service.py` (a public demo value on a local run; your personal flag comes from your hosted instance)
 
 <!-- The capstone game. Both roles teach: Blue learns to configure gates, Red learns where gates have blind spots — but Red's menu is fixed to 3 attacks that actually map to a gate, not open-ended. Run it as live PRs against the pipeline. The weekly quiz no longer asks for the gate/what-it-blocks/flag (dropped — quiz runs before the lab) — that's required in the worksheet instead, don't drop the flag half there, it's still graded. ~3 min. -->
+
+---
+
+## Break the Build — what each change turns red
+
+![The Break the Build game board, measured by running security-ci.yml's own gate commands on the real lab files. Columns: Semgrep gate, Trivy SCA gate, Trivy IaC gate, Gitleaks gate. Blue's baseline is red before Red does anything: unpinned @v4/@v3 action tags and host="0.0.0.0" trip Semgrep, and the docs' own curl examples with the toy alice-token header trip Gitleaks' curl-auth-header (a false positive). Red's attacks, one per PR on Blue's green baseline: urllib3==1.24.1 trips only Trivy SCA (7 HIGH, e.g. CVE-2019-11324). A Dockerfile running as root trips Trivy IaC (DS-0002 HIGH) and also Semgrep (missing-user or last-user-is-root). A ghp_ GitHub token trips Gitleaks (github-pat) and also Trivy SCA, whose secret scanner rates it CRITICAL. Decoys stay green: chmod 777 has no rule, and FROM python:latest is DS-0001 MEDIUM, which the gate filters out.](img/break-the-build-board.svg)
+
+<!-- The rules of the game on one board. Top rows = Task 3 (Blue must clear these first or every Red PR is already red); dashed cells = cross-hits, one defect turning two jobs red. ~2 min. -->
+
+---
+
+## Try it — which job goes red?
+
+Start from the untouched lab or Blue's fixes, plant a defect, read the run step by step.
+
+```sim
+red-team-pr
+```
+
+<!-- Click "untouched lab" first: Semgrep + Gitleaks are red before Red does anything. Then "Blue's clean baseline", then each Red preset. End on "two defects in one PR": the IaC gate shows skipped, which is why the worksheet says one defect per PR. ~3 min. -->
+
+---
+
+## Task 1b at a glance
+
+![Task 1b at a glance. From the lab folder, docker compose up starts two containers from the same python:3.12-slim image, both mounting the lab folder: insecure_service.py on localhost:8090 and secure_service.py on localhost:8091. Send both the same GET /admin with no token. :8090 answers 200 with the panel and the FLAG, because the USERS dictionary lookup raises KeyError and the except branch grants access; its log shows only a 200 access line. :8091 answers 403 forbidden and logs a WARNING on the security logger (event=authz_failure outcome=deny reason=unauthenticated). Then prove the fix keeps admins in: alice-token still unlocks :8091, and the auto-grader checks both. Submit the flag, both responses and the failing-open except line; a local run returns the public demo flag, the graded one comes from your hosted instance.](img/lab-at-a-glance.svg)
+
+<!-- The lab briefing for path (a), in the order students do it: ① compose up, ② same request to both ports, ③ docker compose logs, ④ alice-token still works. ~2 min. -->
 
 ---
 

@@ -366,6 +366,197 @@ def test_the_sqli_sim_does_not_regress_to_quote_parity():
     assert 'indexOf("\'")' in fn
 
 
+# --- the Week 13 sims must say what the real lab files say -----------------
+#
+# trivy-blindspot and image-layers re-implement this week's Dockerfiles and
+# scanner output. If the lab files change and the sims don't, they would teach a
+# Dockerfile that no longer exists — so pin every line they print to the file it
+# claims to come from. (The trivy rule model itself was checked against a real
+# Trivy 0.76.1 scan of all 96 toggle combinations; see trivy-blindspot.js.)
+
+_W13 = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                    "week13-cloud-container")
+
+
+def _w13(name):
+    with open(os.path.join(_W13, name), encoding="utf-8") as f:
+        return f.read()
+
+
+def _sim_js(slug):
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(here, "static", "sim", f"{slug}.js"), encoding="utf-8") as f:
+        return f.read()
+
+
+def _js_strings(src):
+    """Every double-quoted JS string literal, unescaped (\\" and \\\\ only)."""
+    return [m.replace('\\"', '"').replace("\\\\", "\\")
+            for m in re.findall(r'"((?:[^"\\]|\\.)*)"', src)]
+
+
+def test_trivy_blindspot_prints_only_real_dockerfile_lines():
+    insecure, hardened = _w13("Dockerfile.insecure"), _w13("Dockerfile.hardened")
+    ins_lines = {l.strip() for l in insecure.splitlines()}
+    hard_lines = {l.strip() for l in hardened.splitlines()}
+    src = _sim_js("trivy-blindspot")
+    strings = set(_js_strings(src))
+    for line in ("FROM python:latest", "ENV API_TOKEN=sk_live_supersecret_DO_NOT_DO_THIS",
+                 "ENV AWS_SECRET_ACCESS_KEY=AKIAEXAMPLEdeadbeefdeadbeef", "COPY . .",
+                 "RUN pip install -r requirements.txt", "RUN chmod -R 777 /app",
+                 "WORKDIR /app", "EXPOSE 5000", 'CMD ["python", "app.py"]'):
+        assert line in strings, f"sim no longer prints {line!r}"
+        assert line in ins_lines, f"{line!r} is not in Dockerfile.insecure any more"
+    for line in ("COPY requirements.txt .", "COPY app.py .", "USER 65532:65532",
+                 "RUN python -m venv /venv \\",
+                 "&& /venv/bin/pip install --no-cache-dir -r requirements.txt"):
+        assert any(line in s for s in strings), f"sim no longer prints {line!r}"
+        assert line in hard_lines, f"{line!r} is not in Dockerfile.hardened any more"
+    # the digest the sim pins is the one Dockerfile.hardened pins
+    digest = re.search(r"python:3\.11-slim@sha256:[0-9a-f]{64}", src).group(0)
+    assert digest in hardened
+
+
+def test_trivy_blindspot_cites_the_worksheets_three_rules():
+    ws = _w13("worksheet.md")
+    src = _sim_js("trivy-blindspot")
+    for rule, sev in (("DS-0001", "MEDIUM"), ("DS-0002", "HIGH"), ("DS-0031", "CRITICAL")):
+        assert rule in ws, f"worksheet no longer cites {rule}"
+        assert f'id: "{rule}", sev: "{sev}"' in src
+    # DS-0031 fires once per secret ENV line: 1 + 1 + 2 = the 4 scan.sh reports
+    assert src.count('id: "DS-0031"') == 1 and "ENV_LINES.forEach" in src
+    # the three defects no rule covers stay rule-less in the sim
+    for key in ("copy:", "chmod:", "pip:"):
+        assert key in src[src.index("var MANUAL"):src.index("var PRESETS")]
+
+
+def test_image_layers_replays_the_real_secret_and_files():
+    insecure = _w13("Dockerfile.insecure")
+    src = _sim_js("image-layers")
+    for secret in ("sk_live_supersecret_DO_NOT_DO_THIS", "AKIAEXAMPLEdeadbeefdeadbeef"):
+        assert f"={secret}" in insecure and secret in src
+    # docker truncates CREATED BY to 44 chars + an ellipsis; the sim's
+    # truncated rows must be exact prefixes of the --no-trunc ones
+    rows = re.findall(r'\["([^"]*…)",\s*"([^"]*)",\s*"[^"]*"\]', src)
+    assert len(rows) >= 4
+    for short, full in rows:
+        assert full.startswith(short[:-1]) and len(short) == 45, (short, full)
+    # every file `ls -la /app` lists was really in the build context (COPY . .)
+    for name in re.findall(r'root root +\d+ Oct 22 [0-9:]+ ([\w.-]+)"', src):
+        assert os.path.exists(os.path.join(_W13, name)), f"{name} is not in the lab folder"
+    hardened = _w13("Dockerfile.hardened")
+    assert "USER 65532:65532" in hardened and 'user: "65532:65532"' in src
+def _w14_lab_lists():
+    """injection_phrases / INJECTION_PATTERNS / the default flag, read out of the
+    real Week 14 bots with ast — the sims must carry these exact values."""
+    import ast
+    lab = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__)))), "week14-ai-llm-security")
+    if not os.path.isdir(lab):
+        pytest.skip("week14 lab directory not present next to live-quiz")
+    phrases = patterns = secret = None
+    for name in ("vulnerable_chatbot.py", "guarded_chatbot.py"):
+        tree = ast.parse(open(os.path.join(lab, name), encoding="utf-8").read())
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+                continue
+            tgt = getattr(node.targets[0], "id", None)
+            if tgt == "injection_phrases":
+                phrases = list(ast.literal_eval(node.value))
+            elif tgt == "INJECTION_PATTERNS":
+                patterns = list(ast.literal_eval(node.value))
+            elif tgt == "SECRET":
+                secret = ast.literal_eval(node.value.args[1])  # os.environ.get(_, default)
+    assert phrases and patterns and secret
+    return phrases, patterns, secret
+
+
+@pytest.mark.parametrize("slug", ["llm-output", "rag-inject"])
+def test_the_week14_sims_carry_the_labs_exact_lists(slug):
+    """Both sims claim to re-implement the real chatbots. A phrase list or a regex
+    that drifts from the .py files would teach a guard that doesn't exist — e.g.
+    "what's the password" leaking, or <img onerror=print()> passing the guard."""
+    import json
+    phrases, patterns, secret = _w14_lab_lists()
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    src = open(os.path.join(here, "static", "sim", f"{slug}.js"), encoding="utf-8").read()
+
+    body = src[src.index("var INJECTION_PHRASES = ["):]
+    body = body[body.index("["):body.index("];") + 1]
+    assert json.loads(body) == phrases, f"{slug}.js injection_phrases drifted from vulnerable_chatbot.py"
+
+    line = next(x for x in src.splitlines() if "var INJECTION_RE = /" in x)
+    literal = line.split("= /", 1)[1].rsplit("/i;", 1)[0]
+    # guarded_chatbot.py compiles "|".join(INJECTION_PATTERNS) with IGNORECASE
+    assert literal == "|".join(patterns), f"{slug}.js _INJECTION_RE drifted from guarded_chatbot.py"
+    assert f'"{secret}"' in src
+    assert "Hello! I'm HelpBot. How can I help you today?" in src
+    assert "I can't help with that request." in src
+def test_week15_slides_embed_every_diagram_and_sim():
+    """Week 15's deck carries four diagrams and three sims. An alt text holding a
+    ']' (e.g. "USERS[token]") silently stops ![alt](img/x.svg) from being an
+    image and leaves raw markdown on the slide. That happened while this deck was
+    being built, so pin the whole set through the real /learn render path."""
+    doc = C.render_document("week15-devsecops-pipeline", "slides", "software-security")
+    assert doc is not None
+    out = doc["html"]
+    imgs = re.findall(r'<img\b[^>]*src="([^"]+)"', out)
+    assert [os.path.basename(i) for i in imgs] == [
+        "pipeline-at-a-glance.svg", "fail-closed.svg",
+        "break-the-build-board.svg", "lab-at-a-glance.svg"], imgs
+    assert re.findall(r'<iframe src="/sim/([^"]+)"', out) == [
+        "gate-check", "fail-open", "red-team-pr"]
+    assert "](img/" not in out, "an image line fell through as raw markdown"
+
+
+def _load_week15_app(name):
+    """Import one of Week 15's two real lab services under a private module name."""
+    import importlib.util
+    path = os.path.join(C.CONTENT_ROOT, "week15-devsecops-pipeline", f"{name}.py")
+    spec = importlib.util.spec_from_file_location(f"_w15_{name}", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+@pytest.mark.parametrize("xff", [None, "203.0.113.9"])
+def test_the_fail_open_sim_replays_what_the_real_week15_services_return(xff, caplog):
+    """fail-open.js shows, for each Authorization header, the status, body and
+    security-log line of insecure_service.py (:8090) and secure_service.py
+    (:8091). Those are not re-derived in JS: they sit in an OUTCOMES table, and
+    this runs both real lab apps over the same inputs and holds the table to
+    them, so a change to either lab file that the sim doesn't follow turns CI red.
+    The X-Forwarded-For case pins the spoofable src_ip the sim teaches."""
+    import json
+    import logging
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    src = open(os.path.join(here, "static", "sim", "fail-open.js"), encoding="utf-8").read()
+    block = src[src.index("// BEGIN OUTCOMES"):src.index("// END OUTCOMES")]
+    table = json.loads(block[block.index("{"):block.rindex("}") + 1])
+    assert set(table) == {"insecure", "secure"}
+
+    for svc in ("insecure", "secure"):
+        mod = _load_week15_app(f"{svc}_service")
+        client = mod.app.test_client()
+        assert set(table[svc]) == {"none", "garbage", "alice-token", "bob-token"}
+        for key, want in table[svc].items():
+            headers = {} if key == "none" else {"Authorization": key}
+            if xff:
+                headers["X-Forwarded-For"] = xff
+            caplog.clear()
+            with caplog.at_level(logging.INFO, logger="security"):
+                resp = client.get("/admin", headers=headers)
+            assert resp.status_code == want["status"], (svc, key)
+            body = {k: ("<SECRET>" if v == mod.SECRET else v) for k, v in resp.get_json().items()}
+            assert body == want["body"], (svc, key)
+            sec = [(r.levelname, r.getMessage()) for r in caplog.records if r.name == "security"]
+            if want["log"] is None:
+                assert sec == [], f"{svc} {key}: the sim says nothing is logged, the service logged {sec}"
+            else:
+                level, msg = want["log"]
+                assert sec == [(level, msg.replace("{ip}", xff or "127.0.0.1"))], (svc, key, sec)
+
+
 # --- the allowlist covers every student-facing document ---------------------
 #
 # Until 2026-07-29 PUBLIC_FILES held only worksheet.md and README.md. Six of the

@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" role="img" aria-label="Blast radius of a leaked credential under the lab's two IAM policies, drawn to the same scale as the same AWS account box. Left, iam-policy-insecure.json, Action star on Resource star with no Condition: the whole account is filled orange, and example tiles show what the key can now do. s3 star on every bucket: read, overwrite or delete any object. iam CreateAccessKey: mint new keys, so rotating the leaked one does not get the attacker out. ec2 RunInstances: launch machines on your bill. kms Decrypt: read what encryption was protecting. cloudtrail StopLogging: switch off the audit trail. That is full admin. Action star is CWE-269 and Resource star is CWE-732, two separate findings. Right, iam-policy-leastpriv.json: the same account box is empty except one small blue square inside the lab-app-bucket box, the app slash star prefix, labelled s3:GetObject on objects under app slash star, and s3:ListBucket only when the Condition s3:prefix equals app slash star holds. Everything else is implicitly denied. A leaked key can read the app's own objects and nothing more. Trivy does not parse either file; this is manual review, Task 2.">
+<title>Same leaked key, two policies — the blast radius</title>
+<style>
+svg { font-family: system-ui, sans-serif; }
+.bg     { fill: #ffffff; }
+.h1     { fill: #111827; font-size: 21px; font-weight: 700; }
+.h2     { fill: #6b7280; font-size: 14px; }
+.capA   { fill: #a03c05; font-size: 16px; font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.capB   { fill: #01609a; font-size: 16px; font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.sub    { fill: #4b5563; font-size: 14px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.acctA  { fill: #fdece5; stroke: #E35205; stroke-width: 2; }
+.acctB  { fill: #f9fafb; stroke: #9ca3af; stroke-width: 1.6; }
+.acctl  { fill: #6b7280; font-size: 12.5px; font-weight: 700; letter-spacing: .06em; }
+.tile   { fill: #ffffff; stroke: #E35205; stroke-width: 1.2; }
+.tk     { fill: #9a3803; font-size: 14px; font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.tv     { fill: #111827; font-size: 14px; }
+.bkt    { fill: none; stroke: #9ca3af; stroke-width: 1.3; stroke-dasharray: 5 4; }
+.bktl   { fill: #6b7280; font-size: 13px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.pre    { fill: #017BC4; }
+.pret   { fill: #ffffff; font-size: 13px; font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.okt    { fill: #01609a; font-size: 14px; font-weight: 700; }
+.dn     { fill: #6b7280; font-size: 14px; font-style: italic; }
+.verdA  { fill: #E35205; font-size: 17px; font-weight: 700; }
+.verdB  { fill: #017BC4; font-size: 17px; font-weight: 700; }
+.foot   { fill: #4b5563; font-size: 14px; }
+@media (prefers-color-scheme: dark) {
+  .bg     { fill: #0f1419; }
+  .h1     { fill: #e5e7eb; }
+  .h2     { fill: #9aa3ad; }
+  .capA   { fill: #ff9f6e; }
+  .capB   { fill: #4aa3dd; }
+  .sub    { fill: #b6bec8; }
+  .acctA  { fill: #3a1c10; stroke: #ff7a3d; }
+  .acctB  { fill: #161c23; stroke: #4b5563; }
+  .acctl  { fill: #9aa3ad; }
+  .tile   { fill: #1d1410; stroke: #ff7a3d; }
+  .tk     { fill: #ff9f6e; }
+  .tv     { fill: #e5e7eb; }
+  .bkt    { stroke: #6b7684; }
+  .bktl   { fill: #9aa3ad; }
+  .pre    { fill: #4aa3dd; }
+  .pret   { fill: #0f1419; }
+  .okt    { fill: #4aa3dd; }
+  .dn     { fill: #9aa3ad; }
+  .verdA  { fill: #ff7a3d; }
+  .verdB  { fill: #4aa3dd; }
+  .foot   { fill: #9aa3ad; }
+}
+</style>
+
+<rect class="bg" x="0" y="0" width="900" height="400"/>
+
+<text class="h1" x="24" y="34">Same leaked key, two policies — how far can the attacker reach?</text>
+<text class="h2" x="24" y="56">both boxes are the same AWS account, drawn to the same scale</text>
+
+<!-- ===== left: insecure ===== -->
+<text class="capA" x="24" y="86">iam-policy-insecure.json</text>
+<text class="sub"  x="24" y="106">"Action": "*"  "Resource": "*"  no Condition</text>
+<rect class="acctA" x="24" y="116" width="420" height="214" rx="8"/>
+<text class="acctl" x="36" y="134">THE WHOLE ACCOUNT — ALLOWED</text>
+
+<rect class="tile" x="36" y="144" width="196" height="54" rx="6"/>
+<text class="tk" x="46" y="165">s3:* any bucket</text>
+<text class="tv" x="46" y="187">read, overwrite, delete</text>
+<rect class="tile" x="236" y="144" width="196" height="54" rx="6"/>
+<text class="tk" x="246" y="165">iam:CreateAccessKey</text>
+<text class="tv" x="246" y="187">new keys survive rotation</text>
+<rect class="tile" x="36" y="204" width="196" height="54" rx="6"/>
+<text class="tk" x="46" y="225">ec2:RunInstances</text>
+<text class="tv" x="46" y="247">machines on your bill</text>
+<rect class="tile" x="236" y="204" width="196" height="54" rx="6"/>
+<text class="tk" x="246" y="225">kms:Decrypt</text>
+<text class="tv" x="246" y="247">read what was encrypted</text>
+<rect class="tile" x="36" y="264" width="396" height="54" rx="6"/>
+<text class="tk" x="46" y="285">cloudtrail:StopLogging</text>
+<text class="tv" x="46" y="307">turn off the audit trail, then do all of the above unseen</text>
+
+<text class="verdA" x="24" y="356">= full admin</text>
+<text class="foot"  x="140" y="356">Action:* → CWE-269 · Resource:* → CWE-732</text>
+
+<!-- ===== right: least privilege ===== -->
+<text class="capB" x="456" y="86">iam-policy-leastpriv.json</text>
+<text class="sub"  x="456" y="106">2 actions · 1 bucket · 1 prefix · 1 Condition</text>
+<rect class="acctB" x="456" y="116" width="420" height="214" rx="8"/>
+<text class="acctl" x="468" y="134">THE WHOLE ACCOUNT — IMPLICIT DENY</text>
+<text class="dn" x="468" y="172">every other service, bucket and action:</text>
+<text class="dn" x="468" y="192">not granted, so denied</text>
+
+<rect class="bkt" x="596" y="210" width="268" height="108" rx="6"/>
+<text class="bktl" x="608" y="229">lab-app-bucket</text>
+<rect class="pre" x="784" y="244" width="70" height="62" rx="5"/>
+<text class="pret" x="819" y="270" text-anchor="middle">app/*</text>
+<text class="pret" x="819" y="290" text-anchor="middle">read</text>
+<text class="okt" x="608" y="258">s3:GetObject on app/*</text>
+<text class="okt" x="608" y="279">s3:ListBucket only if</text>
+<text class="bktl" x="608" y="302">s3:prefix = app/*</text>
+
+<text class="verdB" x="456" y="356">= read the app's own objects</text>
+<text class="foot"  x="704" y="356">and nothing else</text>
+
+<text class="foot" x="24" y="388">Trivy parses neither file — Task 2 is manual review: three rows, Action, Resource, Condition.</text>
+</svg>

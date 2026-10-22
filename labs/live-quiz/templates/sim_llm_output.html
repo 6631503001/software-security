@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css"></head>
+<body>
+<h1>Same reply, two pages: where does the text become code?</h1>
+<p class="lead">Type a message once. Both of this week's real chatbots answer it side by
+side: the branch their code took, the exact bytes they put in the page, and what the
+browser builds from those bytes. Nothing is executed here; the browser's parser reads
+the bytes in an inert document and this page reports what <em>would</em> run.</p>
+<div class="card">
+  <label for="msg">Message to HelpBot (<code>?msg=</code>)</label>
+  <input type="text" id="msg" autocomplete="off" spellcheck="false">
+  <div class="preset" id="presets"></div>
+  <p class="llm-output-url">Try it in the lab: <code id="url-v"></code><br>
+  and on the guarded bot: <code id="url-g"></code></p>
+</div>
+<div class="llm-output-cols">
+  <div class="card llm-output-col is-vuln">
+    <h2 class="llm-output-head"><code>vulnerable_chatbot.py</code> :8082</h2>
+    <h3>What ran</h3>
+    <p class="llm-output-branch" id="v-branch"></p>
+    <h3>Bytes in the page</h3>
+    <div class="q" id="v-bytes"></div>
+    <h3>What the browser builds</h3>
+    <div id="v-dom"></div>
+    <h3>Text the reader sees</h3>
+    <div class="q" id="v-seen"></div>
+    <p class="verdict" id="v-verdict"></p>
+    <p id="v-explain"></p>
+  </div>
+  <div class="card llm-output-col is-guard">
+    <h2 class="llm-output-head"><code>guarded_chatbot.py</code> :8083</h2>
+    <h3>What ran</h3>
+    <p class="llm-output-branch" id="g-branch"></p>
+    <h3>Bytes in the page</h3>
+    <div class="q" id="g-bytes"></div>
+    <h3>What the browser builds</h3>
+    <div id="g-dom"></div>
+    <h3>Text the reader sees</h3>
+    <div class="q" id="g-seen"></div>
+    <p class="verdict" id="g-verdict"></p>
+    <p id="g-explain"></p>
+  </div>
+</div>
+<script src="/static/sim/llm-output.js?v={{ asset_v }}"></script>
+</body></html>

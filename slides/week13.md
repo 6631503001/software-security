@@ -45,6 +45,14 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ---
 
+## Whose job is it?
+
+![Shared responsibility for this lab's S3-backed app as two panels split by a line. AWS secures OF the cloud: data centres and hardware, the hypervisor and host OS, the S3 and IAM services themselves, the global network. You secure what you put IN it: the IAM policy (iam-policy-insecure.json, 3 flags), the container image (Dockerfile.insecure, 6 flags including the ENV secret), bucket access and encryption, and network rules such as 0.0.0.0/0 on a database port. Conclusion: all 9 Misconfig Hunt flags sit in your half; none is a provider bug.](img/shared-responsibility.svg)
+
+<!-- Point at the line, then at the two pills: every file the students touch today is on the right. Ask "which of the 9 flags could AWS have fixed for you?" — none. ~2 min. -->
+
+---
+
 ## IAM & least privilege
 
 ```json
@@ -63,6 +71,14 @@ iam-scope
 
 ---
 
+## If the key leaks — blast radius
+
+![The same AWS account drawn twice at the same scale. Left, iam-policy-insecure.json (Action star, Resource star, no Condition): the whole account is allowed, with example actions a leaked key can now run — s3 star on any bucket, iam:CreateAccessKey to mint new keys that survive rotation, ec2:RunInstances on your bill, kms:Decrypt, cloudtrail:StopLogging to turn off the audit trail — equals full admin; Action star is CWE-269, Resource star is CWE-732. Right, iam-policy-leastpriv.json: everything is implicitly denied except a small app/* square inside lab-app-bucket, readable via s3:GetObject on app/* objects, plus s3:ListBucket only under the Condition s3:prefix = app/*. Trivy parses neither file; Task 2 is manual review.](img/iam-blast-radius.svg)
+
+<!-- The answer to the cold-call "what does *:* cost you if the key leaks?", drawn. Land on iam:CreateAccessKey: rotating the leaked key doesn't evict an attacker who already minted their own. Right side = iam-policy-leastpriv.json, line for line. ~2 min. -->
+
+---
+
 ## Secrets management
 
 - Secrets in env vars / Dockerfile / git = leaked
@@ -70,6 +86,26 @@ iam-scope
 - Scan history (Gitleaks) — recall Week 2
 
 <!-- Connect to W2 (Gitleaks) and W12. A secret baked into an image layer is in every copy of that image forever — `docker history` reveals it. Fix = inject at runtime from a vault + rotate. ~4 min. -->
+
+---
+
+## Where the ENV secret ends up
+
+![From a real build of week13-insecure:lab, the image history as a stack with the newest layer on top: CMD, EXPOSE, RUN chmod -R 777, RUN pip install, COPY dot dot, WORKDIR, then ENV AWS_SECRET_ACCESS_KEY and ENV API_TOKEN, both 0 bytes because the value lives in the image config, then the python:latest base layers. Arrows to three readouts: plain docker history still prints sk_live_supersecret_DO_NOT_DO_ (30 of 34 characters); docker history --no-trunc prints the whole token (the Task 3 command); docker inspect .Config.Env prints both keys in full. A fourth arrow: COPY dot dot copied Dockerfile.insecure itself into /app, so the secret is in a file too. Fix: never put the secret in the Dockerfile, inject it at run time, and rotate the key because every pushed image keeps the old value.](img/image-layer-leak.svg)
+
+<!-- Two misconceptions to kill: "truncated history hides it" (it prints 30 of 34 characters) and "delete it in a later layer" (0B — it's config, not a file). Then the bonus leak: COPY . . shipped the Dockerfile itself. ~3 min. -->
+
+---
+
+## Try it — which layer gives it away?
+
+Real `docker history` / `docker inspect` output from both lab images. Pick a command.
+
+```sim
+image-layers
+```
+
+<!-- Drive it: insecure + "docker history" (still leaks) → "--no-trunc" (Task 3) → "ls -la /app" (Dockerfile.insecure is in the image). Then flip to hardened: no secret row, no build stage, and no ls at all — distroless. Output was captured from real builds, nothing runs live. ~3 min. -->
 
 ---
 
@@ -100,6 +136,18 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 - **Trivy only catches 3 of 6 planted defects** (`:latest`, root user, secret-in-ENV) — `COPY . .`, `chmod -R 777`, and unpinned `pip install` need **manual review**, no rule fires
 
 <!-- Hands-on — this is the lab's insecure→hardened Dockerfile, always run dockerized (never a bare local trivy binary), against week13-hardened:lab (not a generic myapp:lab). The Trivy-blind-spot point is the actual lesson of this lab, not an aside — half the graded findings need a human, not a tool. Re-scan to prove improvement. ~5 min. -->
+
+---
+
+## Does Trivy see it?
+
+Fix the six defects one at a time and watch `trivy config` re-score the file.
+
+```sim
+trivy-blindspot
+```
+
+<!-- Press "fix only what Trivy flags": Failures 0, three defects still in the file — a clean scan is not a clean image. Then "a tag, not a digest": DS-0001 passes python:3.11-slim, but harden.md row 1 wants @sha256. Rules checked against real Trivy 0.76.1 on all 96 combinations: 4 → 0 matches scan.sh. ~4 min. -->
 
 ---
 

@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css?v={{ asset_v }}"></head>
+<body>
+<h1>Which layer gives the secret away?</h1>
+<p class="lead">Both images were built from this week's two Dockerfiles and inspected with the
+commands below. The output is the real output, captured once (2026-10-23, Docker 29.6.1, arm64).
+Only the Dockerfile's own layers are shown — the base image's layers are folded into one line.
+Nothing runs here.</p>
+<div class="wrap layers-wrap">
+  <div class="card">
+    <fieldset class="layers-set">
+      <legend>Image</legend>
+      <label class="layers-radio"><input type="radio" name="img" id="img-insecure" checked>
+        <code>week13-insecure:lab</code> — from <code>Dockerfile.insecure</code></label>
+      <label class="layers-radio"><input type="radio" name="img" id="img-hardened">
+        <code>week13-hardened:lab</code> — from <code>Dockerfile.hardened</code></label>
+    </fieldset>
+    <fieldset class="layers-set">
+      <legend>Command</legend>
+      <div id="cmds"></div>
+    </fieldset>
+    <p class="layers-size" id="size"></p>
+  </div>
+  <div class="card">
+    <h3>Terminal</h3>
+    <p class="layers-cmd" id="cmdline"></p>
+    <div class="layers-out" id="out"></div>
+    <p class="verdict" id="verdict"></p>
+    <p id="explain"></p>
+  </div>
+</div>
+<script src="/static/sim/image-layers.js?v={{ asset_v }}"></script>
+</body></html>

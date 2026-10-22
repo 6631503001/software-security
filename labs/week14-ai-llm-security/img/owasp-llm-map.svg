@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 486" role="img" aria-label="The OWASP Top 10 for LLM Applications, 2025 edition, as a map of where each item shows up in this week. Solid orange tiles are hands-on and graded today, dashed blue tiles are written or discussion only, grey tiles are not covered this week. LLM01 Prompt Injection, hands-on: Task 1 on port 8082 and Task 4 on Lakera Agent Breaker; the indirect kind is Task 3, written. LLM02 Sensitive Information Disclosure, hands-on: Task 1 leaks the FLAG; the fix, redact_secret, is checked in Task 5. LLM03 Supply Chain: not this week; software supply chain was Week 12. LLM04 Data and Model Poisoning: not this week. LLM05 Improper Output Handling, hands-on: Task 2 reflected XSS; the fix, escape, is checked in Task 5. LLM06 Excessive Agency, written: worksheet Part 2 question 5, on tools, MCP and least privilege. LLM07 System Prompt Leakage, new in 2025: it is why Task 1 works, because the secret sits in SYSTEM_PROMPT, but Task 1 is graded as LLM01 leading to LLM02. LLM08 Vector and Embedding Weaknesses: discussion, the RAG side of Task 3, which itself is graded as LLM01. LLM09 Misinformation: not this week. LLM10 Unbounded Consumption: discussion only, runaway agent cost, no task. Footer: this is 2025 numbering, use it for everything graded this term; the 2026 edition renumbers.">
+  <title>OWASP LLM Top 10 (2025) — where each one shows up this week</title>
+  <style>
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .bg    { fill:#ffffff; }
+    .ttl   { fill:#111827; font-size:18px; font-weight:700; }
+    .sub   { fill:#6b7280; font-size:12px; }
+    .box   { stroke-width:1.6; }
+    .hands { fill:#fff7f3; stroke:#E35205; stroke-width:2.2; }
+    .talk  { fill:#f1f8fd; stroke:#017BC4; stroke-dasharray:6 4; }
+    .none  { fill:#f6f7f8; stroke:#c9ced4; }
+    .idO   { fill:#b23f00; font-size:13px; font-weight:700; }
+    .idB   { fill:#015a8f; font-size:13px; font-weight:700; }
+    .idN   { fill:#9aa3ad; font-size:13px; font-weight:700; }
+    .nm    { fill:#111827; font-size:13px; font-weight:700; }
+    .nmN   { fill:#6b7280; font-size:13px; font-weight:600; }
+    .chipO { fill:#b23f00; font-size:11.5px; font-weight:700; }
+    .chipB { fill:#015a8f; font-size:11.5px; font-weight:700; }
+    .chipN { fill:#9aa3ad; font-size:11.5px; }
+    .note  { fill:#374151; font-size:11px; }
+    .newb  { fill:#E35205; }
+    .newt  { fill:#ffffff; font-size:9.5px; font-weight:700; letter-spacing:.4px; }
+    .foot  { fill:#6b7280; font-size:11.5px; }
+    @media (prefers-color-scheme: dark) {
+      .bg    { fill:#11151a; }
+      .ttl, .nm { fill:#e9edf2; }
+      .sub, .foot, .nmN { fill:#9aa3ad; }
+      .hands { fill:#2b1a12; stroke:#ff7a3d; }
+      .talk  { fill:#122633; stroke:#4aa3dd; }
+      .none  { fill:#161b21; stroke:#33404c; }
+      .idO, .chipO { fill:#ff7a3d; }
+      .idB, .chipB { fill:#4aa3dd; }
+      .idN, .chipN { fill:#6b7682; }
+      .note  { fill:#c4ccd4; }
+      .newb  { fill:#ff7a3d; }
+      .newt  { fill:#11151a; }
+    }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="720" height="486"/>
+
+  <text class="ttl" x="16" y="30">OWASP LLM Top 10 (2025): where each one shows up this week</text>
+  <!-- legend -->
+  <rect class="box hands" x="16"  y="44" width="14" height="12" rx="2"/>
+  <text class="sub" x="36"  y="54">hands-on, graded today</text>
+  <rect class="box talk"  x="186" y="44" width="14" height="12" rx="2"/>
+  <text class="sub" x="206" y="54">written / discussion only</text>
+  <rect class="box none"  x="370" y="44" width="14" height="12" rx="2"/>
+  <text class="sub" x="390" y="54">not covered this week</text>
+
+  <!-- LEFT COLUMN: LLM01-05 -->
+  <rect class="box hands" x="16" y="70" width="336" height="66" rx="8"/>
+  <text class="idO"  x="28" y="91">LLM01</text><text class="nm" x="80" y="91">Prompt Injection</text>
+  <text class="chipO" x="28" y="110">Task 1 (:8082) · Task 4 Agent Breaker</text>
+  <text class="note"  x="28" y="127">indirect kind: Task 3, written</text>
+
+  <rect class="box hands" x="16" y="144" width="336" height="66" rx="8"/>
+  <text class="idO"  x="28" y="165">LLM02</text><text class="nm" x="80" y="165">Sensitive Information Disclosure</text>
+  <text class="chipO" x="28" y="184">Task 1 leaks FLAG{…}</text>
+  <text class="note"  x="28" y="201">fix redact_secret() — checked in Task 5</text>
+
+  <rect class="box none" x="16" y="218" width="336" height="66" rx="8"/>
+  <text class="idN"  x="28" y="239">LLM03</text><text class="nmN" x="80" y="239">Supply Chain</text>
+  <text class="chipN" x="28" y="258">not this week</text>
+  <text class="chipN" x="28" y="275">software supply chain was Week 12</text>
+
+  <rect class="box none" x="16" y="292" width="336" height="66" rx="8"/>
+  <text class="idN"  x="28" y="313">LLM04</text><text class="nmN" x="80" y="313">Data &amp; Model Poisoning</text>
+  <text class="chipN" x="28" y="332">not this week</text>
+
+  <rect class="box hands" x="16" y="366" width="336" height="66" rx="8"/>
+  <text class="idO"  x="28" y="387">LLM05</text><text class="nm" x="80" y="387">Improper Output Handling</text>
+  <text class="chipO" x="28" y="406">Task 2 — reflected XSS on :8082</text>
+  <text class="note"  x="28" y="423">fix escape() — checked in Task 5</text>
+
+  <!-- RIGHT COLUMN: LLM06-10 -->
+  <rect class="box talk" x="368" y="70" width="336" height="66" rx="8"/>
+  <text class="idB"  x="380" y="91">LLM06</text><text class="nm" x="432" y="91">Excessive Agency</text>
+  <text class="chipB" x="380" y="110">written: worksheet Part 2 Q5</text>
+  <text class="note"  x="380" y="127">tools, MCP, least privilege — no agent in the lab</text>
+
+  <rect class="box talk" x="368" y="144" width="336" height="66" rx="8"/>
+  <text class="idB"  x="380" y="165">LLM07</text><text class="nm" x="432" y="165">System Prompt Leakage</text>
+  <rect class="newb" x="604" y="154" width="38" height="15" rx="3"/><text class="newt" x="623" y="165" text-anchor="middle">NEW</text>
+  <text class="chipB" x="380" y="184">why Task 1 works: secret in SYSTEM_PROMPT</text>
+  <text class="note"  x="380" y="201">grade Task 1 as LLM01 → LLM02</text>
+
+  <rect class="box talk" x="368" y="218" width="336" height="66" rx="8"/>
+  <text class="idB"  x="380" y="239">LLM08</text><text class="nm" x="432" y="239">Vector &amp; Embedding Weaknesses</text>
+  <text class="chipB" x="380" y="258">discussion: the RAG side of Task 3</text>
+  <text class="note"  x="380" y="275">Task 3 itself is graded as LLM01 (indirect)</text>
+
+  <rect class="box none" x="368" y="292" width="336" height="66" rx="8"/>
+  <text class="idN"  x="380" y="313">LLM09</text><text class="nmN" x="432" y="313">Misinformation</text>
+  <text class="chipN" x="380" y="332">not this week</text>
+
+  <rect class="box talk" x="368" y="366" width="336" height="66" rx="8"/>
+  <text class="idB"  x="380" y="387">LLM10</text><text class="nm" x="432" y="387">Unbounded Consumption</text>
+  <text class="chipB" x="380" y="406">discussion only: runaway agent cost</text>
+  <text class="note"  x="380" y="423">no task</text>
+
+  <text class="foot" x="16" y="458">2025 numbering — use it for everything graded this term. The 2026 edition renumbers</text>
+  <text class="foot" x="16" y="475">(Excessive Agency → #3, Output Handling → #10); the lab, worksheet and quiz key stay on 2025.</text>
+</svg>
