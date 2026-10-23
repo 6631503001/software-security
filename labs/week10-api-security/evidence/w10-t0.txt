@@ -1,0 +1,6 @@
+### T0 root insecure
+Week 10 INSECURE API — see attack.md
+[HTTP 200]
+### T0 root secure
+Week 10 SECURE API
+[HTTP 200]

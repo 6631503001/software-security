@@ -10,7 +10,7 @@
 
 | Name | Student ID | Date | Group |
 |------|-----------|------|-------|
-|      |           |      |       |
+|  Gritthaphat Intaraprasit    | 6631503001          |      |       |
 
 ## Part 2 — Lecture Questions
 

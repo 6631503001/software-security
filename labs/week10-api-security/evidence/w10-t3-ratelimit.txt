@@ -1,0 +1,19 @@
+=== TASK 3 — no rate limit on :8080 (insecure) ===
+attempt pw=wrong1    -> 401
+attempt pw=wrong2    -> 401
+attempt pw=wrong3    -> 401
+attempt pw=wrong4    -> 401
+attempt pw=wrong5    -> 401
+attempt pw=wrong6    -> 401
+attempt pw=alice123  -> 200
+--- successful guess body (alice123):
+{"is_admin":false,"ok":true,"user_id":1}
+
+[HTTP 200]
+
+=== TASK 3 — :8081 rate limited (RATE_LIMIT=5/60s) ===
+401 401 401 401 401 429 429 
+--- 429 body:
+{"error":"too many requests"}
+
+[HTTP 429]
