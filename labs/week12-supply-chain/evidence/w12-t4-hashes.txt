@@ -1,0 +1,12 @@
+=== TASK 4.1 — --require-hashes against the lab's own requirements.txt (no hashes yet) ===
+Collecting Flask==1.1.4
+  Downloading Flask-1.1.4-py2.py3-none-any.whl (94 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 94.6/94.6 kB 2.3 MB/s eta 0:00:00
+ERROR: Hashes are required in --require-hashes mode, but they are missing from some requirements. Here is a list of those requirements along with the hashes their downloaded archives actually had. Add lines like these to your requirements files to prevent tampering. (If you did not enable --require-hashes manually, note that it turns on automatically when any package has a hash.)
+    Flask==1.1.4 --hash=sha256:c34f04500f2cbbea882b1acb02002ad6fe6b7ffa64a6164577995657f50aed22
+
+[notice] A new release of pip is available: 23.0.1 -> 26.0.1
+[notice] To update, run: pip install --upgrade pip
+
+=== TASK 4.1b — what pip wants instead: the hashes it prints ===
+lines of --hash=sha256: pip offered: 0

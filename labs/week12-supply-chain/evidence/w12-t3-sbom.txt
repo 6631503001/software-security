@@ -1,0 +1,26 @@
+=== TASK 3a — SBOM (CycloneDX) from the built image ===
+2026-10-23T12:14:50Z	INFO	Detected OS	family="debian" version="13.1"
+2026-10-23T12:14:50Z	INFO	Number of language-specific files	num=1
+📣 [34mNotices:[0m
+  - Version 0.76.1 of Trivy is now available, current version is 0.74.0
+To suppress version checks, run Trivy scans with the --skip-version-check flag
+--- sbom.cdx.json: 209235 bytes
+
+=== Flask component entry in the SBOM ===
+bomFormat   : CycloneDX 1.7
+components  : 119
+{
+  "type": "library",
+  "name": "Flask",
+  "version": "1.1.4",
+  "purl": "pkg:pypi/flask@1.1.4"
+}
+
+=== TASK 3b — trivy image CVE summary (superset of fs scan) ===
+┌──────────────────────────────────────────────────────────────────────────────────┬────────────┬─────────────────┬─────────┐
+│ week12-supplychain:lab (debian 13.1)                                             │   debian   │       125       │    -    │
+week12-supplychain:lab (debian 13.1)
+Total: 125 (HIGH: 119, CRITICAL: 6)
+┌─────────────────────────┬─────────────────┬──────────┬──────────────┬─────────────────────────┬───────────────────┬──────────────────────────────────────────────────────────────┐
+Total: 14 (HIGH: 14, CRITICAL: 0)
+┌───────────────────────────┬────────────────┬──────────┬────────┬───────────────────┬────────────────┬──────────────────────────────────────────────────────────────┐

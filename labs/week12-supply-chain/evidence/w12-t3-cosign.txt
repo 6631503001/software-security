@@ -1,0 +1,19 @@
+=== 1. VERIFY the signed image (expect PASS) ===
+
+Verification for localhost:5050/w12:lab --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The signatures were verified against the specified public key
+
+[{"critical":{"identity":{"docker-reference":"localhost:5050/w12:lab"},"image":{"docker-manifest-digest":"sha256:cd3ca29ee1b0f9b0c355bf2c9e5b166ad2e8f44587fbf88762572439b4702b1f"},"type":"https://sigstore.dev/cosign/sign/v1"},"optional":{}},{"critical":{"identity":{"docker-reference":"localhost:5050/w12:lab"},"image":{"docker-manifest-digest":"sha256:cd3ca29ee1b0f9b0c355bf2c9e5b166ad2e8f44587fbf88762572439b4702b1f"},"type":"https://sigstore.dev/cosign/sign/v1"},"optional":{}}]
+
+=== 2. NEGATIVE TEST — an unsigned image must FAIL ===
+lab: digest: sha256:3943033eca2fa43ccd13fc9d1ed832ea777533f15660d6186c0a478ef1cb3d72 size: 1159
+Error: no signatures found
+error during command execution: no signatures found
+[exit=10]
+
+=== 3. keyless-style invocation on a public unsigned image (identity flags required) ===
+Error: no signatures found
+error during command execution: no signatures found

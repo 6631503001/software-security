@@ -1,0 +1,21 @@
+preset: the attack
+  private=1.4.0  public=99.0.0  mode=merged (--extra-index-url)
+  verdict  : installs acme-internal-utils 99.0.0 from PUBLIC — confused   [verdict bad]
+  explain  : --extra-index-url merges both registries into one pool, and the resolver's only rule is “highest version wins” — it has no concept of which source is trusted. 99.0.0 > 1.4.0, so the attacker's package installs and its setup.py runs as you.
+
+preset: single-index defense
+  private=1.4.0  public=99.0.0  mode=single (--index-url)
+  verdict  : installs acme-internal-utils 1.4.0 — safe   [verdict ok]
+  explain  : --index-url means exactly one index is configured. The resolver has no second registry to compare against, so the public look-alike is never even fetched, let alone considered — its version number doesn't matter here at all.
+
+preset: “win the race” (unreliable)
+  private=2.0.0  public=1.9.0  mode=merged (--extra-index-url)
+  verdict  : installs acme-internal-utils 2.0.0 from PRIVATE — safe this time   [verdict ok]
+  explain  : Even merged, the private version isn't lower, so it still wins the comparison. But this is NOT a defense — the attacker chooses their own version number and will simply publish something higher. Raise the public version above 2.0.0 and watch it flip.
+
+custom: private=1.4.0 public=0.9.0 mode=merged  ("keep my version high")
+  verdict  : installs acme-internal-utils 1.4.0 from PRIVATE — safe this time   [verdict ok]
+  explain  : Even merged, the private version isn't lower, so it still wins the comparison. But this is NOT a defense — the attacker chooses their own version number and will simply publish something higher. Raise the public version above 1.4.0 and watch it flip.
+
+custom: private=1.4.0 public=0.9.0 mode=single
+  verdict  : installs acme-internal-utils 1.4.0 — safe   [verdict ok]
