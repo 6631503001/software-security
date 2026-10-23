@@ -44,15 +44,18 @@ Answer in your own words (2–4 sentences each).
 
 ```bash
 # --- A) Wire the gate into a repo you own (README-pipeline.md §1) ---
+# Copy the files of this lab folder to the ROOT of a new public repo you own,
+# then run these commands inside that repo:
 mkdir -p .github/workflows
-cp labs/week15-devsecops-pipeline/security-ci.yml .github/workflows/security-ci.yml
+cp security-ci.yml .github/workflows/security-ci.yml
 git add .github/workflows/security-ci.yml
 git commit -m "ci: add security gate (Semgrep + Trivy + Gitleaks)"
 git push        # runs on push/PR to main
 
 # --- B) Run the sample service locally (logging + fail-closed) ---
+# from this lab folder (labs/week15-devsecops-pipeline in the course clone):
 pip install flask
-python labs/week15-devsecops-pipeline/sample-service.py
+python sample-service.py
 # In another shell:
 curl -s -X POST localhost:5001/login -H 'Content-Type: application/json' -d '{"token":"nope"}'   # 401 authn_failure
 curl -s localhost:5001/admin -H 'Authorization: bob-token'    # 403 authz_failure

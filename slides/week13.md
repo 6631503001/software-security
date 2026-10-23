@@ -16,7 +16,7 @@ Software Security · Nutthakorn Chalaemwongwan
 ## Today
 
 - Shared-responsibility model
-- IAM & least privilege
+- IAM (who can do what) & least privilege
 - Secrets management
 - Container/image hardening
 - 🎮 Game: **Misconfig Hunt**
@@ -39,7 +39,7 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ## Shared responsibility
 
-- Cloud secures *of* the cloud; you secure *in* the cloud
+- The provider secures the cloud itself; you secure what you put in it
 - Misconfig — not provider bugs — causes most breaches
 - Defaults are rarely safe
 
@@ -61,9 +61,9 @@ Software Security · Nutthakorn Chalaemwongwan
 { "Effect":"Allow", "Action":"*", "Resource":"*" }   // 🚩
 ```
 
-- Over-broad policies = blast radius
-- `Resource:"*"` → **CWE-732** (incorrect permission assignment); `Action:"*"` → **CWE-269** (improper privilege management) — they're graded as two distinct findings on the *same* policy, not one
-- Fix: two narrow statements on one bucket — `s3:GetObject` on `app/*` objects, plus `s3:ListBucket` limited by an `s3:prefix` `Condition` — not just a narrower ARN
+- Read a statement as: **Effect** (allow or deny) · **Action** (what) · **Resource** (on which thing) · **Condition** (only when …)
+- `Resource:"*"` → **CWE-732**, `Action:"*"` → **CWE-269**: graded as **two** findings on the same policy
+- Fix: use two statements for one bucket. Allow `s3:GetObject` on `app/*`. Allow `s3:ListBucket` only when the `s3:prefix` `Condition` matches `app/*`
 
 ```sim
 iam-scope
@@ -101,7 +101,7 @@ iam-scope
 
 ## Try it — which layer gives it away?
 
-Real `docker history` / `docker inspect` output from both lab images. Pick a command.
+Real `docker history` / `docker inspect` output from both lab images. Start with `docker history --no-trunc` and compare the ENV rows.
 
 ```sim
 image-layers
@@ -124,18 +124,16 @@ image-layers
 ## Container image hardening
 
 ```bash
-# misconfig scan (Dockerfiles)
+# 1. Dockerfile misconfigs   2. known CVEs in the built image
 docker run --rm -v "${PWD}:/src" aquasec/trivy:latest \
   config --severity MEDIUM,HIGH,CRITICAL /src
-# image CVE scan
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
   aquasec/trivy:latest image --severity HIGH,CRITICAL week13-hardened:lab
 ```
 
-- Multi-stage build: `python:3.11-slim@sha256:...` (compiles) → **distroless** `gcr.io/distroless/python3-debian12@sha256:...` (runs) — a smaller runtime image with no shell/package manager, `USER 65532:65532` (non-root)
-- `@sha256:...` **digest** pins, not just a version tag — a tag can be repointed later, a digest can't
-- Re-scan to prove reduced findings
-- **Trivy only catches 3 of 6 planted defects** (`:latest`, root user, secret-in-ENV) — `COPY . .`, `chmod -R 777`, and unpinned `pip install` need **manual review**, no rule fires
+- **Two stages:** build in `python:3.11-slim`, run in **distroless** (no shell, no package manager) as user `65532`, not root
+- **Pin by digest** (`@sha256:...`): a tag can be moved later, a digest cannot
+- **Trivy finds only 3 of the 6 defects.** `COPY . .`, `chmod -R 777` and unpinned `pip install`: **read the file**
 
 <!-- Hands-on — this is the lab's insecure→hardened Dockerfile, always run dockerized (never a bare local trivy binary), against week13-hardened:lab (not a generic myapp:lab). The Trivy-blind-spot point is the actual lesson of this lab, not an aside — half the graded findings need a human, not a tool. Re-scan to prove improvement. ~5 min. -->
 
@@ -143,7 +141,7 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 
 ## Does Trivy see it?
 
-Fix the six defects one at a time and watch `trivy config` re-score the file.
+Start with **fix only what Trivy flags**: Trivy says 0, but 3 defects are still in the file. Then fix the rest one at a time.
 
 ```sim
 trivy-blindspot
@@ -155,7 +153,7 @@ trivy-blindspot
 
 ## Kubernetes basics (awareness)
 
-- Pod security, network policies, RBAC
+- Pod security (a pod = one or more containers run together), network policies, RBAC (role-based access control)
 - Don't run privileged; limit service-account tokens
 
 <!-- Awareness only (K8s is its own course). Key takeaways: a privileged pod ≈ host root; mounted service-account tokens are a lateral-movement prize. Keep it brief. ~3 min. -->
@@ -183,11 +181,11 @@ trivy-blindspot
 
 ## Deliverable
 
-> 📋 **Worksheet 13** — `labs/week13-cloud-container/worksheet.md` (Parts 1–4) · **kickoff:** `bash scan.sh` (trivy config over the **Dockerfiles only** — IAM JSON is manual review, Trivy doesn't parse it)
+> 📋 **Worksheet 13** — `labs/week13-cloud-container/worksheet.md` (Parts 1–4) · **start:** `bash scan.sh` (it scans the Dockerfiles only — read the IAM JSON yourself)
 
 - Before/after IAM policy + Dockerfile, all 9 flags explained
-- Trivy reports showing reduced risk (container half only)
-- Note on secrets remediation
+- Trivy results before/after (container part only)
+- A short note: how to remove and rotate the leaked secret
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
 
 <!-- Before/after artifacts + the trivy delta prove the container-side fix; IAM has no scanner delta to show, it's reasoned/written. Don't let "trivy over Dockerfiles + IAM JSON" stand — that's the exact misconception this lab's own history already fixed once. AI-resilient tasks count. -->
@@ -198,7 +196,7 @@ trivy-blindspot
 
 - Misconfiguration > zero-days as a breach cause
 - Least privilege, private-by-default, no secrets in code
-- Scan IaC and images in CI
+- Scan infrastructure-as-code (IaC) files and images in CI
 
 <!-- Recap. Cold-call: "what does a `*:*` IAM policy cost you if the key leaks?" (everything — full blast radius). "Scan in CI" sets up W15. ~2 min. -->
 

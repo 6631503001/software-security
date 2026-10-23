@@ -18,7 +18,7 @@ Software Security · Nutthakorn Chalaemwongwan
 - Where AI features add attack surface
 - OWASP **LLM Top 10 (2025)**
 - Prompt injection (direct + indirect)
-- Agentic-AI / MCP risks
+- AI agents with tools (MCP = Model Context Protocol) — risks
 - 🎮 Game: **Gandalf Challenge** — now on Lakera Agent Breaker
 
 <!-- Roadmap, 1 min. Big idea: prompt injection IS injection (W4) — untrusted data interpreted as instructions. Everything they learned applies. Lab = attack Lakera's Agent Breaker apps (the old Gandalf site now redirects there), then see guardrails stop the same attacks. -->
@@ -27,7 +27,7 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ## Why a whole week on AI
 
-- LLMs now sit inside real products & agents
+- LLMs (large language models) now sit inside real products & agents
 - New, fast-moving attack surface
 - OWASP LLM Top 10 + MITRE ATLAS
 
@@ -46,7 +46,7 @@ Software Security · Nutthakorn Chalaemwongwan
 | **LLM07 System Prompt Leakage** | LLM08 Vector/Embedding | LLM09 Misinformation |
 | LLM10 Unbounded Consumption | | |
 
-> **New in 2025:** LLM07 System Prompt Leakage · LLM08 promoted (RAG everywhere) · LLM10 replaces "DoS" with runaway *cost*.
+> **New in 2025:** LLM07 System Prompt Leakage · LLM08 Vector/Embedding weaknesses (risks in text the app retrieves for the model) · LLM10 Unbounded Consumption: runaway *cost*, not just DoS.
 
 > **Heads up:** OWASP released a **2026** edition in Aug 2026 (Excessive Agency jumps to #3, Output Handling drops to #10; see genai.owasp.org). This course's lab, worksheet, and quiz key are still on **2025** numbering — use 2025 for anything graded this term.
 
@@ -67,7 +67,7 @@ Software Security · Nutthakorn Chalaemwongwan
 > Untrusted text overrides the system's instructions — injection, again.
 
 - **Direct:** user tells the bot to ignore its rules — this week's hands-on lab (Task 1 + Agent Breaker in Task 4)
-- **Indirect:** malicious instructions hidden in a fetched doc / web page (RAG) — **discussed, not built:** the lab's mock LLM has no RAG/retrieval, so this is a thought experiment (worksheet Task 3), not something you'll exploit yourself today
+- **Indirect:** hidden instructions in a page or document the bot fetches (RAG = retrieval-augmented generation: the app adds fetched text to the prompt). Task 3 is written only — the lab bot has no retrieval step
 
 <!-- The core concept — say "this is W4 injection in a new interpreter (the LLM)." Direct = graded Task 1 + Agent Breaker (Task 4), fully hands-on; Task 2 is LLM05 (unescaped output), not injection. Indirect is the scary one conceptually, but be upfront that this lab can't demonstrate it live — no retrieval pipeline exists to poison. ~6 min. -->
 
@@ -75,7 +75,7 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ## Indirect injection — the user never typed it
 
-Edit the page the bot reads. Keep the question innocent. **Mock RAG** — the lab has no retrieval step.
+Pick **on the question only**, then **on the question and the retrieved page**, and compare the replies. **Mock RAG** — the lab has no retrieval step.
 
 ```sim
 rag-inject
@@ -162,9 +162,11 @@ llm-output
 ## Defenses
 
 - Input/output **guardrails** + content filtering — *you'll build this: `guarded_chatbot.py`'s regex denylist*
-- Strict output **schemas/validation**; encode before downstream use — *you'll build this: HTML-escaping the model's output*
+- Validate the model's output and **encode** it for where it goes — *you'll build this: HTML-escape the reply before it goes on the page*
 - Redact secrets before they can reach a response — *you'll build this: `redact_secret()`*
 - **Least-privilege tool access**, human-in-the-loop, rate limits, isolating untrusted RAG content — *concepts only this week (worksheet Q5); no agent/tool-calling code exists in this lab to demo*
+
+Try **classic injection** on `vulnerable_chatbot.py`, then switch to `guarded_chatbot.py`.
 
 ```sim
 prompt-guard
@@ -176,9 +178,9 @@ prompt-guard
 
 ## 🧙 Game — Gandalf Challenge
 
-1. Attack **Lakera Agent Breaker** apps via **prompt injection** (real external service; each attempt scored 0–100, 75+ unlocks the next level)
-2. **Round 2 (graded):** replay your Task 1 injection + the Task 2 XSS payload against the **guarded** bot — does it still land?
-3. **Written only:** tool poisoning / excessive agency on an MCP-style agent (worksheet Q5) — no agent exists in this lab to demo live
+1. Attack **Lakera Agent Breaker** (a real public site built to be attacked): each try scores 0–100, and 75+ opens the next level
+2. **Round 2 (graded):** send your Task 1 and Task 2 attacks to the **guarded** bot (:8083) — do they still work?
+3. **Written only:** tool poisoning / excessive agency in an MCP agent (worksheet Q5) — this lab has no agent to attack
 
 <!-- Lakera retired the Gandalf site: https://gandalf.lakera.ai/ now redirects to https://play.lakera.ai/agent-breaker (checked 22 Oct 2026). Still free; students compete on score — start with Cycling Coach (direct: extract the system prompt), then Trippy Planner (indirect: the attack hides in a web page). Round 2 (Task 5: replay against guarded_chatbot.py) is graded — the point is that guardrails/redaction/escaping visibly stop what worked before. Don't promise a live tool-poisoning demo; it's a discussion question. The weekly quiz no longer asks for the injection/guardrail-failure/flag (dropped — quiz runs before the lab) — that's required in the worksheet instead. ~3 min. -->
 
@@ -194,13 +196,12 @@ prompt-guard
 
 ## Deliverable
 
-> 📋 **Worksheet 14** — `labs/week14-ai-llm-security/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → :8082 (insecure) / :8083 (guarded)
+> 📋 **Worksheet 14** — `labs/week14-ai-llm-security/worksheet.md` (Part 3) · **start:** `docker compose up` → :8082 (insecure) / :8083 (guarded)
 
-- Attack log: prompt-injection disclosure (Task 1) + reflected-XSS from unescaped output (Task 2)
-- Written: indirect-injection thought experiment (Task 3)
-- Agent Breaker scores — app, level, score, prompt (Task 4)
-- Mitigations + re-test results against the guarded bot (Task 5)
-- Written: least-privilege agent/MCP tool design (Part 2 Q5 — reflection, not a build)
+- Tasks 1–2: attack log — the leaked secret, and the XSS from the bot's reply
+- Task 4: Agent Breaker — app, level, score, prompt
+- Task 5: the same attacks against the guarded bot, before vs after
+- Written: Task 3 (indirect injection) and Part 2 Q5 (least-privilege tools for an agent)
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
 
 <!-- Six graded pieces, not three — the least-privilege tool design is a written reflection, not a build, so don't let students think they're missing a coding artifact for it. Especially fitting this week: the Audit-the-AI task critiques an AI's own (insecure) answer. Ports are 8082/8083 — the old pair's 6000 half was genuinely unreachable (Chrome/Firefox both block port 6000, the X11 port, per their restricted-port lists); 6001 was never actually blocked anywhere, so if asked, the honest reason for the move is "6000 was dead and we replaced the whole pair," not "the browsers blocked both." -->

@@ -27,7 +27,7 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ## The whole course in one pipeline
 
-- SAST (Wk2) · SCA + image scan (Wk12–13) · secret scanning (Wk2)
+- SAST (Wk2) · SCA + image scan (Wk12–13) · IaC (infrastructure-as-code) config scan (Wk13) · secret scanning (Wk2)
 - Automated gates instead of one-off scans
 - **Secure by Design** as the default
 
@@ -55,9 +55,9 @@ Software Security · Nutthakorn Chalaemwongwan
 # each tool runs TWICE: once to report (SARIF, always), once to gate (fails the build)
 ```
 
-- Least-privilege token: `contents: read`, `security-events: write` — don't hand the pipeline more than it needs
-- Upload SARIF → GitHub Security tab
-- A red run only **blocks** a merge if the jobs are **required checks** (branch protection) — otherwise it's a warning
+- The token gets only what it needs: `contents: read`, `security-events: write`
+- Results (SARIF) go to the GitHub **Security** tab
+- A red run **blocks** a merge only if the jobs are **required checks** (branch protection)
 
 ```sim
 gate-check
@@ -93,9 +93,9 @@ gate-check
 
 ## Detection tooling
 
-- **NIDS** — Snort / Suricata (network signatures)
-- **HIDS** — OSSEC (host-based)
-- **SIEM / stack** — Security Onion bundles them + analysis
+- **NIDS** (network intrusion detection) — Snort / Suricata watch network traffic
+- **HIDS** (host intrusion detection) — OSSEC watches one machine
+- **SIEM** (collects and connects alerts) — Security Onion bundles these tools
 - Network visibility: **TAP** (lossless) vs **SPAN** (cheap, can drop)
 
 <!-- Awareness of the defender's toolkit. NIDS watches the wire, HIDS watches the host, SIEM correlates everything. TAP vs SPAN is a practical gotcha: SPAN ports drop packets under load — you miss attacks. Keep brisk. ~3 min. -->
@@ -120,7 +120,7 @@ gate-check
 
 **Collection → Examination → Analysis → Reporting**
 
-- Preserve **order of volatility**: memory → temp files → disk → logs
+- Collect what disappears first (**order of volatility**): memory → temp files → disk → logs
 - Failed/success logins: Windows Event **4625 / 4624**
 
 <!-- A taste of incident response / forensics. Order of volatility: capture RAM before you pull the plug — it's gone on shutdown. 4625 (failed) / 4624 (success) are the login events they'd grep in a real investigation. ~4 min. -->
@@ -169,9 +169,10 @@ fail-open
 
 ## 🔴🔵 Game — Break the Build
 
-- **Blue:** build the gate (Semgrep + Trivy + Gitleaks), fail on HIGH/CRITICAL, add security logging that fails closed
-- **Red:** one planted defect per PR, aimed at a gate — outdated dependency (Trivy SCA), a Dockerfile running as root (Trivy config), a hardcoded token (Gitleaks). `chmod 777` and `FROM:latest` stay green: that's a blind spot, not a Task 4 screenshot
-- **Score:** Blue per catch, Red per defect that slips through (a blind spot found — propose the rule that would catch it); then leak the flag from the fail-open `/admin` bypass in `insecure_service.py` (a public demo value on a local run; your personal flag comes from your hosted instance)
+- **Blue:** set up the gate (Semgrep + Trivy + Gitleaks), fail on HIGH/CRITICAL, log security events and deny on error
+- **Red:** one planted defect per PR — an old dependency (Trivy SCA), a Dockerfile running as root (Trivy config), or a hard-coded token (Gitleaks)
+- **Score:** Blue +1 per catch · Red +1 per defect that slips through (e.g. `chmod 777`, `FROM :latest` stay green) — then propose a rule that would catch it
+- **Flag:** leak it from the fail-open `/admin` in `insecure_service.py` (local run = demo flag; graded flag = your hosted instance)
 
 <!-- The capstone game. Both roles teach: Blue learns to configure gates, Red learns where gates have blind spots. Task 4 (the graded screenshot) needs a defect that maps to a gate; anything that slips through instead is a Task 5 Red point, exactly as the worksheet scores it. Run it as live PRs against the pipeline. The weekly quiz no longer asks for the gate/what-it-blocks/flag (dropped — quiz runs before the lab) — that's required in the worksheet instead, don't drop the flag half there, it's still graded. ~3 min. -->
 
@@ -187,7 +188,7 @@ fail-open
 
 ## Try it — which job goes red?
 
-Start from the untouched lab or Blue's fixes, plant a defect, read the run step by step.
+Click **Blue's clean baseline**, then **Red: old urllib3**, and find the gate that fails.
 
 ```sim
 red-team-pr
@@ -207,11 +208,11 @@ red-team-pr
 
 ## Deliverable
 
-> 📋 **Worksheet 15** — `labs/week15-devsecops-pipeline/worksheet.md` (Part 3) · **kickoff:** push `security-ci.yml` → GitHub Actions; separately, `docker compose up` → :8090 (insecure) / :8091 (secure) for the flag task
+> 📋 **Worksheet 15** — `labs/week15-devsecops-pipeline/worksheet.md` (Part 3) · **start:** push `security-ci.yml` to your own public repo → GitHub Actions; for the flag, `docker compose up` → :8090 (insecure) / :8091 (secure)
 
 - A passing PR that adds the pipeline
-- Screenshot: the **failing** gate step for your planted defect, and which job caught it (one defect per PR; trying all 3 categories is good practice)
-- The `FLAG{...}` from the fail-open `/admin` bypass, in the **worksheet** (not the weekly quiz, which runs before the lab); your personal flag comes from your hosted instance
+- A screenshot of the **failing** gate step for your planted defect, and which job caught it
+- The `FLAG{...}` from the fail-open `/admin`, written in the worksheet (graded flag: your hosted instance)
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
 
 <!-- Two separate targets this week, both graded: security-ci.yml is the CI gate; insecure_service.py/secure_service.py (compose, :8090/:8091) is where the local (public demo) flag lives; graded per-student flags come from the hosted instance. The "build failing" screenshot is the proof the gate actually says no — a green pipeline that never fails is useless. The worksheet grades one planted defect (Task 4); encourage all three if time allows. AI-resilient tasks count. This is also the last weekly quiz. -->
