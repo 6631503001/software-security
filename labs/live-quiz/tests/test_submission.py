@@ -212,8 +212,11 @@ def test_no_deadline_means_always_open(conn, uploads):
 
 def test_lateness_is_computed_not_stored(conn, uploads):
     """A stored late flag goes stale the moment a deadline is extended."""
-    aid = make(conn, due_at="2026-08-15T07:00:00")     # already past
+    aid = make(conn)
     sub, _ = open_sub(conn, aid)
+    conn.execute("UPDATE assignments SET due_at = ? WHERE id = ?",
+                 ("2026-08-15T07:00:00", aid))         # now already past
+    conn.commit()
     conn.execute("UPDATE submissions SET submitted_at = ? WHERE id = ?",
                  ("2026-08-15T09:00:00", sub["id"]))
     conn.commit()
@@ -225,12 +228,101 @@ def test_lateness_is_computed_not_stored(conn, uploads):
     assert not S.is_late(conn, sub), "extending the deadline must un-late everyone"
 
 
+def _handed_in_then_lost_the_session(conn, aid, uploads, sid="65310001"):
+    """The student opened the worksheet and uploaded before the deadline; the code is now spent."""
+    sub, _ = open_sub(conn, aid, sid)
+    S.store_file(conn, sub, display_name="evidence.pdf", data=b"x", now=T0, upload_dir=uploads)
+    return sub
+
+
+def _deadline_passed(conn, code, now=LATE):
+    with pytest.raises(S.SubmitError) as exc:
+        S.redeem(conn, code, now)
+    assert str(exc.value) == S.CODE_DEADLINE_PASSED
+    row = conn.execute("SELECT redeemed_at FROM submit_codes WHERE code = ?", (code,)).fetchone()
+    assert row["redeemed_at"] is None, "a refused code must be left unused"
+
+
 def test_a_student_can_still_read_feedback_after_the_deadline(conn, uploads):
+    # After the deadline a code opens only to read released marks: the student handed in, lost
+    # the session, and the teacher re-issued a code. It opens read-only and is burned.
     aid = make(conn)
-    codes = S.issue_codes(conn, aid, ["65310001"], T0)
-    sub = S.redeem(conn, codes["65310001"], LATE)      # redeeming still works
-    assert sub is not None
-    assert not S.can_upload(conn, sub, LATE)           # but writing does not
+    sub = _handed_in_then_lost_the_session(conn, aid, uploads)
+    conn.execute("UPDATE assignments SET released = 1 WHERE id = ?", (aid,))
+    conn.commit()
+    code = S.issue_codes(conn, aid, ["65310001"], LATE)["65310001"]
+    again = S.redeem(conn, code, LATE)
+    assert again["id"] == sub["id"]
+    assert not S.can_upload(conn, again, LATE)         # but writing does not
+    with pytest.raises(S.SubmitError) as exc:
+        S.redeem(conn, code, LATE)
+    assert str(exc.value) == S.CODE_ALREADY_USED
+
+
+def test_a_closed_worksheet_with_nothing_handed_in_does_not_open(conn):
+    aid = make(conn)
+    code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
+    _deadline_passed(conn, code)
+    assert conn.execute("SELECT COUNT(*) n FROM submissions").fetchone()["n"] == 0
+    # released marks change nothing: there are none of theirs to read
+    conn.execute("UPDATE assignments SET released = 1 WHERE id = ?", (aid,))
+    conn.commit()
+    _deadline_passed(conn, code)
+
+
+def test_a_closed_worksheet_opened_but_never_handed_in_does_not_open(conn):
+    # Opened before the deadline (so a submission row exists) but nothing uploaded, then the
+    # session was lost and a code re-issued. Released marks are not theirs to read.
+    aid = make(conn)
+    open_sub(conn, aid)
+    conn.execute("UPDATE assignments SET released = 1 WHERE id = ?", (aid,))
+    conn.commit()
+    code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
+    _deadline_passed(conn, code)
+
+
+def test_two_redemptions_of_one_code_at_once_let_only_one_in(conn, monkeypatch):
+    # redeem() reads the code, then burns it. If a second redemption burns it in between (two
+    # tabs, a double-tapped button, or a classmate with a photo of the slip), the one that lost
+    # must be refused, not handed the same submission.
+    aid = make(conn)
+    code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
+    real = S.get_assignment
+
+    def the_other_redemption_wins(c, assignment_id):
+        c.execute("UPDATE submit_codes SET redeemed_at = ? WHERE code = ?", ("2026-08-15T08:00:01", code))
+        c.commit()
+        return real(c, assignment_id)
+
+    monkeypatch.setattr(S, "get_assignment", the_other_redemption_wins)
+    with pytest.raises(S.SubmitError) as exc:
+        S.redeem(conn, code, T0)
+    assert str(exc.value) == S.CODE_ALREADY_USED
+    assert conn.execute("SELECT COUNT(*) n FROM submissions").fetchone()["n"] == 0
+    assert conn.execute("SELECT redeemed_at FROM submit_codes WHERE code = ?",
+                        (code,)).fetchone()["redeemed_at"] == "2026-08-15T08:00:01"
+
+
+def test_a_closed_worksheet_whose_marks_are_not_released_does_not_burn_the_code(conn, uploads):
+    # Seen 23 Oct 2026: a student had handed in Week 6, and its code predates single-use codes, so
+    # it was still unspent. Typing it a month after Week 6 closed used to burn it for nothing.
+    aid = make(conn)
+    _handed_in_then_lost_the_session(conn, aid, uploads)
+    code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
+    _deadline_passed(conn, code)
+    # the same code opens once the marks are out
+    conn.execute("UPDATE assignments SET released = 1 WHERE id = ?", (aid,))
+    conn.commit()
+    assert S.redeem(conn, code, LATE) is not None
+
+
+def test_closed_means_exactly_what_can_upload_means(conn):
+    # One instant: the code stops opening the worksheet when the upload form disappears.
+    aid = make(conn)
+    codes = S.issue_codes(conn, aid, ["65310001", "65310002"], T0)
+    sub = S.redeem(conn, codes["65310001"], DUE)       # at the deadline: still open
+    assert S.can_upload(conn, sub, DUE)
+    _deadline_passed(conn, codes["65310002"], "2026-08-20T23:59:01")
 
 
 # --- codes -----------------------------------------------------------------
@@ -246,8 +338,9 @@ def test_a_code_is_burned_after_its_first_redemption(conn, uploads):
     # once; everything after that goes through the session it established.
     aid = make(conn)
     sub, code = open_sub(conn, aid)
-    with pytest.raises(S.SubmitError, match="isn't valid"):
+    with pytest.raises(S.SubmitError) as exc:
         S.redeem(conn, code, T0)
+    assert str(exc.value) == S.CODE_ALREADY_USED
     # marked spent, not deleted — gradebook_rows() still enumerates this
     # student by this row (see the regression this guards: a submitted
     # student must never silently drop off the gradebook)
@@ -287,8 +380,9 @@ def test_codes_are_idempotent_and_avoid_misread_glyphs(conn):
 
 def test_a_bogus_code_is_refused(conn):
     make(conn)
-    with pytest.raises(S.SubmitError, match="isn't valid"):
+    with pytest.raises(S.SubmitError) as exc:
         S.redeem(conn, "NOPENOPE", T0)
+    assert str(exc.value) == S.CODE_NOT_VALID
 
 
 # --- rubric + marks --------------------------------------------------------
@@ -357,8 +451,9 @@ def test_a_student_who_never_submitted_is_not_a_zero(conn, uploads):
 def test_late_travels_with_the_row_rather_than_being_deducted(conn, uploads):
     """SUBMISSION.md's -10%/day is the teacher's call, applied once, not silently
     baked into the exported percentage."""
-    aid = make(conn, due_at="2026-08-15T07:00:00")
+    aid = make(conn)
     sub, _ = open_sub(conn, aid)
+    conn.execute("UPDATE assignments SET due_at=? WHERE id=?", ("2026-08-15T07:00:00", aid))
     conn.execute("UPDATE submissions SET submitted_at=? WHERE id=?",
                  ("2026-08-15T09:00:00", sub["id"]))
     conn.commit()

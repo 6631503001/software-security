@@ -293,12 +293,23 @@ def owned_submission_ids():
     remember each one it opened: with W10-12 due on the same day a student opens all three,
     and remembering only the latest stranded the earlier ones with no code left to get back in.
     Sessions from before the list existed carry just `submission_id`; that still counts.
+
+    Only the worksheets of the student on screen count. remember_submission() keeps the list to
+    one student, but /quiz used to bypass it, and a session it mixed up (Bob on screen, Alice's
+    worksheet still listed) lives for 180 days — this is what closes those too.
     """
     ids = list(session.get("submission_ids") or [])
     cur = session.get("submission_id")
-    if cur is not None and cur not in ids:
+    if cur is None:
+        return []
+    if cur not in ids:
         ids.append(cur)
-    return ids
+    owner = {}
+    for sid in ids:
+        row = _db().execute("SELECT student_id FROM submissions WHERE id = ?", (sid,)).fetchone()
+        if row is not None:
+            owner[sid] = row["student_id"]
+    return [sid for sid in ids if sid in owner and owner[sid] == owner.get(cur)]
 
 
 def remember_submission(sub):
@@ -375,11 +386,11 @@ def entry():
         session["attempt_id"] = att["id"]
         return redirect(url_for("assess.quiz_take"))
     if kind != "submit":
-        return _entry_page(error="That code isn't valid.", code=raw), 200
+        return _entry_page(error=S.CODE_NOT_VALID, code=raw), 200
     # redeem() used to be unable to fail here (find_kind() just confirmed the
-    # row exists) — now it can, if the code was already burned by an earlier
-    # redemption (see submission.py's redeem() for why that's the fix, not
-    # a bug). That failure must reach the page as a plain refusal, not a 500.
+    # row exists) — now it can: the code was already used, or its worksheet
+    # has closed (see submission.py's redeem()). That failure must reach the
+    # page as its own message, not a 500.
     try:
         sub = S.redeem(_db(), raw, _now())
     except S.SubmitError as exc:

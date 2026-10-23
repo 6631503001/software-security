@@ -280,18 +280,26 @@ def quiz_entry():
         # student did. Log it for us; refuse rather than trust either side.
         current_app.logger.exception("codes.find_kind: code in both tables")
         kind = None
+    import submission as S
     if kind == "submit":
         # A submit code typed into this box by mistake — the two look
         # identical (same alphabet, same length) and a student's slip carries
-        # both. submission.redeem() cannot itself fail once find_kind() has
-        # confirmed the code is there — see codes.py.
-        import submission as S
-        sub = S.redeem(_db(), raw, _now())
-        session["submission_id"] = sub["id"]
+        # both. submission.redeem() CAN fail here (code already used, worksheet
+        # closed), so its message reaches the page rather than a 500. And the
+        # worksheet is opened exactly as /submit opens it: setting
+        # session["submission_id"] here directly kept the previous student's
+        # worksheets in a shared browser, and the next student could open them.
+        try:
+            sub = S.redeem(_db(), raw, _now())
+        except S.SubmitError as exc:
+            return render_template("quiz_entry.html", csrf_token=_csrf(),
+                                   error=str(exc), code=raw), 200
+        import routes_submit
+        routes_submit.remember_submission(sub)
         return redirect(url_for("submit.workspace"))
     if kind != "quiz":
         return render_template("quiz_entry.html", csrf_token=_csrf(),
-                               error="That code isn't valid.", code=raw), 200
+                               error=S.CODE_NOT_VALID, code=raw), 200
     try:
         att = A.redeem(_db(), raw, _now())
     except A.AttemptError as exc:

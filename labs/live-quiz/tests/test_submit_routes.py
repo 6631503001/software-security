@@ -131,7 +131,9 @@ def test_a_leaked_code_cannot_be_redeemed_a_second_time_by_someone_else(
     assert r2.status_code not in (302, 303), (
         "a second redemption of the same code must not reach the workspace"
     )
-    assert "valid" in r2.get_data(as_text=True).lower()
+    import submission as S
+    from markupsafe import escape
+    assert str(escape(S.CODE_ALREADY_USED)) in r2.get_data(as_text=True)
 
 
 def test_a_fresh_colliding_code_does_not_silently_authenticate_into_the_workspace(

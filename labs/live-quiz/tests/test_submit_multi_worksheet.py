@@ -13,11 +13,14 @@ import os
 import sys
 
 import pytest
+from markupsafe import escape
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # Reuse the real app/client/teacher fixtures and the CSRF helper.
 from test_submit_routes import _csrf, appmod, client, teacher  # noqa: F401
+
+import submission as S  # noqa: E402
 
 STUDENT_A, STUDENT_B = "65310001", "65310002"
 
@@ -156,7 +159,8 @@ def test_a_used_code_still_cannot_be_redeemed_again_from_another_browser(appmod,
     code = worksheets["W10"][STUDENT_A]
     assert _enter(appmod.app.test_client(), code).status_code in (302, 303)
     again = _enter(appmod.app.test_client(), code)
-    assert again.status_code == 200 and "valid" in again.get_data(as_text=True).lower()
+    assert again.status_code == 200
+    assert str(escape(S.CODE_ALREADY_USED)) in again.get_data(as_text=True)
 
 
 def test_typing_a_used_code_while_signed_in_points_back_to_the_open_worksheet(appmod, worksheets):  # noqa: F811
@@ -167,7 +171,7 @@ def test_typing_a_used_code_while_signed_in_points_back_to_the_open_worksheet(ap
     _enter(student, code)
     for path in ("/submit", "/code"):
         page = _enter(student, code, path).get_data(as_text=True)
-        assert "valid" in page.lower()
+        assert str(escape(S.CODE_ALREADY_USED)) in page
         assert 'href="/submit/work"' in page, f"{path}: no link back to the worksheet she has open"
     # ...whereas someone with nothing open is not shown a link to nowhere.
     fresh = _enter(appmod.app.test_client(), code).get_data(as_text=True)

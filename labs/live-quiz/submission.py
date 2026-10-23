@@ -69,6 +69,21 @@ class SubmitError(Exception):
     """Refusal with a student-safe message."""
 
 
+# Why a code did not open its worksheet. Three separate messages, because one "isn't valid" for
+# all of them sent students who had simply re-typed a used code to email that the system was
+# broken. Saying "used" or "closed" leaks nothing practical (8 characters from 32 symbols cannot
+# be guessed), but none of them names the worksheet or the student the code belongs to. The
+# unknown-code text also shows on /code and /quiz, so it has to suit a quiz code too.
+CODE_NOT_VALID = ("That code isn't valid. Check that you typed all 8 characters of the code"
+                  " on your slip (not your student ID) and try again.")
+CODE_ALREADY_USED = ("That code has already been used. A code opens its worksheet once, and the"
+                     " worksheet stays open in the browser where the code was first entered — go"
+                     " back to that browser. If you can't, ask your teacher for a new code.")
+CODE_DEADLINE_PASSED = ("The deadline for this worksheet has passed, so it is closed. Your code"
+                        " has not been used, and it will still work if your teacher reopens the"
+                        " worksheet.")
+
+
 def safe_display_name(raw: str) -> str:
     """Sanitise a filename for DISPLAY. Never used to build a path.
 
@@ -193,31 +208,55 @@ def redeem(conn, code, now):
     teacher re-runs issue_codes() for that student — it mints a fresh code
     since the old row is gone, and redeem() finds the SAME submission by
     (assignment_id, student_id), never by the code string.
+
+    After the deadline a code opens the worksheet only to read released marks
+    on work that was handed in (read-only: can_upload() is False by then).
+    Any other past-deadline code is refused BEFORE anything is written, so it
+    stays unused: there is nothing to do on a closed worksheet, and the
+    teacher has reopened deadlines before (the W1-6 resubmission window).
+    Checked in this order — unknown, used, closed — so a used code is called
+    used even once its worksheet has closed.
     """
     row = conn.execute("SELECT * FROM submit_codes WHERE code = ?",
                        ((code or "").strip().upper(),)).fetchone()
-    if row is None or row["redeemed_at"] is not None:
-        raise SubmitError("That code isn't valid.")
+    if row is None:
+        raise SubmitError(CODE_NOT_VALID)
+    if row["redeemed_at"] is not None:
+        raise SubmitError(CODE_ALREADY_USED)
 
     sub = conn.execute(
         "SELECT * FROM submissions WHERE assignment_id = ? AND student_id = ?",
         (row["assignment_id"], row["student_id"])).fetchone()
+    a = get_assignment(conn, row["assignment_id"])
+    has_feedback = bool(a["released"] and sub is not None and sub["submitted_at"])
+    if not _is_open(a, now) and not has_feedback:
+        raise SubmitError(CODE_DEADLINE_PASSED)
+
+    # Burn first, and only if nobody else has: the SELECT above is not a lock,
+    # so two redemptions of one code at once must not both get in.
+    if conn.execute("UPDATE submit_codes SET redeemed_at = ?"
+                    " WHERE code = ? AND redeemed_at IS NULL",
+                    (now, row["code"])).rowcount != 1:
+        conn.rollback()
+        raise SubmitError(CODE_ALREADY_USED)
     if sub is None:
         cur = conn.execute(
             "INSERT INTO submissions (assignment_id, student_id, created_at)"
             " VALUES (?,?,?)", (row["assignment_id"], row["student_id"], now))
         sub = conn.execute("SELECT * FROM submissions WHERE id = ?",
                            (cur.lastrowid,)).fetchone()
-
-    conn.execute("UPDATE submit_codes SET redeemed_at = ? WHERE code = ?",
-                 (now, row["code"]))
     conn.commit()
     return sub
 
 
+def _is_open(assignment, now) -> bool:
+    """Before (or at) the deadline. redeem() and can_upload() both ask this, so a code stops
+    opening the worksheet at the same instant the upload form disappears."""
+    return not assignment["due_at"] or now <= assignment["due_at"]
+
+
 def can_upload(conn, submission, now) -> bool:
-    a = get_assignment(conn, submission["assignment_id"])
-    return not a["due_at"] or now <= a["due_at"]
+    return _is_open(get_assignment(conn, submission["assignment_id"]), now)
 
 
 def is_late(conn, submission) -> bool:

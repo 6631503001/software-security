@@ -4,9 +4,11 @@
 --
 -- IDENTITY: the same one-time-code model as the graded quiz. No student password
 -- anywhere on this platform — that would be a fifth credential to distribute,
--- reset and own. Unlike a quiz, a submission code stays usable until the
--- deadline (a student must be able to come back and replace a bad upload), and
--- read-only afterwards so they can still read their feedback.
+-- reset and own. A submission code opens its worksheet once (redeemed_at); the
+-- browser session it starts is how a student comes back to replace a bad upload
+-- before the deadline and to read feedback, read-only, afterwards. After the
+-- deadline a code opens only released feedback on handed-in work; any other
+-- past-deadline code is refused and left unused (see submission.redeem).
 --
 -- FILES LIVE ON DISK, NOT IN THIS DATABASE. Decided rather than drifted into:
 -- worksheet PDFs with embedded screenshots run to megabytes, and at N≈120 × 13

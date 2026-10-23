@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from flask import Blueprint, current_app, redirect, render_template, request, session, url_for
 
+import submission as S
+
 bp = Blueprint("code", __name__)
 
 
@@ -63,12 +65,10 @@ def entry():
         return redirect(url_for("assess.quiz_take"))
 
     if kind == "submit":
-        import submission as S
         # Used to be unable to fail here (find_kind() just confirmed the row
-        # exists) — now it can, if the code was already burned by an earlier
-        # redemption (submission.py's redeem() no longer stays valid forever;
-        # see its docstring for why). Mirror the quiz branch above: a plain
-        # refusal on the page, not a 500.
+        # exists) — now it can: the code was already used, or its worksheet
+        # has closed (submission.py's redeem(); see its docstring for why).
+        # Mirror the quiz branch above: its own message on the page, not a 500.
         try:
             sub = S.redeem(_db(), raw, _now())
         except S.SubmitError as exc:
@@ -77,4 +77,4 @@ def entry():
         routes_submit.remember_submission(sub)
         return redirect(url_for("submit.workspace"))
 
-    return _entry_page(error="That code isn't valid.", code=raw), 200
+    return _entry_page(error=S.CODE_NOT_VALID, code=raw), 200
