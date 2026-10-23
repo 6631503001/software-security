@@ -42,6 +42,15 @@ svg { font-family: system-ui, sans-serif; }
   .pillOt { fill: #9aa3ad; }
   .punch  { fill: #ff7a3d; }
 }
+
+/* Emphasis only: every element remains complete without animation.
+   Stroke/fill colours inherit the light and dark house palettes above. */
+rect.panY { animation: lesson-emphasis 6s ease-in-out infinite; }
+@keyframes lesson-emphasis {
+  0%, 100% { stroke-width: 2; }
+  50% { stroke-width: 3.2; }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
 </style>
 
 <rect class="bg" x="0" y="0" width="900" height="400"/>

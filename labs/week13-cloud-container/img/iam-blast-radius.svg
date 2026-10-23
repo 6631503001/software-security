@@ -16,7 +16,7 @@ svg { font-family: system-ui, sans-serif; }
 .tv     { fill: #111827; font-size: 14px; }
 .bkt    { fill: none; stroke: #9ca3af; stroke-width: 1.3; stroke-dasharray: 5 4; }
 .bktl   { fill: #6b7280; font-size: 13px; font-family: ui-monospace, Menlo, Consolas, monospace; }
-.pre    { fill: #017BC4; }
+.pre    { fill: #017BC4; stroke: #017BC4; stroke-width: 1.2; }
 .pret   { fill: #ffffff; font-size: 13px; font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; }
 .okt    { fill: #01609a; font-size: 14px; font-weight: 700; }
 .dn     { fill: #6b7280; font-size: 14px; font-style: italic; }
@@ -38,7 +38,7 @@ svg { font-family: system-ui, sans-serif; }
   .tv     { fill: #e5e7eb; }
   .bkt    { stroke: #6b7684; }
   .bktl   { fill: #9aa3ad; }
-  .pre    { fill: #4aa3dd; }
+  .pre    { fill: #4aa3dd; stroke: #4aa3dd; }
   .pret   { fill: #0f1419; }
   .okt    { fill: #4aa3dd; }
   .dn     { fill: #9aa3ad; }
@@ -46,6 +46,20 @@ svg { font-family: system-ui, sans-serif; }
   .verdB  { fill: #4aa3dd; }
   .foot   { fill: #9aa3ad; }
 }
+
+/* Emphasis only: every element remains complete without animation.
+   Stroke/fill colours inherit the light and dark house palettes above. */
+rect.acctA { animation: lesson-emphasis 6s ease-in-out infinite; }
+@keyframes lesson-emphasis {
+  0%, 100% { stroke-width: 2; }
+  50% { stroke-width: 3.2; }
+}
+rect.pre { animation: lesson-prefix 6s ease-in-out infinite; }
+@keyframes lesson-prefix {
+  0%, 100% { stroke-width: 1.2; }
+  50% { stroke-width: 2.6; }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
 </style>
 
 <rect class="bg" x="0" y="0" width="900" height="400"/>

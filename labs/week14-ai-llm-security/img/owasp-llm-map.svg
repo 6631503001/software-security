@@ -35,7 +35,18 @@
       .newb  { fill:#ff7a3d; }
       .newt  { fill:#11151a; }
     }
-  </style>
+
+/* Emphasis only: every element remains complete without animation.
+   Stroke/fill colours inherit the light and dark house palettes above. */
+.lesson-step { animation: lesson-step 6s ease-in-out infinite; }
+.lesson-second { animation-delay: 2s; }
+.lesson-third { animation-delay: 4s; }
+@keyframes lesson-step {
+  0%, 30%, 100% { stroke-width: 2.2; }
+  14% { stroke-width: 3.4; }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
 
   <rect class="bg" x="0" y="0" width="720" height="486"/>
 
@@ -49,12 +60,12 @@
   <text class="sub" x="390" y="54">not covered this week</text>
 
   <!-- LEFT COLUMN: LLM01-05 -->
-  <rect class="box hands" x="16" y="70" width="336" height="66" rx="8"/>
+  <rect class="box hands lesson-step" x="16" y="70" width="336" height="66" rx="8"/>
   <text class="idO"  x="28" y="91">LLM01</text><text class="nm" x="80" y="91">Prompt Injection</text>
   <text class="chipO" x="28" y="110">Task 1 (:8082) · Task 4 Agent Breaker</text>
   <text class="note"  x="28" y="127">indirect kind: Task 3, written</text>
 
-  <rect class="box hands" x="16" y="144" width="336" height="66" rx="8"/>
+  <rect class="box hands lesson-step lesson-second" x="16" y="144" width="336" height="66" rx="8"/>
   <text class="idO"  x="28" y="165">LLM02</text><text class="nm" x="80" y="165">Sensitive Information Disclosure</text>
   <text class="chipO" x="28" y="184">Task 1 leaks FLAG{…}</text>
   <text class="note"  x="28" y="201">fix redact_secret() — checked in Task 5</text>
@@ -68,7 +79,7 @@
   <text class="idN"  x="28" y="313">LLM04</text><text class="nmN" x="80" y="313">Data &amp; Model Poisoning</text>
   <text class="chipN" x="28" y="332">not this week</text>
 
-  <rect class="box hands" x="16" y="366" width="336" height="66" rx="8"/>
+  <rect class="box hands lesson-step lesson-third" x="16" y="366" width="336" height="66" rx="8"/>
   <text class="idO"  x="28" y="387">LLM05</text><text class="nm" x="80" y="387">Improper Output Handling</text>
   <text class="chipO" x="28" y="406">Task 2 — reflected XSS on :8082</text>
   <text class="note"  x="28" y="423">fix escape() — checked in Task 5</text>

@@ -58,6 +58,25 @@ text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
   .sb    { fill: #dde4ea; }
   .sm    { fill: #9aa3ad; }
 }
+
+/* Emphasis only: every element remains complete without animation.
+   Stroke/fill colours inherit the light and dark house palettes above. */
+.wire { stroke-dasharray: 6 5; animation: lesson-flow 6s ease-in-out infinite; }
+@keyframes lesson-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -44; }
+}
+rect.cok { animation: lesson-emphasis 6s ease-in-out infinite; }
+@keyframes lesson-emphasis {
+  0%, 100% { stroke-width: 1.8; }
+  50% { stroke-width: 3; }
+}
+rect.strip { animation: lesson-admin-check 6s ease-in-out infinite; }
+@keyframes lesson-admin-check {
+  0%, 55%, 100% { stroke-width: 1.2; }
+  75% { stroke-width: 2.6; }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
 </style>
 
 <rect class="bg" x="0" y="0" width="960" height="524"/>
@@ -84,9 +103,9 @@ text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
 <text class="tm" x="38" y="350">compose -p &lt;name&gt; down</text>
 <text class="tm" x="38" y="368">when you finish</text>
 
-<path class="wire" d="M220 172 H242"/>
+<path class="wire" fill="none" d="M220 172 H242"/>
 <polygon class="head" points="241,166.5 241,177.5 248,172"/>
-<path class="wire" d="M220 334 H242"/>
+<path class="wire" fill="none" d="M220 334 H242"/>
 <polygon class="head" points="241,328.5 241,339.5 248,334"/>
 
 <!-- containers -->
@@ -108,9 +127,9 @@ text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
 <text class="code mono" x="264" y="373">security_log.warning(…)</text>
 <text class="code mono" x="264" y="390">return …forbidden, 403</text>
 
-<path class="wire" d="M550 172 H558"/>
+<path class="wire" fill="none" d="M550 172 H558"/>
 <polygon class="head" points="557,166.5 557,177.5 564,172"/>
-<path class="wire" d="M550 334 H558"/>
+<path class="wire" fill="none" d="M550 334 H558"/>
 <polygon class="head" points="557,328.5 557,339.5 564,334"/>
 
 <!-- results -->

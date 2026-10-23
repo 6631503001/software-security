@@ -493,7 +493,7 @@ def test_the_week14_sims_carry_the_labs_exact_lists(slug):
     assert "Hello! I'm HelpBot. How can I help you today?" in src
     assert "I can't help with that request." in src
 def test_week15_slides_embed_every_diagram_and_sim():
-    """Week 15's deck carries four diagrams and three sims. An alt text holding a
+    """Week 15's deck carries five diagrams (the story spine first) and three sims. An alt text holding a
     ']' (e.g. "USERS[token]") silently stops ![alt](img/x.svg) from being an
     image and leaves raw markdown on the slide. That happened while this deck was
     being built, so pin the whole set through the real /learn render path."""
@@ -502,11 +502,45 @@ def test_week15_slides_embed_every_diagram_and_sim():
     out = doc["html"]
     imgs = re.findall(r'<img\b[^>]*src="([^"]+)"', out)
     assert [os.path.basename(i) for i in imgs] == [
-        "pipeline-at-a-glance.svg", "fail-closed.svg",
+        "story-spine.svg", "pipeline-at-a-glance.svg", "fail-closed.svg",
         "break-the-build-board.svg", "lab-at-a-glance.svg"], imgs
     assert re.findall(r'<iframe src="/sim/([^"]+)"', out) == [
         "gate-check", "fail-open", "red-team-pr"]
     assert "](img/" not in out, "an image line fell through as raw markdown"
+
+
+_SESSION6_UNITS = ("week13-cloud-container", "week14-ai-llm-security", "week15-devsecops-pipeline")
+
+
+@pytest.mark.parametrize("unit", _SESSION6_UNITS)
+def test_session6_decks_open_on_the_story_spine(unit):
+    """Weeks 13-15 are taught back to back as one story: each deck shows the same
+    "One app, three layers" picture with its own week marked YOU ARE HERE."""
+    doc = C.render_document(unit, "slides", "software-security")
+    imgs = [os.path.basename(i) for i in re.findall(r'<img\b[^>]*src="([^"]+)"', doc["html"])]
+    assert imgs and imgs[0] == "story-spine.svg", imgs
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    svg = open(os.path.join(here, "..", unit, "img", "story-spine.svg"), encoding="utf-8").read()
+    assert f"You are here: W{unit[4:6]}." in svg
+
+
+@pytest.mark.parametrize("unit", _SESSION6_UNITS)
+def test_session6_animated_diagrams_stay_static_safe(unit):
+    """The diagrams animate with CSS only. The image route never runs script, and
+    the pptx build, print and reduced-motion readers all see the resting frame,
+    so: no script or handlers, and every animated file honours reduced motion."""
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    d = os.path.join(here, "..", unit, "img")
+    names = sorted(n for n in os.listdir(d) if n.endswith(".svg"))
+    assert names
+    for n in names:
+        svg = open(os.path.join(d, n), encoding="utf-8").read()
+        low = svg.lower()
+        assert "<script" not in low and "foreignobject" not in low, n
+        assert not re.search(r"\son[a-z]+\s*=", low), f"{n}: event handler attribute"
+        assert "@import" not in low and "url(http" not in low, n
+        if "@keyframes" in svg:
+            assert "prefers-reduced-motion: reduce" in svg, f"{n}: animates without a reduced-motion stop"
 
 
 def _load_week15_app(name):

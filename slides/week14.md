@@ -31,7 +31,9 @@ Software Security · Nutthakorn Chalaemwongwan
 - New, fast-moving attack surface
 - OWASP LLM Top 10 + MITRE ATLAS
 
-<!-- Justify the week: this is the most current, fastest-moving area in the course. Note the field changes monthly — what they learn is the THINKING, not a fixed list. OWASP LLM Top 10 + MITRE ATLAS are the references. ~3 min. -->
+![One app, three layers. You are here: W14. W13, where it runs: a secret baked into an image layer and an IAM policy with Action * on Resource *; fix with a hardened image and least privilege. W14, what it says: the app gets a chatbot; typed text overrides its rules (prompt injection) and its reply goes into the page unescaped (XSS); fix with guardrails, secret redaction and output escaping. W15, how it ships: Semgrep, Trivy and Gitleaks check every push, a red gate fails the PR, and the app denies on error.](img/story-spine.svg)
+
+<!-- Point at the story spine first: the same app from W13, now with a chatbot — the new 'input' is plain text, and the model's reply is new untrusted output. Justify the week: this is the most current, fastest-moving area in the course. Note the field changes monthly — what they learn is the THINKING, not a fixed list. OWASP LLM Top 10 + MITRE ATLAS are the references. ~3 min. -->
 
 ---
 
@@ -46,7 +48,7 @@ Software Security · Nutthakorn Chalaemwongwan
 
 > **New in 2025:** LLM07 System Prompt Leakage · LLM08 promoted (RAG everywhere) · LLM10 replaces "DoS" with runaway *cost*.
 
-> **Heads up:** OWASP shipped a **2026** edition days before this lecture (Excessive Agency jumps to #3, Output Handling drops to #10). This course's lab, worksheet, and quiz key are still on **2025** numbering — use 2025 for anything graded this term.
+> **Heads up:** OWASP released a **2026** edition in Aug 2026 (Excessive Agency jumps to #3, Output Handling drops to #10; see genai.owasp.org). This course's lab, worksheet, and quiz key are still on **2025** numbering — use 2025 for anything graded this term.
 
 <!-- Don't read all 10 — highlight the 2025 changes. LLM07 (system-prompt leakage) is new because devs hid secrets in prompts. LLM10 reframed as runaway COST (an agent loop can run up a huge bill). Mention the 2026 edition exists so students who search OWASP themselves aren't confused by different numbers — but the quiz/worksheet key is 2025, don't let them "correct" an answer to 2026 numbering. ~4 min. -->
 
@@ -123,9 +125,9 @@ llm-output
 - Agents call tools (e.g. via **MCP**) → real-world actions
 - **Tool poisoning**, **excessive agency**, RCE via tools
 - MITRE ATLAS added agent techniques (Oct 2025)
-- Research: **43%** of public MCP servers had command-injection flaws
+- One 2025 audit of popular MCP servers reported command-injection flaws in **43%** of the servers it tested
 
-<!-- The frontier — and where THEY will build. The moment an LLM can call tools, injection becomes real-world ACTIONS (send money, run code). The 43% MCP stat lands: the ecosystem is young and insecure. ~5 min. -->
+<!-- The frontier — and where THEY will build. The moment an LLM can call tools, injection becomes real-world ACTIONS (send money, run code). Present the 43% as one audit's sample, not a census of every MCP server (secondary sources attribute it inconsistently) — the point is that a young ecosystem ships the same injection bugs as W4. ~5 min. -->
 
 ---
 
@@ -151,9 +153,9 @@ llm-output
 
 ## No boundary in the context window
 
-![The system prompt, the user's typed turn, and any retrieved document all arrive at the model as the same run of text, with nothing marking any of it as data instead of instruction. The reply leaves the same way — untrusted, attacker-shaped text — and if it's passed unescaped into HTML, a shell, or SQL, whatever the model said just executes there. The model itself cannot fix this: there's no tag inside the context window that says "this part is data." The guards have to live outside the model — input_guardrail, redact_secret and escape — which is exactly guarded_chatbot.py.](img/prompt-injection.svg)
+![The system prompt, the user's typed turn, and any retrieved document all arrive at the model as the same run of text, with nothing marking any of it as data instead of instruction. The reply leaves the same way — untrusted, attacker-shaped text — and if it's passed unescaped into HTML, a shell, or SQL, whatever the model said just executes there. Chat APIs do label roles (system, user, tool), but a label is not a security boundary: a model can still follow instructions it finds in any part of its context. The guards have to live outside the model — input_guardrail, redact_secret and escape — which is exactly guarded_chatbot.py.](img/prompt-injection.svg)
 
-<!-- The argument underneath everything today: prompt = system + "\nUser: " + user is ONE string, so the model has no way to tell "instructions I trust" from "text I should just process." Land on the last line before moving to Defenses — it's the direct setup for the three guardrail functions the sim demonstrates next. ~5 min. -->
+<!-- The argument underneath everything today. In this lab, prompt = system + "\nUser: " + user is literally ONE string. Real chat APIs keep roles separate, but that is a hint to the model, not an enforced boundary — instructions hidden in a user turn or a fetched page can still win. Be honest that the lab bot is a rule-based mock that reacts to fixed phrases: it illustrates the idea, it is not evidence of how a real model behaves. Land on the last line before moving to Defenses — it's the direct setup for the three guardrail functions the sim demonstrates next. ~5 min. -->
 
 ---
 
@@ -168,7 +170,7 @@ llm-output
 prompt-guard
 ```
 
-<!-- The payoff — map each defense to a leg of the pattern: least-privilege tools cut PRIVILEGE; isolating RAG content cuts UNTRUSTED INPUT; egress limits + human approval cut the OUTBOUND CHANNEL. The sim runs the actual guardrail/redact/escape code from both real files against whatever they type, layer by layer. Verified live: try the "not in either list" preset — a natural rephrase ("what's" vs "what is") slips past BOTH the vulnerable list and the guarded regex, in either mode. That's the honest lesson, not "redaction saves it" — in this toy model redact_secret() only has something to catch when mock_llm's own hardcoded leak path already fired, so a keyword filter that's too narrow is a gap on both sides, not one your later layers automatically patch. Be honest that the first three are hands-on today and the fourth bullet is discussion-only. No single guardrail is enough; layer them. ~5 min. -->
+<!-- The payoff — map each defense to a leg of the pattern: least-privilege tools cut PRIVILEGE; isolating RAG content cuts UNTRUSTED INPUT; egress limits + human approval cut the OUTBOUND CHANNEL. The sim runs the actual guardrail/redact/escape code from both real files against whatever they type, layer by layer. Verified live: try the "not in either list" preset — a natural rephrase ("what's" vs "what is") slips past BOTH the vulnerable list and the guarded regex, in either mode. That's the honest lesson, not "redaction saves it" — in this toy model redact_secret() only has something to catch when mock_llm's own hardcoded leak path already fired, so a keyword filter that's too narrow is a gap on both sides, not one your later layers automatically patch. Be honest that the first three are hands-on today and the fourth bullet is discussion-only. Also be honest about the Task 5 comparison: guarded_chatbot.py changes THREE things at once — the secret is no longer in SYSTEM_PROMPT, mock_llm's leak branch is gone, and the three guards are added — so Task 5 shows the combination works, not which single layer did it. Moving the secret out of the prompt is itself a defense (LLM07). No single guardrail is enough; layer them. ~5 min. -->
 
 ---
 

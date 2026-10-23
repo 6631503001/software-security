@@ -66,6 +66,26 @@
     errEl.hidden = true;
     findingsEl.innerHTML = "";
 
+    // Effect decides whether the wildcards GRANT anything. A Deny with "*"
+    // is a guardrail, not a finding, so judge it before the two CWEs.
+    var effect = typeof stmt.Effect === "string" ? stmt.Effect : "";
+    if (effect !== "Allow" && effect !== "Deny") {
+      verdictEl.className = "verdict bad";
+      verdictEl.textContent = "not a valid statement — Effect must be \"Allow\" or \"Deny\"";
+      explainEl.textContent = "AWS rejects a statement without a valid Effect, so it grants nothing. "
+        + "Put \"Effect\":\"Allow\" back to see what the wildcards would grant.";
+      return;
+    }
+    if (effect === "Deny") {
+      findingsEl.appendChild(finding(null, "Effect is Deny — this statement only ever takes access away", false));
+      verdictEl.className = "verdict ok";
+      verdictEl.textContent = "a Deny grants nothing — no wildcard finding";
+      explainEl.textContent = "Wildcards are only dangerous in an Allow. \"Effect\":\"Deny\" with Action:\"*\" "
+        + "blocks everything it matches, and an explicit Deny beats any Allow. Switch Effect back to \"Allow\" to "
+        + "see the two findings.";
+      return;
+    }
+
     var actionWild = isWildcard(stmt.Action);
     var resourceWild = isWildcard(stmt.Resource);
     var hasCondition = stmt.Condition && typeof stmt.Condition === "object"
@@ -85,7 +105,9 @@
 
     if (badCount === 2) {
       verdictEl.className = "verdict bad";
-      verdictEl.textContent = "full admin on everything — 2 findings, same statement";
+      verdictEl.textContent = hasCondition
+        ? "2 findings, same statement — wildcards on both, narrowed only by the Condition"
+        : "full admin on everything — 2 findings, same statement";
       explainEl.textContent = "Action:\"*\" and Resource:\"*\" are graded separately because they fail "
         + "independently: fixing only one (e.g. scoping Resource but leaving Action:\"*\") still leaves "
         + "the other CWE open. A leaked credential with this statement can do anything to anything.";
@@ -102,7 +124,8 @@
       verdictEl.textContent = "both wildcard findings closed";
       explainEl.textContent = hasCondition
         ? "Action and Resource are both scoped, and the Condition narrows it further (e.g. by prefix) — "
-          + "this is the shape of iam-policy-leastpriv.json."
+          + "the idea behind iam-policy-leastpriv.json, which uses two statements: s3:GetObject on app/* objects, "
+          + "plus s3:ListBucket limited by an s3:prefix Condition."
         : "Action and Resource are both scoped — a Condition isn't required to close CWE-732/CWE-269, "
           + "but it's extra narrowing worth having when the resource itself allows it (e.g. a prefix).";
     }

@@ -38,7 +38,18 @@
       .seeB  { fill:#4aa3dd; }
       .rule  { stroke:#33404c; }
     }
-  </style>
+
+/* Emphasis only: every element remains complete without animation.
+   Stroke/fill colours inherit the light and dark house palettes above. */
+.lesson-step { animation: lesson-step 6s ease-in-out infinite; }
+.lesson-second { animation-delay: 2s; }
+.lesson-third { animation-delay: 4s; }
+@keyframes lesson-step {
+  0%, 30%, 100% { stroke-width: 1.6; }
+  14% { stroke-width: 2.8; }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
 
   <rect class="bg" x="0" y="0" width="720" height="506"/>
 
@@ -72,7 +83,7 @@
   <text class="run" x="234" y="194">injection_phrases matches</text>
   <text class="run" x="234" y="210">"ignore previous instructions"</text>
   <text class="seeO" x="234" y="236">→ “…secret password is FLAG{…}.”</text>
-  <rect class="box good" x="472" y="174" width="232" height="76" rx="7"/>
+  <rect class="box good lesson-step" x="472" y="174" width="232" height="76" rx="7"/>
   <text class="run" x="484" y="194">input_guardrail(): match → refused</text>
   <text class="run" x="484" y="210">mock_llm() never runs</text>
   <text class="seeB" x="484" y="236">→ I can't help with that request.</text>
@@ -86,7 +97,7 @@
   <text class="run" x="234" y="278">no phrase, no "hi" → "You said: …"</text>
   <text class="run" x="234" y="294">PAGE.format(reply=reply) — raw</text>
   <text class="seeO" x="234" y="320">→ an alert() box pops up</text>
-  <rect class="box good" x="472" y="258" width="232" height="76" rx="7"/>
+  <rect class="box good lesson-step lesson-second" x="472" y="258" width="232" height="76" rx="7"/>
   <text class="run" x="484" y="278">regex: no match (HTML ≠ a phrase)</text>
   <text class="run" x="484" y="294">escape() → &amp;lt;script&amp;gt;…</text>
   <text class="seeB" x="484" y="320">→ the tag, shown as plain text</text>
@@ -100,7 +111,7 @@
   <text class="run" x="234" y="362">no phrase, no "hi" → echo</text>
   <text class="run" x="234" y="378">nothing filters the reply</text>
   <text class="seeO" x="234" y="404">→ You said: FLAG{…}</text>
-  <rect class="box good" x="472" y="342" width="232" height="76" rx="7"/>
+  <rect class="box good lesson-step lesson-third" x="472" y="342" width="232" height="76" rx="7"/>
   <text class="run" x="484" y="362">echo → redact_secret()</text>
   <text class="run" x="484" y="378">the only time it has work to do</text>
   <text class="seeB" x="484" y="404">→ You said: [REDACTED]</text>

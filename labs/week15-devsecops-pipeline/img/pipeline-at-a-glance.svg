@@ -67,6 +67,23 @@ text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
   .sb    { fill: #dde4ea; }
   .foot  { fill: #9aa3ad; }
 }
+
+/* Emphasis only: every element remains complete without animation.
+   Stroke/fill colours inherit the light and dark house palettes above. */
+rect.cell[x="302"], rect.cell[x="562"], rect.gate {
+  animation: lesson-stage 6s ease-in-out infinite;
+}
+rect.cell[x="562"] { animation-delay: 2s; }
+rect.gate { animation-name: lesson-gate; animation-delay: 4s; }
+@keyframes lesson-stage {
+  0%, 30%, 100% { stroke-width: 1.2; }
+  14% { stroke-width: 2.6; }
+}
+@keyframes lesson-gate {
+  0%, 30%, 100% { stroke-width: 1.8; }
+  14% { stroke-width: 3; }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
 </style>
 
 <rect class="bg" x="0" y="0" width="960" height="520"/>

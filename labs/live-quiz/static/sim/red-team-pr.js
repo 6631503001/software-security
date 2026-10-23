@@ -63,7 +63,8 @@
               "DS-0002 (HIGH): Last USER command in Dockerfile should not be 'root'"]
     }
   };
-  var DEP_TRIVY = ["requirements.txt (pip)  Total: 7 (HIGH: 7, CRITICAL: 0)",
+  // Captured 2026-10-23; the count moves as the Trivy DB updates — grade the red gate, not the number.
+  var DEP_TRIVY = ["requirements.txt (pip)  Total: 7 (HIGH: 7, CRITICAL: 0)   [captured 23 Oct 2026]",
                    "urllib3 1.24.1  CVE-2019-11324 HIGH  fixed in 1.24.2  (+6 more HIGH)"];
   var TOKEN_TRIVY = ["settings.py (secrets)  Total: 1 (HIGH: 0, CRITICAL: 1)",
                      "CRITICAL: GitHub (github-pat)  GitHub Personal Access Token"];
@@ -237,7 +238,8 @@
         + "runs scanners: vuln,secret, and a GitHub token is a CRITICAL secret finding.");
     }
     if (s.dep && !s.token) {
-      addWhy("urllib3==1.24.1 is caught only by the Trivy SCA gate: 7 HIGH CVEs, e.g. CVE-2019-11324. Semgrep and "
+      addWhy("urllib3==1.24.1 is caught only by the Trivy SCA gate: 7 HIGH CVEs on 23 Oct 2026 (the count moves as "
+        + "Trivy's database updates), e.g. CVE-2019-11324. Semgrep and "
         + "Gitleaks have nothing to say about a version number.");
     }
     var skipped = trivyRows.filter(function (r) { return r.state === "skipped" && r.st.gate; });

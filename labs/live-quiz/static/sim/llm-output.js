@@ -111,6 +111,20 @@
     return "fires when the reader triggers “" + name.slice(2) + "”";
   }
 
+  // A javascript: URL only runs where the browser actually navigates to it.
+  // Anywhere else (title=, alt=, data-*) it is just text.
+  function jsUrlNote(tag, attr) {
+    if (attr === "href" && (tag === "a" || tag === "area")) { return "runs when clicked"; }
+    if (attr === "xlink:href" && tag === "a") { return "runs when clicked"; }
+    if (attr === "src" && (tag === "iframe" || tag === "frame")) { return "runs when the frame loads"; }
+    if (attr === "action" && tag === "form") { return "runs when the form is submitted"; }
+    if (attr === "formaction" && (tag === "button" || tag === "input")) { return "runs when the form is submitted"; }
+    return null;
+  }
+
+  // Only a classic or module script runs; type="text/plain" etc. is inert data.
+  var JS_TYPES = /^(|module|(text|application)\/(java|ecma)script)$/;
+
   function walk(node, effects, visible) {
     for (var c = node.firstChild; c; c = c.nextSibling) {
       if (c.nodeType === 3) { visible.push(c.nodeValue); continue; }
@@ -118,19 +132,25 @@
       var tag = c.tagName.toLowerCase();
       var label = "<" + tag + ">";
       if (tag === "script") {
-        effects.push({ kind: "run", label: label + " element",
-                       note: "runs as soon as the page loads: " + c.textContent });
+        if (JS_TYPES.test((c.getAttribute("type") || "").trim().toLowerCase())) {
+          effects.push({ kind: "run", label: label + " element",
+                         note: "runs as soon as the page loads: " + c.textContent });
+        } else {
+          effects.push({ kind: "markup", label: label + " element",
+                         note: "type=\"" + c.getAttribute("type") + "\" is not JavaScript, so the browser keeps it as inert data" });
+        }
         continue;
       }
       var ran = false;
       for (var i = 0; i < c.attributes.length; i++) {
         var n = c.attributes[i].name.toLowerCase();
         var v = c.attributes[i].value;
+        var jsNote = /^\s*javascript:/i.test(v) ? jsUrlNote(tag, n) : null;
         if (n.indexOf("on") === 0) {
           effects.push({ kind: "run", label: label + " " + n + "=", note: handlerNote(n) + ": " + v });
           ran = true;
-        } else if (/^\s*javascript:/i.test(v)) {
-          effects.push({ kind: "run", label: label + " " + n + "=", note: "runs when clicked: " + v });
+        } else if (jsNote) {
+          effects.push({ kind: "run", label: label + " " + n + "=", note: jsNote + ": " + v });
           ran = true;
         }
       }

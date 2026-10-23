@@ -31,7 +31,9 @@ Software Security · Nutthakorn Chalaemwongwan
 - Today → where you run it
 - **OWASP A02:2025 Security Misconfiguration** (now #2)
 
-<!-- 1-min bridge. Misconfiguration jumped to A02 in 2025 — it's not a footnote, it's the second most critical web risk. ~2 min. -->
+![One app, three layers. You are here: W13. W13, where it runs: a secret baked into an image layer and an IAM policy with Action * on Resource *; fix with a hardened image and least privilege. W14, what it says: the app gets a chatbot; typed text overrides its rules (prompt injection) and its reply goes into the page unescaped (XSS); fix with guardrails, secret redaction and output escaping. W15, how it ships: Semgrep, Trivy and Gitleaks check every push, a red gate fails the PR, and the app denies on error.](img/story-spine.svg)
+
+<!-- 1-min bridge. Misconfiguration jumped to A02 in 2025 — it's not a footnote, it's the second most critical web risk. Then the story spine: one app, three layers — today we package it and give it cloud permissions (W13), next we add an AI chatbot to it (W14), last we put a pipeline in front of all of it (W15). Same root mistake all day: trusting input and defaults nobody checked. ~2 min. -->
 
 ---
 
@@ -61,7 +63,7 @@ Software Security · Nutthakorn Chalaemwongwan
 
 - Over-broad policies = blast radius
 - `Resource:"*"` → **CWE-732** (incorrect permission assignment); `Action:"*"` → **CWE-269** (improper privilege management) — they're graded as two distinct findings on the *same* policy, not one
-- Fix: scope to one bucket + one action, add a `Condition` (e.g. `s3:prefix`) — not just a narrower ARN
+- Fix: two narrow statements on one bucket — `s3:GetObject` on `app/*` objects, plus `s3:ListBucket` limited by an `s3:prefix` `Condition` — not just a narrower ARN
 
 ```sim
 iam-scope

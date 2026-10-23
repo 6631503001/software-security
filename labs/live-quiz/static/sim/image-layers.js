@@ -127,8 +127,9 @@
       user: ["ok", "65532:65532 — the distroless nonroot user",
         "This is how to prove non-root on a distroless image, since you cannot exec a shell into it to run id."],
       ls: ["ok", "There is no ls to run",
-        "Distroless ships no shell and no coreutils. That is the point: code execution inside this container has "
-        + "nothing to call. Use docker inspect (the .Config.User button) for evidence instead."]
+        "Distroless ships no shell and no coreutils, so an attacker gets far fewer ready-made tools. It is not a cure: "
+        + "the Python interpreter and the app's packages are still there, so code execution is still serious. "
+        + "Use docker inspect (the .Config.User button) for evidence instead."]
     }
   };
 

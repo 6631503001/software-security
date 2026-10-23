@@ -50,6 +50,20 @@ svg { font-family: system-ui, sans-serif; }
   .fix    { fill: #4aa3dd; }
   .fix2   { fill: #e5e7eb; }
 }
+
+/* Emphasis only: every element remains complete without animation.
+   Stroke/fill colours inherit the light and dark house palettes above. */
+.e, .e2 { stroke-dasharray: 6 5; animation: lesson-flow 6s ease-in-out infinite; }
+@keyframes lesson-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -44; }
+}
+rect.layS { animation: lesson-emphasis 6s ease-in-out infinite; }
+@keyframes lesson-emphasis {
+  0%, 100% { stroke-width: 2; }
+  50% { stroke-width: 3; }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
 </style>
 
 <rect class="bg" x="0" y="0" width="900" height="400"/>
@@ -78,10 +92,10 @@ svg { font-family: system-ui, sans-serif; }
 <text class="ltM" x="34" y="320">11 layers of python:latest</text>
 
 <!-- ===== connectors ===== -->
-<path class="e" d="M384,287 C420,287 420,109 452,109"/>
-<path class="e" d="M384,287 C428,287 428,181 452,181"/>
-<path class="e" d="M384,259 C430,259 430,253 452,253"/>
-<path class="e2" d="M384,203 C414,203 414,318 452,318"/>
+<path class="e" fill="none" d="M384,287 C420,287 420,109 452,109"/>
+<path class="e" fill="none" d="M384,287 C428,287 428,181 452,181"/>
+<path class="e" fill="none" d="M384,259 C430,259 430,253 452,253"/>
+<path class="e2" fill="none" d="M384,203 C414,203 414,318 452,318"/>
 <path class="ah" d="M452,103 L462,109 L452,115 Z"/>
 <path class="ah" d="M452,175 L462,181 L452,187 Z"/>
 <path class="ah" d="M452,247 L462,253 L452,259 Z"/>

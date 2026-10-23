@@ -9,7 +9,7 @@ header: "Software Security · Week 15"
 ## DevSecOps: Putting It Together
 Software Security · Nutthakorn Chalaemwongwan
 
-<!-- Final teaching week. Hook: everything we've learned — SAST, SCA, secrets, image scans — only works if it runs automatically on every commit. Today we wire it into one pipeline that blocks bad code. ~2 min. -->
+<!-- Final teaching week. Hook: everything we've learned — SAST, SCA, secrets, image scans — only works if it runs automatically on every commit. Today we wire it into one pipeline that turns every bad PR red — and, once those checks are required, blocks the merge. ~2 min. -->
 
 ---
 
@@ -31,7 +31,9 @@ Software Security · Nutthakorn Chalaemwongwan
 - Automated gates instead of one-off scans
 - **Secure by Design** as the default
 
-<!-- The synthesis slide — walk back through the term: every tool we used by hand now runs automatically on every PR. Manual scanning doesn't scale and humans forget; pipelines don't. ~4 min. -->
+![One app, three layers. You are here: W15. W13, where it runs: a secret baked into an image layer and an IAM policy with Action * on Resource *; fix with a hardened image and least privilege. W14, what it says: the app gets a chatbot; typed text overrides its rules (prompt injection) and its reply goes into the page unescaped (XSS); fix with guardrails, secret redaction and output escaping. W15, how it ships: Semgrep, Trivy and Gitleaks check every push, a red gate fails the PR, and the app denies on error.](img/story-spine.svg)
+
+<!-- The story spine one last time: W13's image and IAM mistakes and W14's injection and XSS are exactly what this pipeline is built to catch on every push. The synthesis slide — walk back through the term: every tool we used by hand now runs automatically on every PR. Manual scanning doesn't scale and humans forget; pipelines don't. ~4 min. -->
 
 ---
 
@@ -39,7 +41,7 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ![The security-ci.yml pipeline at a glance. A push or PR to main starts three jobs in parallel: Semgrep (SAST), Trivy (SCA plus IaC) and Gitleaks (secrets, whole git history). Each job runs the same three phases. The report step never fails (|| true or exit-code "0"). The upload step (if: always()) sends the SARIF to the GitHub Security tab, where every finding of every severity shows. The gate step re-scans and can fail the build. Semgrep's --error and Gitleaks' --exit-code 1 fail on any finding. Trivy's two gates fail only on HIGH or CRITICAL, and the IaC gate is skipped if the SCA gate already failed. The report shows everything; the gate decides.](img/pipeline-at-a-glance.svg)
 
-<!-- Walk it left to right before the YAML: ① report never fails, ② upload always runs, ③ only the gate can turn the build red — that's Part 2 Q1 in one picture. Point at the footnote: the Security tab shows MEDIUM findings like DS-0001 that the gate lets through. ~2 min. -->
+<!-- Walk it left to right before the YAML: ① report never fails, ② upload always runs, ③ the gate is the step meant to turn the build red — that's Part 2 Q1 in one picture. (An upload can still fail on its own, e.g. a private repo without code scanning — that's why the lab uses a public throwaway repo.) Point at the footnote: the Security tab shows MEDIUM findings like DS-0001 that the gate lets through. ~2 min. -->
 
 ---
 
@@ -55,6 +57,7 @@ Software Security · Nutthakorn Chalaemwongwan
 
 - Least-privilege token: `contents: read`, `security-events: write` — don't hand the pipeline more than it needs
 - Upload SARIF → GitHub Security tab
+- A red run only **blocks** a merge if the jobs are **required checks** (branch protection) — otherwise it's a warning
 
 ```sim
 gate-check
@@ -146,9 +149,9 @@ gate-check
 
 ## One decision, made twice
 
-![Two panels showing the same yes-or-no decision at two different times. Build time: the CI gate's HIGH/CRITICAL severity filter, not the scanner itself, decides what a build refuses — root user (DS-0002, HIGH) is caught, :latest (DS-0001, MEDIUM) slips past the filter. Run time: the /admin handler makes the identical decision on an exception — fail-open returns 200 and logs nothing (silent bypass, A09); fail-closed returns 403 and logs event=authz_failure without ever logging the token itself (CWE-532). Both defaults, unexamined, are yes: the gate exits 0 on anything it wasn't told to fail on, the handler returns 200 on anything that threw. Nobody chose — that silence is A10, CWE-636.](img/fail-closed.svg)
+![Two panels showing the same yes-or-no decision at two different times. Build time: the CI gate's HIGH/CRITICAL severity filter, not the scanner itself, decides what a build refuses — root user (DS-0002, HIGH) is caught, :latest (DS-0001, MEDIUM) slips past the filter. Run time: the /admin handler makes the identical decision on an exception — fail-open returns 200 and logs nothing (silent bypass, A09); fail-closed returns 403 and logs event=authz_failure without ever logging the token itself (CWE-532). At build time, letting MEDIUM through is a risk decision — fine if someone made it on purpose, a gap if nobody looked. At run time, the except branch that returns 200 is the actual fail-open bug: A10, CWE-636.](img/fail-closed.svg)
 
-<!-- The synthesis slide, and arguably the whole course's closing argument: "secure by default" means someone has to have DECIDED the default, twice here — once in YAML severity filters, once in an except block. An unexamined default is always permissive. Walk both panels, land on the bottom line before the game. ~5 min. -->
+<!-- The synthesis slide, and arguably the whole course's closing argument: "secure by default" means someone has to have DECIDED the default, twice here — once in YAML severity filters, once in an except block. Keep the two apart: a severity threshold is a policy someone can defend (or not), while an except branch that grants access on error is a bug (A10, CWE-636). Walk both panels, land on the bottom line before the game. ~5 min. -->
 
 ---
 
@@ -167,10 +170,10 @@ fail-open
 ## 🔴🔵 Game — Break the Build
 
 - **Blue:** build the gate (Semgrep + Trivy + Gitleaks), fail on HIGH/CRITICAL, add security logging that fails closed
-- **Red:** three gate-mapped attacks only — outdated dependency (Trivy SCA), a Dockerfile running as root (Trivy config), a hardcoded token (Gitleaks). `chmod 777` and `FROM:latest` are decoys that stay green — not gate bypasses
-- **Score:** Blue per catch, Red per successful bypass; then leak the flag from the fail-open `/admin` bypass in `insecure_service.py` (a public demo value on a local run; your personal flag comes from your hosted instance)
+- **Red:** one planted defect per PR, aimed at a gate — outdated dependency (Trivy SCA), a Dockerfile running as root (Trivy config), a hardcoded token (Gitleaks). `chmod 777` and `FROM:latest` stay green: that's a blind spot, not a Task 4 screenshot
+- **Score:** Blue per catch, Red per defect that slips through (a blind spot found — propose the rule that would catch it); then leak the flag from the fail-open `/admin` bypass in `insecure_service.py` (a public demo value on a local run; your personal flag comes from your hosted instance)
 
-<!-- The capstone game. Both roles teach: Blue learns to configure gates, Red learns where gates have blind spots — but Red's menu is fixed to 3 attacks that actually map to a gate, not open-ended. Run it as live PRs against the pipeline. The weekly quiz no longer asks for the gate/what-it-blocks/flag (dropped — quiz runs before the lab) — that's required in the worksheet instead, don't drop the flag half there, it's still graded. ~3 min. -->
+<!-- The capstone game. Both roles teach: Blue learns to configure gates, Red learns where gates have blind spots. Task 4 (the graded screenshot) needs a defect that maps to a gate; anything that slips through instead is a Task 5 Red point, exactly as the worksheet scores it. Run it as live PRs against the pipeline. The weekly quiz no longer asks for the gate/what-it-blocks/flag (dropped — quiz runs before the lab) — that's required in the worksheet instead, don't drop the flag half there, it's still graded. ~3 min. -->
 
 ---
 
@@ -207,11 +210,11 @@ red-team-pr
 > 📋 **Worksheet 15** — `labs/week15-devsecops-pipeline/worksheet.md` (Part 3) · **kickoff:** push `security-ci.yml` → GitHub Actions; separately, `docker compose up` → :8090 (insecure) / :8091 (secure) for the flag task
 
 - A passing PR that adds the pipeline
-- Screenshot: build **failing** on each of the 3 Red-team categories (dependency, root Dockerfile, hardcoded token) — not just one
+- Screenshot: the **failing** gate step for your planted defect, and which job caught it (one defect per PR; trying all 3 categories is good practice)
 - The `FLAG{...}` from the fail-open `/admin` bypass, in the **worksheet** (not the weekly quiz, which runs before the lab); your personal flag comes from your hosted instance
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
 
-<!-- Two separate targets this week, both graded: security-ci.yml is the CI gate; insecure_service.py/secure_service.py (compose, :8090/:8091) is where the local (public demo) flag lives; graded per-student flags come from the hosted instance. The "build failing" screenshots are the proof the gate actually blocks — a green pipeline that never fails is useless, and one category alone undersells the deliverable. AI-resilient tasks count. This is also the last weekly quiz. -->
+<!-- Two separate targets this week, both graded: security-ci.yml is the CI gate; insecure_service.py/secure_service.py (compose, :8090/:8091) is where the local (public demo) flag lives; graded per-student flags come from the hosted instance. The "build failing" screenshot is the proof the gate actually says no — a green pipeline that never fails is useless. The worksheet grades one planted defect (Task 4); encourage all three if time allows. AI-resilient tasks count. This is also the last weekly quiz. -->
 
 ---
 

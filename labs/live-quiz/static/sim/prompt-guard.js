@@ -117,7 +117,9 @@
       }
       var escaped = htmlEscape(redacted);
       stepsEl.appendChild(step("escape()", escaped, "is-fixed"));
-      renderedEl.textContent = escaped;
+      // The browser decodes the entities back, so the reader sees the literal
+      // characters as plain text: the tag is visible but never becomes markup.
+      renderedEl.textContent = redacted;
       verdictEl.className = "verdict ok";
       verdictEl.textContent = "reached the model, but redacted + escaped before rendering";
       explainEl.textContent = "Nothing in this message tripped the 6 regex patterns, so mock_llm() "
@@ -139,13 +141,15 @@
         var echoed = mockReply(msg);
         stepsEl.appendChild(step("mock_llm()", echoed, ""));
         renderedEl.textContent = echoed;
-        verdictEl.className = low.indexOf("<") !== -1 ? "verdict bad" : "verdict ok";
-        explainEl.textContent = low.indexOf("<") !== -1
+        // Judge the REPLY, not the message: a greeting branch drops the payload entirely.
+        var htmlInReply = echoed.indexOf("<") !== -1;
+        verdictEl.className = htmlInReply ? "verdict bad" : "verdict ok";
+        explainEl.textContent = htmlInReply
           ? "No injection phrase matched, so this falls through to the raw echo — and nothing "
             + "escapes it before it reaches the page. Whatever HTML is in the message renders as HTML."
           : "No injection phrase matched, so nothing leaks this time. But there is no escaping "
             + "here either way — try the XSS preset.";
-        verdictEl.textContent = low.indexOf("<") !== -1
+        verdictEl.textContent = htmlInReply
           ? "no leak, but the echo is unescaped — XSS"
           : "no leak this time";
       }

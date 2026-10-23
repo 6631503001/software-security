@@ -55,7 +55,7 @@
     { label: "Dockerfile.insecure (all 6)", s: { from: "latest", env: false, copy: false, chmod: false, user: false, pip: false } },
     { label: "fix only what Trivy flags", s: { from: "digest", env: true, copy: false, chmod: false, user: true, pip: false } },
     { label: "a tag, not a digest", s: { from: "tag", env: true, copy: true, chmod: true, user: true, pip: true } },
-    { label: "all 6 fixed (= hardened)", s: { from: "digest", env: true, copy: true, chmod: true, user: true, pip: true } }
+    { label: "all 6 rows fixed (scanner's view)", s: { from: "digest", env: true, copy: true, chmod: true, user: true, pip: true } }
   ];
 
   var el = function (id) { return document.getElementById(id); };
@@ -91,7 +91,8 @@
     // row has no line number: it is not in the file Trivy reads.
     L.push(s.user ? { t: USER_FIX, kind: "fixed", tag: "" }
                   : { t: "(no USER line — runs as root, uid 0)", kind: "flag", tag: "DS-0002", ghost: true });
-    L.push({ t: "CMD [\"python\", \"app.py\"]", kind: "plain", tag: "" });
+    // With the venv fix, Flask lives in /venv, so the app has to start from there.
+    L.push({ t: s.pip ? "CMD [\"/venv/bin/python\", \"app.py\"]" : "CMD [\"python\", \"app.py\"]", kind: "plain", tag: "" });
     return L;
   }
 
@@ -208,9 +209,12 @@
         + why.join(", and ") + ". Only reading the Dockerfile finds " + (manual.length > 1 ? "these." : "this.") + lowNote;
     } else {
       verdictEl.className = "verdict ok";
-      verdictEl.textContent = "0 findings and nothing left to catch by hand";
-      explainEl.textContent = "Same shape as Dockerfile.hardened, which scan.sh scores 0. Task 4 asks you to prove "
-        + "this with the before/after count — 4 → 0 — plus one sentence per fix." + lowNote;
+      verdictEl.textContent = "0 findings, and all six planted defects addressed";
+      explainEl.textContent = "This is a one-stage, scanner-sized fragment, not the whole Dockerfile.hardened: the real file "
+        + "also builds the venv in its own stage and copies it into a distroless runtime. One honest caveat on row 6: "
+        + "requirements.txt still says Flask>=3.1.3 — a minimum, not a pin — so the install is only truly reproducible once "
+        + "every version is fixed with == (better, with hashes). scan.sh scores Dockerfile.hardened 0; Task 4 asks you to "
+        + "prove it with the before/after count — 4 → 0 — plus one sentence per fix." + lowNote;
     }
   }
 

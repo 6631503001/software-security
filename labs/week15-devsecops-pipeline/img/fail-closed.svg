@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 600" role="img" aria-label="Two panels showing the same yes-or-no decision made at two different times. Left panel, build time, the CI gate in security-ci.yml, on a pull request. The pull request fans out to three jobs: Semgrep for SAST, Trivy for SCA and IaC, and Gitleaks for secrets. Step one is the report run, with exit-code 0 or a trailing or-true, so the SARIF file uploads to the Security tab even when the gate is about to fail. Step two is the gate step, with exit-code 1. The two Trivy gate steps filter to severity HIGH and CRITICAL, while Semgrep's --error flag and Gitleaks have no severity filter at all and fail on any finding. Two outcomes follow. Caught: a Dockerfile running as root is DS-0002, rated HIGH, so the gate says no and the build turns red. Slips past: a base image tagged latest is DS-0001, rated MEDIUM, which the HIGH-CRITICAL filter drops, so the build goes green with the defect merged. The lesson on the left is that the threshold, not the scanner, decides what the build is willing to refuse. Right panel, run time, the same decision inside the /admin handler, for a GET request carrying no Authorization header. The fail-open version, insecure_service.py on port 8090, indexes the dictionary with USERS square-bracket token, which raises KeyError, and its except Exception branch returns jsonify with panel UNLOCKED and secret SECRET. The observed response is 200 carrying the per-student flag FLAG-devsecops, and nothing at all is logged, so the bypass is silent, which is OWASP A09. The fail-closed version, secure_service.py on port 8091, uses USERS dot get of token, which returns None instead of raising, and its except Exception as exc branch returns jsonify error forbidden with status 403. The observed response is 403 forbidden, plus a structured log line reading event=authz_failure outcome=deny src_ip and reason=unauthenticated. Every path denies, and the except logs only the exception type, never the message, which is CWE-209, and never the token, which is CWE-532. The two handlers share the same try and except structure: the only difference is one return that gives 200 and one that gives 403. The closing claim across the bottom: one decision, made twice, and both defaults are yes. The gate exits 0 for anything it was not told to fail on; the handler returns 200 for anything that threw. Nobody chose, and that silence is OWASP A10 Mishandling of Exceptional Conditions, CWE-636.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 600" role="img" aria-label="Two panels showing the same yes-or-no decision made at two different times. Left panel, build time, the CI gate in security-ci.yml, on a pull request. The pull request fans out to three jobs: Semgrep for SAST, Trivy for SCA and IaC, and Gitleaks for secrets. Step one is the report run, with exit-code 0 or a trailing or-true, so the SARIF file uploads to the Security tab even when the gate is about to fail. Step two is the gate step, with exit-code 1. The two Trivy gate steps filter to severity HIGH and CRITICAL, while Semgrep's --error flag and Gitleaks have no severity filter at all and fail on any finding. Two outcomes follow. Caught: a Dockerfile running as root is DS-0002, rated HIGH, so the gate says no and the build turns red. Slips past: a base image tagged latest is DS-0001, rated MEDIUM, which the HIGH-CRITICAL filter drops, so the build goes green with the defect merged. The lesson on the left is that the threshold, not the scanner, decides what the build is willing to refuse. Right panel, run time, the same decision inside the /admin handler, for a GET request carrying no Authorization header. The fail-open version, insecure_service.py on port 8090, indexes the dictionary with USERS square-bracket token, which raises KeyError, and its except Exception branch returns jsonify with panel UNLOCKED and secret SECRET. The observed response is 200 carrying the flag (a public demo value on a local run), and nothing at all is logged, so the bypass is silent, which is OWASP A09. The fail-closed version, secure_service.py on port 8091, uses USERS dot get of token, which returns None instead of raising, and its except Exception as exc branch returns jsonify error forbidden with status 403. The observed response is 403 forbidden, plus a structured log line reading event=authz_failure outcome=deny src_ip and reason=unauthenticated. Every path denies, and the except logs only the exception type, never the message, which is CWE-209, and never the token, which is CWE-532. The two handlers share the same try and except structure: the only difference is one return that gives 200 and one that gives 403. The closing claim across the bottom: one decision, made twice, and both defaults are yes. The gate exits 0 for anything it was not told to fail on; the handler returns 200 for anything that threw. The severity threshold is a policy someone has to own; the except branch that grants access on error is the actual bug, OWASP A10 Mishandling of Exceptional Conditions, CWE-636.">
 <title>Fail open or fail closed: the CI gate and the /admin handler are the same decision at two different times</title>
 <style>
 text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -83,6 +83,20 @@ text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
   .sb    { fill: #dde4ea; }
   .tag   { fill: #ff9b63; }
 }
+
+/* Emphasis only: every element remains complete without animation.
+   Stroke/fill colours inherit the light and dark house palettes above. */
+rect.gate { animation: lesson-emphasis 6s ease-in-out infinite; }
+@keyframes lesson-emphasis {
+  0%, 100% { stroke-width: 1.4; }
+  50% { stroke-width: 2.6; }
+}
+rect.ok[x="334"] { animation: lesson-deny 6s ease-in-out infinite; }
+@keyframes lesson-deny {
+  0%, 100% { stroke-width: 1.8; }
+  50% { stroke-width: 3; }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
 </style>
 
 <rect class="bg" x="0" y="0" width="720" height="600"/>
@@ -189,5 +203,5 @@ text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
 <text class="sb" x="44"  y="548">it was not told to fail on.</text>
 <text class="sb" x="376" y="533">The handler returns 200 for</text>
 <text class="sb" x="376" y="548">anything that threw.</text>
-<text class="tag" x="44" y="569">Nobody chose. That default is A10 / CWE-636 — fail open.</text>
+<text class="tag" x="44" y="569">Threshold: a policy to own. The except that grants access: the bug, A10 / CWE-636.</text>
 </svg>

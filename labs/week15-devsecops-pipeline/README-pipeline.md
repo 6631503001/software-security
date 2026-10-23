@@ -47,9 +47,10 @@ Each tool runs **twice** on purpose:
 2. **Gate step** (`exit-code: 1`, `--error`) — re-runs and **fails the build**
    if any HIGH/CRITICAL finding (or any secret) exists.
 
-This ordering is deliberate: a single failing scan would abort before the
-SARIF could upload, hiding the findings. Report-then-gate gives you both the
-visible results *and* a red build.
+This split is deliberate: one scan can only have one severity filter. The
+report step has none, so the Security tab shows findings of every severity;
+the gate step has its own HIGH/CRITICAL threshold and decides the build.
+Report-then-gate gives you both the full picture *and* a red build.
 
 > Why not just `|| true` everything? Because then the build never fails and
 > the "gate" is decorative. Real gates must be able to say **no**.

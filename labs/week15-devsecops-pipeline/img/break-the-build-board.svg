@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 568" role="img" aria-label="The Break the Build game board: which gate step each change turns red, measured by running security-ci.yml's own gate commands on the real lab files. Columns are the four gate steps: the Semgrep gate (--error, any finding), the Trivy SCA gate (fs scan with the vuln and secret scanners, HIGH and CRITICAL), the Trivy IaC gate (config scan, HIGH and CRITICAL), and the Gitleaks gate (any secret). First group, Blue's baseline, which is red before Red does anything and is Task 3's job to clear: the unpinned uses at v4 and v3 action tags trip Semgrep's github-actions-mutable-action-tag; host 0.0.0.0 in the two services trips Semgrep's avoid_app_run_with_bad_host; and the docs' own curl examples that send the toy alice-token header trip Gitleaks' curl-auth-header, a false positive. Trivy is green on the untouched lab. Second group, Red's three attacks, one per pull request once Blue is green: urllib3 1.24.1 in requirements.txt trips only the Trivy SCA gate, with 7 HIGH CVEs such as CVE-2019-11324. A Dockerfile with no USER line or with USER root trips the Trivy IaC gate with DS-0002 HIGH, and also Semgrep, through missing-user or last-user-is-root: a cross-hit. A GitHub-format ghp token in settings.py trips Gitleaks with github-pat and also the Trivy SCA gate, because that step runs the secret scanner too, where it is a CRITICAL github-pat finding: another cross-hit. Third group, the decoys, which stay green: chmod 777 in a Dockerfile that keeps a non-root USER has no rule anywhere, and FROM python latest is seen by Trivy as DS-0001 MEDIUM, which the HIGH and CRITICAL filter drops. One defect per pull request: inside a job, the first failing gate skips the gates after it.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 568" role="img" aria-label="The Break the Build game board: which gate step each change turns red, measured by running security-ci.yml's own gate commands on the real lab files. Columns are the four gate steps: the Semgrep gate (--error, any finding), the Trivy SCA gate (fs scan with the vuln and secret scanners, HIGH and CRITICAL), the Trivy IaC gate (config scan, HIGH and CRITICAL), and the Gitleaks gate (any secret). First group, Blue's baseline, which is red before Red does anything and is Task 3's job to clear: the unpinned uses at v4 and v3 action tags trip Semgrep's github-actions-mutable-action-tag; host 0.0.0.0 in the two services trips Semgrep's avoid_app_run_with_bad_host; and the docs' own curl examples that send the toy alice-token header trip Gitleaks' curl-auth-header, a false positive. Trivy is green on the untouched lab. Second group, Red's three attacks, one per pull request once Blue is green: urllib3 1.24.1 in requirements.txt trips only the Trivy SCA gate, with, for example, 7 HIGH CVEs such as CVE-2019-11324 in the 23 Oct 2026 capture; the count varies with the Trivy DB. A Dockerfile with no USER line or with USER root trips the Trivy IaC gate with DS-0002 HIGH, and also Semgrep, through missing-user or last-user-is-root: a cross-hit. A GitHub-format ghp token in settings.py trips Gitleaks with github-pat and also the Trivy SCA gate, because that step runs the secret scanner too, where it is a CRITICAL github-pat finding: another cross-hit. Third group, the decoys, which stay green: chmod 777 in a Dockerfile that keeps a non-root USER has no rule anywhere, and FROM python latest is seen by Trivy as DS-0001 MEDIUM, which the HIGH and CRITICAL filter drops. One defect per pull request: inside a job, the first failing gate skips the gates after it.">
 <title>Break the Build: which gate step each planted defect turns red</title>
 <style>
 text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -55,6 +55,15 @@ text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
   .ft    { fill: #e8edf2; }
   .fs    { fill: #dde4ea; }
 }
+
+/* Emphasis only: every element remains complete without animation.
+   Stroke/fill colours inherit the light and dark house palettes above. */
+rect.lesson-crosshit { animation: lesson-emphasis 6s ease-in-out infinite; }
+@keyframes lesson-emphasis {
+  0%, 100% { stroke-width: 1.6; }
+  50% { stroke-width: 2.8; }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
 </style>
 
 <rect class="bg" x="0" y="0" width="960" height="568"/>
@@ -109,13 +118,14 @@ text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
 <!-- ================= GROUP 2 : RED'S ATTACKS ================= -->
 <text class="grpr" x="24" y="290">RED'S ATTACKS</text>
 <text class="grps" x="160" y="290">on top of Blue's green baseline · one per PR</text>
+<text class="rs" x="480" y="290">*23 Oct 2026; count varies with Trivy DB</text>
 
 <rect class="row" x="24" y="298" width="918" height="40" rx="5"/>
 <text class="rt mono" x="36" y="316">urllib3==1.24.1</text>
 <text class="rs" x="36" y="331">requirements.txt</text>
 <text class="dot" x="406" y="324" text-anchor="middle">·</text>
 <rect class="hit" x="490" y="302" width="140" height="32" rx="4"/>
-<text class="ht" x="500" y="316">7 HIGH CVEs</text>
+<text class="ht" x="500" y="316">e.g. 7 HIGH CVEs*</text>
 <text class="hs" x="500" y="329">e.g. CVE-2019-11324</text>
 <text class="dot" x="714" y="324" text-anchor="middle">·</text>
 <text class="dot" x="868" y="324" text-anchor="middle">·</text>
@@ -123,11 +133,11 @@ text   { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
 <rect class="row" x="24" y="342" width="918" height="40" rx="5"/>
 <text class="rt" x="36" y="360">Dockerfile runs as root</text>
 <text class="rs mono" x="36" y="375">no USER line, or USER root</text>
-<rect class="xhit" x="336" y="346" width="140" height="32" rx="4"/>
+<rect class="xhit lesson-crosshit" x="336" y="346" width="140" height="32" rx="4"/>
 <text class="ht" x="346" y="360">missing-user /</text>
 <text class="hs" x="346" y="373">last-user-is-root</text>
 <text class="dot" x="560" y="368" text-anchor="middle">·</text>
-<rect class="hit" x="644" y="346" width="140" height="32" rx="4"/>
+<rect class="hit lesson-crosshit" x="644" y="346" width="140" height="32" rx="4"/>
 <text class="ht" x="654" y="360">DS-0002 HIGH</text>
 <text class="hs" x="654" y="373">root user</text>
 <text class="dot" x="868" y="368" text-anchor="middle">·</text>

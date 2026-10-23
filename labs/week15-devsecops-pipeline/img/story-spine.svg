@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 380" role="img" aria-label="One app, three layers. Same root mistake all day: trusting input and defaults nobody checked. W13, where it runs: container image and cloud permissions. A secret baked into an image layer; IAM Action star on Resource star. Fix: hardened image, least privilege. Lab: Dockerfile + IAM JSON. W14, what it says: the app gets an AI chatbot. Typed text overrides bot rules, prompt injection; an unescaped bot reply in the page causes XSS. Fix: guardrails, redact secrets, escape output. Lab: :8082 vs :8083. W15, how it ships: every push runs Semgrep, Trivy and Gitleaks. A red gate fails the PR; the app fails closed, deny on error. Lab: security-ci.yml + :8090 vs :8091. You are here: W15.">
+<title>One app, three layers</title>
+<style>
+text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 19px; }
+.bg { fill: #ffffff; }
+.strip, .stage { fill: #f2f6f9; stroke: #c9d4de; stroke-width: 1.2; }
+.h1 { fill: #12232e; font-size: 30px; font-weight: 700; }
+.sub { fill: #6b7280; font-size: 22px; }
+.heading { fill: #12232e; font-size: 26px; font-weight: 700; }
+.body { fill: #1f2933; }
+.context, .lab { fill: #4b5563; }
+.fix { fill: #12232e; font-weight: 700; }
+.rule { stroke: #c9d4de; stroke-width: 1.2; }
+.current .stage { fill: #e9f2f9; stroke: #017BC4; stroke-width: 1.6; }
+.current .heading, .current .fix { fill: #017BC4; }
+.here { fill: #e9f2f9; stroke: #017BC4; stroke-width: 1.6; animation: here-pulse 5s ease-in-out infinite; }
+.here-text { fill: #017BC4; font-weight: 700; }
+.wire { stroke: #9fb8c9; stroke-width: 1.6; stroke-dasharray: 5 4; animation: app-flow 6s linear infinite; }
+.head { fill: #9fb8c9; }
+.gate { fill: #fdeee4; stroke: #E35205; stroke-width: 1.8; }
+.gate-text { fill: #b34205; font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .bg { fill: #0f1419; }
+  .strip, .stage { fill: #1e262e; stroke: #31404d; }
+  .h1, .heading, .fix { fill: #e8edf2; }
+  .sub { fill: #9aa3ad; }
+  .body { fill: #dde4ea; }
+  .context, .lab { fill: #9aa3ad; }
+  .rule { stroke: #31404d; }
+  .current .stage { fill: #12283a; stroke: #4aa3dd; }
+  .current .heading, .current .fix { fill: #4aa3dd; }
+  .here { fill: #12283a; stroke: #4aa3dd; }
+  .here-text { fill: #4aa3dd; }
+  .wire { stroke: #4c6070; }
+  .head { fill: #4c6070; }
+  .gate { fill: #3a2213; stroke: #ff7a3d; }
+  .gate-text { fill: #ff9b63; }
+}
+/* Emphasis only: the static render is already complete. */
+@keyframes app-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -36; } }
+@keyframes here-pulse { 0%, 100% { stroke-width: 1.6; } 50% { stroke-width: 3; } }
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+<rect class="bg" width="1200" height="380"/>
+<rect class="strip" x="24" y="24" width="1152" height="62" rx="8"/>
+<text class="h1" x="40" y="50">One app, three layers</text>
+<text class="sub" x="40" y="78">Same root mistake all day: trusting input and defaults nobody checked</text>
+<g aria-hidden="true"><rect class="here" x="904" y="100" width="184" height="28" rx="7"/>
+<text class="here-text" x="996" y="121" text-anchor="middle">YOU ARE HERE</text></g>
+<path class="wire" fill="none" d="M390 200 H408"/>
+<polygon class="head" points="407,195 414,200 407,205"/>
+<path class="wire" fill="none" d="M786 200 H804"/>
+<polygon class="head" points="803,195 810,200 803,205"/>
+<g class="quiet">
+<rect class="stage" x="24" y="138" width="360" height="194" rx="8"/>
+<text class="heading" x="40" y="166">W13 · Where it runs</text>
+<text class="context" x="40" y="191">Container image + cloud permissions</text>
+<line class="rule" x1="40" y1="202" x2="368" y2="202"/>
+<text class="body" x="40" y="222">Secret baked into an image layer;</text>
+<text class="body" x="40" y="246">IAM: Action "*" on Resource "*".</text>
+<text class="fix" x="40" y="296">Fix: hardened image,</text>
+<text class="fix" x="40" y="320">least privilege.</text>
+<text class="lab" x="28" y="351">Lab: Dockerfile + IAM JSON</text>
+</g>
+<g class="quiet">
+<rect class="stage" x="420" y="138" width="360" height="194" rx="8"/>
+<text class="heading" x="436" y="166">W14 · What it says</text>
+<text class="context" x="436" y="191">The app gets an AI chatbot</text>
+<line class="rule" x1="436" y1="202" x2="764" y2="202"/>
+<text class="body" x="436" y="222">Typed text overrides bot rules</text>
+<text class="body" x="436" y="246">(prompt injection); unescaped</text>
+<text class="body" x="436" y="270">bot reply in page → XSS.</text>
+<text class="fix" x="436" y="296">Fix: guardrails, redact secrets,</text>
+<text class="fix" x="436" y="320">escape output.</text>
+<text class="lab" x="424" y="351">Lab: :8082 vs :8083</text>
+</g>
+<g class="current">
+<rect class="stage" x="816" y="138" width="360" height="194" rx="8"/>
+<text class="heading" x="832" y="166">W15 · How it ships</text>
+<text class="context" x="832" y="191">Every push runs these checks</text>
+<line class="rule" x1="832" y1="202" x2="1160" y2="202"/>
+<rect class="gate" x="832" y="237" width="328" height="34" rx="6"/>
+<text class="body" x="832" y="222">Semgrep · Trivy · Gitleaks</text>
+<text class="gate-text" x="844" y="260">Red gate fails the PR</text>
+<text class="fix" x="832" y="296">App fails closed:</text>
+<text class="fix" x="832" y="320">deny on error.</text>
+<text class="lab" x="820" y="351">Lab: security-ci.yml + :8090 vs :8091</text>
+</g>
+</svg>
