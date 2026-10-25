@@ -35,9 +35,9 @@ Answer as a team (2–4 sentences each).
 > Replaces the hands-on exploit lab. Bring the deliverables below to the studio; run the 10-min demo + 5-min Q&A; complete a peer review of another team.
 >
 > **Note:** the 10-min-demo + 5-min-Q&A clock below is today's own live rehearsal format — it is not
-> what Week 19 does. **Week 19 itself has since moved to a different format:** each team submits a
-> pre-recorded video walkthrough before the session (graded asynchronously on the project rubric),
-> and the in-class slot is a **3-minute live Q&A**, not a re-demo (`AGENDA.md` §*Week 19*).
+> what the final demo does: each team submits a recorded video walkthrough (linked in the report,
+> due with it), graded asynchronously on the project rubric; there is no per-team live slot — the
+> instructor may call a team for a short Q&A (`AGENDA.md` §*Week 19*).
 
 ### A) Deliverables checklist (bring all six)
 

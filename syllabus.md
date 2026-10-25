@@ -152,7 +152,7 @@ Consolidate Weeks 10–16 (+ first-half callbacks). *🎯 "Security Jeopardy: Ch
 
 ### 📝 Weeks 18–19 — Final Exam
 - **Week 18 — Written exam:** cumulative, with emphasis on Weeks 10–16 (API, memory safety, supply chain, cloud, AI/LLM, DevSecOps).
-- **Week 19 — Capstone CTF tournament + final project demos:** a full term-spanning CTF plus each team's secured-build presentation (threat model → vulns → remediation → SBOM/signing → CI pipeline).
+- **Week 19 — Capstone CTF tournament + final project demos:** a full term-spanning CTF plus each team's secured-build demo video, submitted with the report (threat model → vulns → remediation → SBOM/signing → CI pipeline).
 
 ---
 

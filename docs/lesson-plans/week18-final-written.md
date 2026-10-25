@@ -132,7 +132,7 @@ exam regulations. Order of business follows the proctor deck `slides/week18.md`:
 | Before the clock | State the materials rule explicitly — **the paper does not state it** (see below) | This plan; `exam.md` header carries no closed-book line |
 | Clock starts | 150 min writing. Keep talking minimal once the clock runs | `AGENDA.md`; `slides/week18.md` presenter note |
 | On the paper | Name, Student ID and Date fields are on the paper — check they are filled before collecting | `exam.md` header |
-| At collection | Collect papers; remind the cohort that Week 19 is the team capstone CTF **plus graded project demos**, and that they must bring a runnable project with threat model, vuln report, SBOM, signed artifact and CI pipeline | `slides/week18.md` closing note; `labs/week19-final-ctf-capstone/README.md`, *Bring* |
+| At collection | Collect papers; remind the cohort that Week 19 is the team capstone CTF, that the **graded project demo video** is linked in the report and due with it, and that they must bring a runnable project with threat model, vuln report, SBOM, signed artifact and CI pipeline | `slides/week18.md` closing note; `labs/week19-final-ctf-capstone/README.md`, *Bring* |
 
 **Materials allowed.** The Week 8 paper states "Closed book unless stated otherwise" in its header.
 **This paper states nothing**: `labs/week18-final-written/exam.md` carries no materials line, the

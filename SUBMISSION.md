@@ -77,11 +77,12 @@ machine before Week 1. Nothing on the website will work without this step.**
 | W8 Midterm written | on paper in class (120 min) |
 | W9 Midterm CTF | flags in **`ctf.zcr.ai`**; payload + mitigation via **`learn.zcr.ai/submit`** (150 min) |
 | W18 Final written | on paper (150 min) |
-| W19 Final CTF + demo | flags in **`ctf.zcr.ai`**; recorded video walkthrough submitted **before** the session (graded by rubric) + 3-min live Q&A on the day |
+| W19 Final CTF + demo | flags in **`ctf.zcr.ai`**; project demo = recorded video walkthrough, link in the project report, due **with the report** (graded by rubric); no per-team live slot — the instructor may call a team for a short Q&A |
 
 ## TERM PROJECT
 - Report: fill [project/REPORT-TEMPLATE.md](project/REPORT-TEMPLATE.md) → export PDF → **`learn.zcr.ai/submit`**.
 - Code + SBOM + signed artifact + CI pipeline: in the team's **GitHub** repo (link in the report).
+- Demo video: an **unlisted YouTube or Google Drive link** (viewable by anyone with the link) in the report's cover table, due with the report.
 - Milestones per [project/README.md](project/README.md).
 
 ---

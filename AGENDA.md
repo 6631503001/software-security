@@ -103,7 +103,7 @@ review weeks (W7 pre-midterm, W17 pre-final).
 | Time | Block |
 |------|-------|
 | 0:00–2:30 | Capstone CTF tournament (whole term) |
-| 2:30–4:00 | Graded final project demos (pre-recorded demo submitted beforehand + **3-min live Q&A per team** — see the note below) |
+| 2:30–4:00 | Project demo videos are **graded beforehand** (link in the report, due with it); use this block for short live Q&A with **flagged teams only**, feedback and wrap-up — see the note below |
 > **Demo format — read before timetabling.** 90 min ÷ (10-min demo + 5-min Q&A) is **six team
 > slots**. At N≈80–120 in teams of 2–3 that is 27–60 teams, so the live-demo-for-everyone format
 > cannot run as written. The format actually used: each team **submits a pre-recorded demo video
@@ -111,6 +111,12 @@ review weeks (W7 pre-midterm, W17 pre-final).
 > is **3 minutes of live Q&A per team** — which is what the rubric's understanding checks and the
 > anti-AI controls actually need. 90 min covers ~30 teams; above that, run two parallel rooms with
 > a second assessor, or split Q&A across the Week 16 studio and Week 19.
+>
+> **Decision 2026-10-24 (supersedes the per-team Q&A above):** there is no per-team Q&A slot. The
+> demo video is linked in the report and due with it, and graded asynchronously on the project
+> rubric; only teams the instructor flags (report ≠ repo, a similarity hit, work the team can't
+> account for) are called for a short live Q&A. Reason: the MFU final day (Session 7) already holds
+> the written exam (AM) and the capstone CTF (PM).
 
 
 ---

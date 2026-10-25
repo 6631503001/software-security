@@ -4,7 +4,7 @@
 |---|---|
 | **Course** | Software Security (⬚ course code) |
 | **Week / date** | 19 · ⬚ |
-| **Contact time** | 240 min — a single final block: **150 min capstone CTF + 90 min graded project demos**. No lecture, no lab (`AGENDA.md`, *Week 19 — Final CTF + project demos (240 min)*) |
+| **Contact time** | 240 min — a single final block: **150 min capstone CTF + 90 min for viva spot-checks of flagged teams and wrap-up** (demo videos are graded beforehand). No lecture, no lab (`AGENDA.md`, *Week 19 — Final CTF + project demos (240 min)*) |
 | **Lab folder** | `labs/week19-final-ctf-capstone` — holds `README.md` and `ctf.md` (the student paper); it ships no target of its own |
 | **Slides** | `slides/week19.md` — proctor/compère deck, not a teaching deck |
 | **Covers** | The whole term (`ctf.md`, *Covers*): web, API, supply chain, cloud, memory safety and LLM/agentic challenges (`labs/week19-final-ctf-capstone/README.md`) |
@@ -41,14 +41,14 @@ sitting is designed to evidence:
 - P6 — Record, per challenge, the **flag (or noted proof)**, the **payload/command** and a
   **one-line mitigation** — the three columns of `ctf.md`'s submission table.
 - P7 — Present a secured build end to end: threat model → vulnerabilities found → remediation;
-  SBOM + signed artifact; security CI/CD pipeline; **a pre-recorded video walkthrough submitted
-  before the session, plus a 3-minute live Q&A** (`labs/week19-final-ctf-capstone/README.md`).
+  SBOM + signed artifact; security CI/CD pipeline; **a recorded video walkthrough linked in the
+  report and due with it** (`labs/week19-final-ctf-capstone/README.md`).
 
 **Attitude (A)**
 - A1 — Attack only the provided targets, under [ETHICS.md](../../ETHICS.md) (`ctf.md`, *Rules*).
 - A2 — One submission per team per challenge; document the method (`ctf.md`, *Rules*).
-- A3 — Answer unscripted follow-up questions on the team's own work at the demo — a live viva check
-  (`project/README.md`, deliverable 6).
+- A3 — If called, answer unscripted follow-up questions on the team's own work — a live viva
+  spot-check (`project/README.md`, deliverable 6).
 
 ## 2. What is assessed
 
@@ -77,17 +77,17 @@ that will not start costs the team that challenge, not the paper.
 ### 2.2 The demo — graded separately
 
 Each team presents its secured build: threat model → vulnerabilities found → remediation; SBOM +
-signed artifact; security CI/CD pipeline. **Format (graded):** each team submits a pre-recorded
-video walkthrough **before the session** (graded asynchronously against the project rubric), and
-the in-class slot is a **3-minute live Q&A** — a viva check, not a re-demo
+signed artifact; security CI/CD pipeline. **Format (graded):** each team submits a recorded
+video walkthrough linked in the report and **due with it** (graded asynchronously against the project rubric);
+there is no per-team slot — only teams the instructor flags get a short live Q&A, a viva spot-check, not a re-demo
 (`labs/week19-final-ctf-capstone/README.md`; `AGENDA.md` §*Week 19*). `ctf.md` line 6 says the demo
 *"is scored separately"* and links the rubric — see the cross-reference defect noted in §5.
 
 **CLO coverage.** Challenges 1–12 evidence **CLO2**; the per-challenge mitigation line is the
 **CLO3** evidence available inside a 150-minute tournament (there is no defend-and-re-test task, as
 there is in a teaching week). The demo carries **CLO3** (remediation shown and re-tested) and
-**CLO5** (communicating a finding, its impact and its fix, plus the Q&A). Per-student flags,
-identity-stamped evidence and the live viva carry **CLO6**.
+**CLO5** (communicating a finding, its impact and its fix, in the video). Per-student flags,
+identity-stamped evidence and the viva spot-checks carry **CLO6**.
 
 ## 3. Preparation and infrastructure readiness
 
@@ -266,9 +266,8 @@ instance they used before anything else.
       (`CTFd-SETUP.md` §3–§4).
 - [ ] Submission Form open/close times set, with the settings from `instructor/anti-cheating.md` §C
       (restrict to the cohort's accounts, collect email, one response, auto-close).
-- [ ] **Video-submission deadline and Q&A schedule published to teams in advance** —
-      `slides/week19.md`: "Tell teams their demo slot up front"; each team's **3-minute live Q&A**
-      slot follows submission of its pre-recorded video walkthrough before the session.
+- [ ] **Video deadline published to teams in advance** — the video link goes in the report and is
+      due with it; decide before the day which flagged teams (if any) to call for a short live Q&A.
 - [ ] The Week 16 scrimmage and the Week 17 mock CTF have been run — both state they are the same
       format as this tournament (`labs/week16-capstone/scrimmage.md`,
       `labs/week17-review-final-prep/mock-ctf.md`).
@@ -284,7 +283,7 @@ tournament, `2:30–4:00` graded final project demos.
 | 0:00–0:10 *(inside the 150)* | **Briefing + target check** | Run `slides/week19.md`: the two parts, the 150-minute window, the submit format (flag/proof + payload/command + one-line mitigation), the rules (provided targets only, one submission per team per challenge, document method), that graded flags for challenges 1–6 and 11 are per-student and come only from **your own hosted instance** (a local run serves demo flags, which are not graded flags) and copying across teams is traceable, and, for local copies, the **port-8080 warning** (below). Confirm everyone can log in to CTFd and reach a spawned instance, and that Docker / `make` works for the local-only challenges | Log in and spawn the hosted instances they need; stand up the local targets; report anything that will not start or connect **now**, not at 1:00 |
 | 0:10–2:30 | **Competition window** | Invigilate; answer environment questions only, not challenge questions; announce first bloods aloud for hype (`slides/week19.md`); watch for demo/placeholder flags — a student on a local copy (§3.2) | Solve challenges 1–12 in any order; fill the three columns per challenge as they go |
 | 2:30 | **Submission cutoff** | Close the Form / collect the paper tables | Submit flags + payload/command + one-line mitigation |
-| 2:30–4:00 | **Graded live Q&A** | Each team gets a **3-minute live Q&A** slot; ask one or two unscripted probing questions ("why this fix and not X?", "what does this SBOM line mean?") — the built-in viva (`anti-cheating.md` §D). Confirm the CI pipeline failing on a finding was shown in the submitted video (`slides/week19.md`) rather than re-demoing it live | Per team: answer the live Q&A on the video already submitted **before** the session (graded asynchronously on the project rubric) — not a re-demo, per `labs/week19-final-ctf-capstone/README.md` |
+| 2:30–4:00 | **Viva spot-checks (flagged teams only)** | Call only the teams you flagged while grading the videos; ask one or two unscripted probing questions ("why this fix and not X?", "what does this SBOM line mean?") — the built-in viva (`anti-cheating.md` §D). Confirm the CI pipeline failing on a finding was shown in the submitted video (`slides/week19.md`) rather than re-demoing it live | Flagged teams only: answer the live Q&A on the video already submitted with the report (graded asynchronously on the project rubric) — not a re-demo, per `labs/week19-final-ctf-capstone/README.md` |
 
 **Port warning to give in the briefing (local copies only).** `labs/week04-injection`,
 `labs/week05-xss-client-side`, `labs/week06-authn-authz`, `labs/week10-api-security`
@@ -296,8 +295,8 @@ with these: ⬚. See §9 for the fix.
 1. `slides/week19.md`'s closing note records that the research **post-test + post-survey happen
    now** (`instructor/research/`; the post-test is 20 MCQ + 2 applied items). No slot for it exists
    in `AGENDA.md`'s 240 minutes; duration and placement: ⬚.
-2. Even at 3 minutes/team the live Q&A block may not fit the largest cohorts — resolve before the
-   day (§9).
+2. Resolved 2026-10-24: no per-team Q&A — only flagged teams are called, so the block fits any
+   cohort size (`AGENDA.md` §*Week 19*).
 
 ## 5. Scoring — how points become marks
 
@@ -443,7 +442,7 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 
 | Risk | Mitigation |
 |---|---|
-| **The demo block does not fit the largest cohorts.** `AGENDA.md` gives 90 min (2:30–4:00); a strict live 10-min-demo + 5-min-Q&A format would be **15 min/team → 6 slots**, which cannot seat the ~27–60 teams N≈80–120 (`AGENDA.md`) implies in teams of 2–3 | **Resolved by `AGENDA.md`:** each team submits a pre-recorded video walkthrough before the session (graded asynchronously on the project rubric), and the in-class block is a **3-minute live Q&A per team**, which fits ~30 teams in 90 min. Above ~30 teams: run parallel rooms with a second assessor, or split the Q&A across the Week 16 studio and Week 19 (`AGENDA.md` §*Week 19*) |
+| **The demo block does not fit the largest cohorts.** `AGENDA.md` gives 90 min (2:30–4:00); a strict live 10-min-demo + 5-min-Q&A format would be **15 min/team → 6 slots**, which cannot seat the ~27–60 teams N≈80–120 (`AGENDA.md`) implies in teams of 2–3 | **Resolved by `AGENDA.md` (decision 2026-10-24):** each team's video walkthrough is linked in the report, due with it, and graded asynchronously on the project rubric; there is no per-team Q&A slot — only teams the instructor flags are called for a short live Q&A, so the block fits any cohort size (`AGENDA.md` §*Week 19*) |
 | **Five-way port-8080 collision (local copies).** W4, W5, W6, W10 (`vulnerable-api`) and `project/starter-app` all publish 8080; a team running several local copies at once hits it | Brief at 0:00–0:10: `docker compose down` one before the next, or override the **left** side of the ports mapping. The Flask apps listen on 5000 *inside* the W4/W5/W6/W10 containers — do not republish 5000 (macOS AirPlay squats 5000, not 8080). W10's `solution-api` already takes 8081; W14 uses 8082/8083; a local CTFd, if run, uses 8000 |
 | **Burp on its default listener.** The Week 6 worksheet's optional Burp step proxies through `127.0.0.1:8080` — the same port the targets publish | Move either Burp's listener or the target's published port |
 | **Student works on a local copy → demo flag.** Verified: with no `.env`, compose renders `FLAG_*: null` in all four local labs (W4, W6, W10, W14) and the app falls back to its committed placeholder | Brief it at 0:00: graded flags for 1–6 and 11 come only from your own hosted instance. Treat a placeholder flag on a sheet as "worked locally", not as cheating; ask which instance was used. Do not try to fix it by seeding per-student `.env` files — the student owns the file |
@@ -477,8 +476,8 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 4. **A team's pre-recorded video is missing or will not play.** The pre-recorded format removes
    the live-exploit-fails failure mode from this block — there is no live attack segment left to
    fall back from. A missing/unplayable video is a missing deliverable against `project/README.md`'s
-   rubric, not a live-demo contingency; run the 3-minute Q&A anyway on whatever artefacts the team
-   can show and record the gap for marking. Exactly how the rubric penalizes a missing video: ⬚.
+   rubric, not a live-demo contingency; call that team for a short live Q&A on whatever artefacts
+   it can show and record the gap for marking. Exactly how the rubric penalizes a missing video: ⬚.
 5. **Widespread failure to start targets or reach the hosted instances inside the first 10
    minutes.** That is exactly what the 0:00–0:10 target check exists to expose. The repository
    defines no fallback adjustment to the 150-minute window, and this is the last session of term so

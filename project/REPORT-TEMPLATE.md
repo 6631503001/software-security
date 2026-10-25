@@ -11,6 +11,7 @@
 | Members (name + ID) | |
 | Target application | |
 | Repository URL | |
+| Demo video (unlisted YouTube / Google Drive link) | |
 | Date | |
 
 ## AI-tool usage disclosure

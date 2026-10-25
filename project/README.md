@@ -13,7 +13,7 @@ Take a small web/API application (provided starter, or your own with instructor 
 3. **Remediated code** — the fixes, in a branch with clear commits referencing each finding.
 4. **Supply-chain hardening** — generate an **SBOM** (CycloneDX) and **sign the release artifact** with Cosign.
 5. **Security CI pipeline** — a GitHub Actions workflow running SAST + SCA + secret scanning that fails on high-severity findings.
-6. **Demo** — attack → root cause → fix: a **short live walkthrough** at the **Week 16** capstone studio (WIP, ungraded); for **Week 19**, a **pre-recorded video walkthrough submitted before the session** (graded asynchronously on this rubric) plus a **3-minute live Q&A**. Expect a couple of unscripted follow-up questions from the instructor during the Week 19 Q&A (e.g. *"why this fix and not X?"*) — a live viva check that the team genuinely did the work, same spirit as the AIR-Sec viva spot-checks used elsewhere in the course.
+6. **Demo** — attack → root cause → fix: a **short live walkthrough** at the **Week 16** capstone studio (WIP, ungraded); the **final demo** is a **recorded video walkthrough**, shared as an **unlisted YouTube or Google Drive link in the report** (viewable by anyone with the link) and due **with the report**; it is graded asynchronously on this rubric. There is **no per-team live slot**: the instructor may call any team for a short live Q&A on its own work (e.g. *"why this fix and not X?"*) — a viva spot-check that the team genuinely did the work, same spirit as the AIR-Sec viva spot-checks used elsewhere in the course.
 
 ## Suggested timeline
 
@@ -24,7 +24,7 @@ Take a small web/API application (provided starter, or your own with instructor 
 | Vulnerability report (draft) | Week 11 |
 | Remediation + SBOM + signed artifact | Week 14 |
 | Capstone studio — WIP demo & peer review | Week 16 |
-| Final demo & report (graded) | Week 19 |
+| Final report + demo video link (graded) | Before Week 19 (the portal shows the exact deadline) |
 
 ## Rubric (100 pts)
 
@@ -60,7 +60,7 @@ teams is prevented — three layers, all cheap since they reuse mechanisms alrea
    team's marker is a direct tell.
 2. **Similarity checking** — team repos and reports are run through the same MOSS/JPlag pass used
    on weekly labs (see `instructor/anti-cheating.md`).
-3. **Live viva at the Week 19 demo** — see the Demo deliverable above.
+3. **Live viva spot-check** — the instructor may call any team for a short live Q&A on its own work (see the Demo deliverable above).
 
 Two teams independently fixing the same bug the "obviously correct" way will naturally look
 similar — that's expected, not a red flag. These layers target verbatim copying, not convergent

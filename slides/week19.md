@@ -16,9 +16,9 @@ The grand finale
 ## Two parts
 
 1. 🏆 **Capstone CTF tournament** — whole-term, team-based
-2. 🎤 **Final project demos** — graded
+2. 🎤 **Final project demo videos** — graded (submitted with the report)
 
-<!-- Time-box the 240-min block: CTF tournament first (energy), then graded demos. Tell teams their demo slot up front. -->
+<!-- The CTF tournament is the live part. Demo videos were graded beforehand; after the CTF, call aside only the teams you flagged for a short viva-style Q&A. -->
 
 ---
 
@@ -39,16 +39,16 @@ Present your secured build end-to-end:
 - Threat model → vulnerabilities → remediation
 - SBOM + signed artifact
 - Security CI/CD pipeline
-- **Submit a recorded video walkthrough before the session** — graded asynchronously on the rubric
-- **3-min live Q&A** per team on the day (not a live demo slot)
+- **Recorded video walkthrough**, linked in the report and due with it — graded asynchronously on the rubric
+- No per-team live slot — the instructor may call a team for a short live Q&A
 
-<!-- Format change (2026-07-26): with N≈80–120 students in teams of 2–3, a 10-min-demo+5-min-Q&A live format needs far more than the 90 minutes this block has — it cannot physically run. Video is graded beforehand on the project rubric (project/README.md) + peer-contribution multiplier; the live slot is a short viva-style Q&A only, to confirm the work is theirs — not a re-demo. -->
+<!-- Format change (2026-07-26): with N≈80–120 students in teams of 2–3, a 10-min-demo+5-min-Q&A live format needs far more than the 90 minutes this block has — it cannot physically run. Video is graded beforehand on the project rubric (project/README.md) + peer-contribution multiplier; live Q&A only as a viva spot-check for teams the instructor flags (decided 2026-10-24: the final day already holds the written exam and the CTF) — not a re-demo. -->
 
 ---
 
 ## Bring
 
-- **Video walkthrough submitted before the session**
+- **Video walkthrough link in your report** (due with the report)
 - Threat model + vuln report (CWE/OWASP mapped)
 - Fixed code, SBOM, signed artifact, CI pipeline
 

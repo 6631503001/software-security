@@ -78,7 +78,7 @@ Bring a laptop able to run Docker Desktop to every session — the compressed fo
 | **4** | **Sat 19 Sep 69** | **Wk 8–9** | **Midterm written exam** (covers Sessions 1–3) | **Midterm CTF practical** |
 | 5 | Sat 10 Oct 69 | Wk 10–12 | API security + Memory-safety + Supply chain | crAPI Raid + Pwn the Binary + Dependency Confusion Heist |
 | 6 | Sat 24 Oct 69 | Wk 13–15 | Cloud/container + AI/LLM security + DevSecOps | Misconfig Hunt + Gandalf Challenge + Break the Build |
-| **7** | **Sat 14 Nov 69** | **Wk 18–19** | **Final written exam** (cumulative, emphasis Sessions 5–6) | **Capstone CTF tournament + team project demos** |
+| **7** | **Sat 14 Nov 69** | **Wk 18–19** | **Final written exam** (cumulative, emphasis Sessions 5–6) | **Capstone CTF tournament** (project demo videos are due with the report, Fri 6 Nov 16:59) |
 
 *Week 16 (capstone-studio content) is assigned as self-study/team-project work between Sessions 6 and 7 rather than new taught content in Session 6 — see §3.*
 
@@ -149,12 +149,12 @@ Bring a laptop able to run Docker Desktop to every session — the compressed fo
 - 🧙 **"Gandalf Challenge"** — direct + indirect prompt injection to exfiltrate a secret; demo tool poisoning/excessive agency in an agent; add guardrails, output validation, and least-privilege tool access, then re-test.
 - 🔴🔵 **"Break the Build"** (Red vs Blue) — Blue builds a GitHub Actions gate (Semgrep + Trivy + Gitleaks) that fails on high-severity findings; Red submits PRs trying to sneak vulns past it.
 
-**Assigned between Session 6 and Session 7 (self-study/team time, not new taught content):** Capstone-studio prep — teams finalize their term project (threat model → vulns → remediation → SBOM/signing → CI pipeline) and rehearse for the Session 7 capstone CTF and project demo, using Session 6's Break the Build pipeline as their working baseline.
+**Assigned between Session 6 and Session 7 (self-study/team time, not new taught content):** Capstone-studio prep — teams finalize their term project (threat model → vulns → remediation → SBOM/signing → CI pipeline) prepare for the Session 7 capstone CTF, and record their project demo video, using Session 6's Break the Build pipeline as their working baseline.
 
 ### Session 7 (Sat 14 Nov 69) — Wk 18–19: FINAL
 
 **AM — Written exam.** Cumulative, with emphasis on Sessions 5–6 (API, memory safety, supply chain, cloud, AI/LLM, DevSecOps).
-**PM — Capstone CTF tournament + final project demos.** A full term-spanning CTF plus each team's secured-build presentation (threat model → vulns → remediation → SBOM/signing → CI pipeline).
+**PM — Capstone CTF tournament.** A full term-spanning CTF. The term project's demo is a recorded video walkthrough (threat model → vulns → remediation → SBOM/signing → CI pipeline), linked in the report and due with it on **Fri 6 Nov 16:59**; it is graded beforehand, and the instructor may call a team for a short live Q&A during the afternoon.
 
 ---
 

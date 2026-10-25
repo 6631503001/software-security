@@ -58,7 +58,7 @@ Whole-course categories — modern stack + first-half callbacks:
 ## Exam scope reminder
 
 - **Wk 18 written:** cumulative, emphasis on Weeks 10–15 (Week 16 capstone isn't separately examined)
-- **Wk 19:** capstone CTF tournament + final project demos (**video walkthrough submitted before the session** + a short live Q&A — not a live demo slot)
+- **Wk 19:** capstone CTF tournament + final project demos (**video walkthrough linked in the report, due with it**; live Q&A only if the instructor calls your team)
 
 <!-- State scope + logistics clearly — 10-15, not 10-16 (this was deliberately corrected in exam.md, don't reintroduce the old range here). W19's demo format changed too: pre-recorded + async grading, because the old live-demo format can't fit N≈80-120 students into a 90-min block. Remind teams the W19 demo is graded — bring a runnable project + the video. ~3 min. -->
 
