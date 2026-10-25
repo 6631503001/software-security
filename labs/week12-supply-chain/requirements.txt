@@ -13,7 +13,7 @@
 
 Flask==1.1.4           # old Flask 1.x line
 Werkzeug==1.0.1        # old; pre-2.x security hardening
-Jinja2==2.11.3         # CVE-2020-28493 (ReDoS in the urlize filter)
+Jinja2==2.11.3         # old; 2.11.3 FIXED CVE-2020-28493 - read the scanner output for what is still open
 MarkupSafe==2.0.1      # pinned for Jinja2 2.11 compatibility
 itsdangerous==1.1.0    # old; pinned for Flask 1.1.x
 click==7.1.2           # old; pinned for Flask 1.1.x

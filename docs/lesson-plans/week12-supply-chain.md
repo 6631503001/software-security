@@ -143,11 +143,13 @@ Worksheet 12's own task names and minute budgets.
   "image scanning is a superset" claim, made concrete. Say this before Task 1's table is started, or
   half the room will conclude one of the tools is broken.
 - **Two packages named in `requirements.txt`'s own comments behave differently.** urllib3's
-  **CVE-2021-33503** does appear in the `trivy fs` output (HIGH, fixed in 1.26.5). Jinja2's
-  **CVE-2020-28493** does **not** — verified 2026-07-26, it is reported by neither `trivy fs` at any
-  severity nor `pip-audit` against `Jinja2==2.11.3`. A student who picks Jinja2 for their three-row table
-  because the file comment names a CVE will not find it. Excellent 60 seconds on "the comment is not the
-  evidence; the tool output is".
+  **CVE-2021-33503** does appear in the `trivy fs` output (HIGH, fixed in 1.26.5). Jinja2 2.11.3 is
+  the release that **fixed** **CVE-2020-28493**, so neither `trivy fs` (any severity) nor `pip-audit`
+  reports that CVE against it (verified 2026-07-26); `pip-audit` lists Jinja2's *later* advisories
+  instead (e.g. CVE-2024-22195, fixed in 3.1.3). Until 25 Oct 2026 the file comment and this deck's
+  diagram alt text named CVE-2020-28493 as if it were still open, and some students copied it into
+  their Task 1 table; the comment now says 2.11.3 fixed it. Still worth 60 seconds: "the comment is
+  not the evidence; the tool output is".
 - **`pip-audit` printed only `PYSEC-` IDs**, no `GHSA-` (verified 2026-07-26), although the worksheet
   writes "GHSA-/PYSEC-". Accept either.
 - **`pip-audit` sees a package that is not in `requirements.txt`.** It flags `idna 2.10`, pulled in
