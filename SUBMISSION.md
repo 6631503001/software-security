@@ -47,13 +47,17 @@ machine before Week 1. Nothing on the website will work without this step.**
    and open `http://localhost:8081` — never change the right side (`5000`); the app listens on
    5000 *inside* the container, and on macOS port 5000 is taken by AirPlay Receiver.
 3. Work through the **worksheet** (`labs/week<NN>…/worksheet.md`): for each task record the **payload/command**, a **screenshot** of the result, and a **2–3 sentence mitigation**.
-4. For the **Defend / fix** task: edit the code, **commit to your `wk<NN>` branch**, and note the **commit hash** in the worksheet.
+4. For the **Defend / fix** task: edit the code, **commit to your `wk<NN>` branch**, and note the **commit hash** in the worksheet. Commit **code only** — keep the worksheet, screenshots and flags out of git.
 
 **Submit (two parts):**
 | Part | Where | What |
 |------|-------|------|
 | Worksheet | **`learn.zcr.ai/submit`** | the completed worksheet exported to **PDF** (screenshots embedded). You can replace it any time before the deadline. |
-| Code fix | **GitHub** | push branch `wk<NN>`, open a PR (paste the commit link in the worksheet) |
+| Code fix | **GitHub** | push branch `wk<NN>`, open a PR with **only the code you changed** (paste the commit link in the worksheet). No worksheet, screenshots or flags in the PR. |
+
+> **Your fork and every PR are public** — anyone can read them. They hold your code fix and
+> nothing else. The worksheet PDF and its screenshots go to **`learn.zcr.ai/submit`** only; an
+> answer posted on GitHub before the deadline can be copied by anyone.
 
 **File name:** `Wk<NN>_<StudentID>.pdf`  (e.g. `Wk04_65123456.pdf`)
 **Deadline:** before the next class session (unless told otherwise).
