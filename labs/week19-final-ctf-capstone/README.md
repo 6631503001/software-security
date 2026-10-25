@@ -10,7 +10,7 @@ The grand finale.
 *Time breakdown: [AGENDA.md](../../AGENDA.md).*
 
 ## 🏆 Capstone CTF Tournament
-A full capture-the-flag covering the whole term — web, API, supply chain, cloud, memory safety, and LLM/agentic challenges. Team-based, leaderboard, prizes.
+A full capture-the-flag covering the whole term — 14 challenges, 165 pts across web, API, memory safety, supply chain, cloud, LLM/agentic and DevSecOps. Team-based, leaderboard, prizes.
 
 ## Final Project Demos
 Each team's video walks through their secured build end-to-end:

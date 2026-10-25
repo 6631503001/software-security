@@ -58,7 +58,7 @@ Weeks 10–16 look like six separate modern-stack topics and are really the same
 | 15 | DevSecOps: putting it together | "Break the Build" (Red vs Blue) | fail **closed**, not open; a CI gate fails the build on HIGH/CRITICAL; SAST/SCA/secret-scanning — what each catches; SARIF to the Security tab | Jeopardy (*DevSecOps*); Quiz 2 Part A/C; **Week 18 written** |
 | 16 | Capstone studio & CTF warm-up | Project WIP review + `scrimmage.md` | attack → root cause → fix, demoed live; threat model → SBOM → signed artifact → CI pipeline as one story | Project readiness check today; graded in **Week 19** |
 
-**Coverage gap to name out loud.** The mock CTF's challenges are drawn from Weeks 10–14 (plus one web-half callback) only. **Weeks 15 (DevSecOps) and 16 (capstone) have no mock-CTF challenge.** DevSecOps is carried today by the Jeopardy *DevSecOps* category and Quiz 2, and it is examined in the **Week 18 written paper** — where the CI-gate question (A6, 5 pts) and the GitHub-Actions-pipeline design (D1, 10 pts) put **15 of the paper's 100 marks** on a week the mock never touches. A team that revises only from the mock CTF will walk into Week 18 having skipped it. The capstone is not a CTF topic at all — it is the graded project demo, due Week 19.
+**Coverage gap to name out loud.** The mock CTF's challenges are drawn from Weeks 10–14 (plus one web-half callback) only. **Weeks 15 (DevSecOps) and 16 (capstone) have no mock-CTF challenge.** DevSecOps is carried today by the Jeopardy *DevSecOps* category and Quiz 2, and it is examined in the **Week 18 written paper** — where the CI-gate question (A6, 5 pts) and the GitHub-Actions-pipeline design (D1, 10 pts) put **15 of the paper's 100 marks** on a week the mock never touches. A team that revises only from the mock CTF will walk into Week 18 — and into Week 19's #14 "Break the Build" (15 pts) — having skipped it. The capstone is not a CTF topic at all — it is the graded project demo, due Week 19.
 
 ## 5. Session run-sheet — 300 min
 
@@ -181,7 +181,7 @@ Cumulative, emphasis on Weeks 10–16. Closed book unless stated otherwise. Blue
 
 Team-based. From `labs/week19-final-ctf-capstone/ctf.md` and README, and AGENDA.md:
 
-- **Capstone CTF tournament** (0:00–2:30, 150 min): **150 pts across 12 challenges**, team-based, leaderboard, sandbox targets only. Challenges 1–6 and 11 are hosted: each student spawns their **own** instance on the course's CTFd (`ctf.zcr.ai`) and the platform issues that student a per-student flag. Challenges 7, 8, 9, 10 and 12 have no hosted instance; how their targets are started on the day: ⬚. For each challenge the submission table wants three things — the **flag** (or noted proof), the **payload or command**, and a **one-line mitigation**. Difficulty rises with points; first-blood bonus is at the instructor's discretion.
+- **Capstone CTF tournament** (0:00–2:30, 150 min): **165 pts across 14 challenges**, team-based, leaderboard, sandbox targets only. Challenges 1–8, 12 and 14 are hosted: each student spawns their **own** instance on the course's CTFd (`ctf.zcr.ai`) and the platform issues that student a per-student flag (#8 Smash stays hidden on CTFd until the sitting). Challenges 9, 10, 11 and 13 have no hosted instance and run from the local lab folders. For each challenge the submission table wants three things — the **flag** (or noted proof), the **payload or command**, and a **one-line mitigation**. Difficulty rises with points; first-blood bonus is at the instructor's discretion.
 - **Graded final project demos** (2:30–4:00, 90 min): each team presents its secured build end-to-end — threat model → vulnerabilities → remediation → SBOM + signed artifact → CI pipeline — as a recorded video walkthrough linked in the report and due with it (graded asynchronously by rubric); live Q&A only for teams the instructor flags, not a re-demo (`project/README.md`, `project/REPORT-TEMPLATE.md`, `AGENDA.md` §*Week 19*).
 
 Flags in Week 19 are submitted via the CTF Form / Classroom (SUBMISSION.md). The final (W18 written + W19 CTF) is worth **25%** of the course mark (course specification §4); the term project is a separate 15%, with each member's mark scaled by peer contribution.
@@ -192,15 +192,16 @@ Flags in Week 19 are submitted via the CTF Form / Classroom (SUBMISSION.md). The
 
 | | Mock CTF (today) | Week 19 |
 |---|---|---|
-| Challenges | 8 | **12** |
-| First-half web | one optional callback (challenge 8) | **five separate challenges** — Boolean Bypass 10 · Shell Out 15 · Persistent Pop 10 · Not Your Object 10 · Token Smith 15 = **60 of 150 pts** |
-| API | split into two (#1 BOLA, #2 mass assignment) | **combined** into one — #6 "Raid the API" (15 pts) |
-| Indirect injection / output XSS | **no counterpart** (mock #7 is *direct* injection only) | #12 "Indirect Hit" (10 pts), drawn from Week 14 worksheet Tasks 2–3 |
-| Targets and flags | local Docker / toolbox on the team's own machine; no flags (public placeholders) | challenges 1–6 and 11 are per-student hosted instances on `ctf.zcr.ai` with per-student flags; 7–10 and 12 have no hosted instance. How a team's submission maps onto per-student flags: ⬚ |
+| Challenges | 8 | **14** |
+| First-half web | one optional callback (challenge 8) | **five separate challenges** — Boolean Bypass 10 · Shell Out 15 · Persistent Pop 10 · Not Your Object 10 · Token Smith 15 = **60 of 165 pts** |
+| API | split into two (#1 BOLA, #2 mass assignment) | also two — #6 BOLA (8 pts), #7 Mass Assignment (7 pts) |
+| Indirect injection / output XSS | **no counterpart** (mock #7 is *direct* injection only) | #13 "Indirect Hit" (10 pts), drawn from Week 14 worksheet Tasks 2–3 |
+| DevSecOps (Week 15) | **no counterpart** | #14 "Break the Build" (15 pts): `/admin` fails open on a malformed token (Week 15 worksheet Task 1b) |
+| Targets and flags | local Docker / toolbox on the team's own machine; no flags (public placeholders) | challenges 1–8, 12 and 14 are per-student hosted instances on `ctf.zcr.ai` with per-student flags; 9, 10, 11 and 13 have no hosted instance. How a team's submission maps onto per-student flags: ⬚ |
 | Hints | included in the file | none |
 | Stakes | ungraded, participation | team-scored, part of the 25% final |
 
-The two Week 19 challenges with **no mock counterpart** — the 60-point block of first-half web and the indirect-injection challenge — are exactly where a team that revised only from the mock is exposed. Anyone who reaches the end of the mock early should spend the remaining time re-landing a web-half exploit end-to-end and doing the Week 14 indirect-injection thought-experiment rather than polishing a solved challenge.
+The three Week 19 areas with **no mock counterpart** — the 60-point block of first-half web, the indirect-injection challenge and the DevSecOps fail-open challenge — are exactly where a team that revised only from the mock is exposed. Anyone who reaches the end of the mock early should spend the remaining time re-landing a web-half exploit end-to-end and doing the Week 14 indirect-injection thought-experiment or Week 15's Task 1b fail-open `/admin` rather than polishing a solved challenge.
 
 ### 7.4 Logistics to read out in the debrief
 

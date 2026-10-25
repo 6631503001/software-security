@@ -270,7 +270,7 @@ boss are where teams that have divided labour badly will stall.
 3. `worksheet.md` Part 4 Q3: **which category was hardest, and what will you drill before Week 19?**
    Map the answer onto Week 17's mock CTF so the drill has a scheduled slot.
 
-Close by naming what changes in Week 19: it is graded, it is 150 min for 12 challenges over 150
+Close by naming what changes in Week 19: it is graded, it is 150 min for 14 challenges over 165
 points (`labs/week19-final-ctf-capstone/ctf.md`), the hints are gone, and the project demo is scored
 separately.
 

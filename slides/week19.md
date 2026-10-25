@@ -9,7 +9,7 @@ header: "Software Security · Week 19 · Final"
 ## Final — Capstone CTF + Project Demos
 The grand finale
 
-<!-- The finale — make it celebratory + high-energy. Before class: graded flags for challenges 1–6 and 11 come from each student's own hosted instance (confirm everyone can log in and reach one); bring up the local targets for 7–10 and 12, open CTFd, set the demo schedule. Confirm projects run. ~2 min. -->
+<!-- The finale — make it celebratory + high-energy. Before class: graded flags for challenges 1–8, 12 and 14 come from each student's own hosted instance (confirm everyone can log in and reach one, and flip Smash (#8) from hidden to visible); bring up the local targets for 9, 10, 11 and 13, open CTFd, set the demo schedule. Confirm projects run. ~2 min. -->
 
 ---
 
@@ -24,11 +24,11 @@ The grand finale
 
 ## 🏆 CTF tournament
 
-- Web · API · supply chain · cloud · memory safety · LLM/agentic
+- Web · API · memory safety · supply chain · cloud · LLM/agentic · DevSecOps — 14 challenges, 165 pts
 - Team leaderboard, prizes — the **live CTFd board** (bigger, includes bonus/boss challenges)
 - **Graded score** comes from the paper trail: flag/proof + payload + one-line mitigation per challenge
 
-<!-- Run from ctf.md (graded, 12 challenges/150 pts) + exams/item-bank.md (CTF pool, incl. the boss chain). CTFd's live board runs more challenges at different point values for engagement/leaderboard — that scoreboard is NOT the grade; ctf.md's submission is. Dynamic scoring + first-blood bonus on CTFd; announce first-bloods aloud for hype. Prizes for top Houses. -->
+<!-- Run from ctf.md (graded, 14 challenges/165 pts) + exams/item-bank.md (CTF pool, incl. the boss chain). CTFd's live board runs more challenges at different point values for engagement/leaderboard — that scoreboard is NOT the grade; ctf.md's submission is. Dynamic scoring + first-blood bonus on CTFd; announce first-bloods aloud for hype. Prizes for top Houses. -->
 
 ---
 
