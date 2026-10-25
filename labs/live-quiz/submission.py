@@ -36,6 +36,7 @@ MARKS
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import os
@@ -247,6 +248,54 @@ def redeem(conn, code, now):
                            (cur.lastrowid,)).fetchone()
     conn.commit()
     return sub
+
+
+# Deadlines are STORED in UTC, like every other timestamp here (app._now() is naive
+# UTC), but people type and read them in course-local time: the cohort is in Thailand
+# (ICT = UTC+7, no DST). In Oct 2026 "23:59" Thai time was typed into this UTC field
+# for W10-15, which kept the portal open until 06:59 the next morning, and every page
+# showed the raw value with no zone. So the form takes ICT, every page shows ICT, and
+# only storage and comparison use UTC.
+COURSE_TZ = datetime.timezone(datetime.timedelta(hours=7), "ICT")
+
+
+# A date AND a time, nothing else. fromisoformat alone also takes "2026-11-07" (midnight,
+# a day early for anyone meaning "by the 7th"), compact and ISO-week forms, and offsets;
+# and Python 3.13+ takes "24:00" where 3.12 does not, so the hour range is spelled out.
+_DUE_INPUT = re.compile(r"\d{4}-\d{2}-\d{2}[T ]([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?")
+
+
+def due_from_local(text):
+    """'2026-11-07T23:59' Thai time -> '2026-11-07T16:59:00' UTC, as stored. Blank -> None.
+
+    An explicit offset is refused, not honoured: this field is Thai time, and quietly
+    accepting '+00:00' is how the two conventions got mixed in the first place."""
+    s = (text or "").strip()
+    if not s:
+        return None
+    if not _DUE_INPUT.fullmatch(s):
+        raise ValueError(f"“{s}” isn't a date and time in Thai time like 2026-11-07T23:59"
+                         " (with no offset).")
+    try:
+        local = datetime.datetime.fromisoformat(s.replace(" ", "T", 1))
+        utc = local.replace(tzinfo=COURSE_TZ).astimezone(datetime.timezone.utc)
+    except (ValueError, OverflowError):
+        raise ValueError(f"“{s}” isn't a real date and time.") from None
+    return utc.replace(tzinfo=None).isoformat(timespec="seconds")
+
+
+def due_label(due_at) -> str:
+    """A stored UTC deadline as people read it: '2026-11-07 23:59 ICT'."""
+    if not due_at:
+        return ""
+    try:
+        t = datetime.datetime.fromisoformat(due_at)
+        if t.tzinfo is None:            # the stored convention: naive UTC
+            t = t.replace(tzinfo=datetime.timezone.utc)
+        local = t.astimezone(COURSE_TZ)
+    except (ValueError, OverflowError):
+        return str(due_at)
+    return local.strftime("%Y-%m-%d %H:%M:%S ICT" if local.second else "%Y-%m-%d %H:%M ICT")
 
 
 def _is_open(assignment, now) -> bool:

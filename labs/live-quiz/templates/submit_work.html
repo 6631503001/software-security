@@ -7,7 +7,7 @@
   <div class="join-card">
     <h1>Your submission</h1>
     <p class="lead">{{ sub.student_id }}
-      {%- if a.due_at %} · due {{ a.due_at }}{% endif %}
+      {%- if a.due_at %} · due {{ a.due_at|due_ict }}{% endif %}
       {%- if late %} · <b>late</b>{% endif %}
       {%- if a.week_slug %} · <a href="/learn/{{ a.week_slug }}">read the worksheet</a>{% endif %}</p>
     {% if a.instructions %}<p class="lead">{{ a.instructions }}</p>{% endif %}

@@ -8,7 +8,7 @@
 
     <div class="lx-panel">
       <h1>Assignment</h1>
-      <p class="lx-lead">{{ total }} points{% if a.due_at %} · due {{ a.due_at }}{% else %} · no deadline{% endif %}
+      <p class="lx-lead">{{ total }} points{% if a.due_at %} · due {{ a.due_at|due_ict }}{% else %} · no deadline{% endif %}
         {%- if a.week_slug %} · <a class="lx-link" href="/learn/{{ a.week_slug }}">worksheet</a>{% endif %}</p>
       <form method="post" action="/work/{{ a.id }}/release"> <!-- nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -->
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

@@ -45,6 +45,12 @@ import submission as S
 bp = Blueprint("submit", __name__)
 
 
+@bp.app_template_filter("due_ict")
+def _due_ict(due_at):
+    # Stored deadlines are UTC; every page shows them in Thai time with the zone named.
+    return S.due_label(due_at)
+
+
 def _db():
     return current_app.config["GET_DB"]()
 
@@ -115,7 +121,7 @@ def new():
             title=f.get("title", "").strip() or "Worksheet",
             week_slug=(f.get("week_slug") or "").strip() or None,
             instructions=f.get("instructions", "").strip()[:8000],
-            due_at=(f.get("due_at") or "").strip() or None,
+            due_at=S.due_from_local(f.get("due_at")),
             rubric=rubric or None, now=_now(),
             course_slug=(f.get("course_slug") or "").strip() or None)
     except ValueError as exc:

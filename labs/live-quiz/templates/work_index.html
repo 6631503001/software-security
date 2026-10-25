@@ -19,7 +19,7 @@
           <div class="lx-listcard-main">
             <a class="lx-listcard-t lx-listcard-t--link" href="/work/{{ a.id }}">{{ a.title }}</a>
             <span class="lx-listcard-sub">{{ a.handed_in }}/{{ a.issued }} handed in
-              {%- if a.due_at %} · due {{ a.due_at }}{% endif %}
+              {%- if a.due_at %} · due {{ a.due_at|due_ict }}{% endif %}
               {%- if a.released %} · released{% endif %}</span>
           </div>
         </li>

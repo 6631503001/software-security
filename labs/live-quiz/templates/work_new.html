@@ -25,7 +25,7 @@
           <option value="">— none —</option>
           {% for w in weeks %}<option value="{{ w.slug }}">Week {{ w.number }} — {{ w.title }}</option>{% endfor %}
         </select></div>
-      <div class="lx-field"><label class="lx-label" for="due_at">Due (UTC, e.g. 2026-08-20T23:59:00)</label>
+      <div class="lx-field"><label class="lx-label" for="due_at">Due (Thai time, ICT — e.g. 2026-11-07T23:59)</label>
         <input class="lx-input" id="due_at" name="due_at" placeholder="blank = no deadline"></div>
       <div class="lx-field"><label class="lx-label" for="instructions">Instructions</label>
         <textarea class="lx-textarea" id="instructions" name="instructions" rows="4"></textarea></div>
