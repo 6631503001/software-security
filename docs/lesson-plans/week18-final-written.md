@@ -149,22 +149,27 @@ from a maintained item bank, supporting make-up sittings and reducing answer sha
 
 | Form | Where it lives | Status | Use |
 |---|---|---|---|
-| **A** | `labs/week18-final-written/exam.md` | **Public** — in the student-facing repo | The default sitting, *if* the cohort has not seen it |
-| **B** | `instructor/exams/week18-final-written-formB.md` | Instructor-only (git-ignored) | Pre-assembled parallel form, same section weights as Form A; drawn from the FINAL POOL of `instructor/exams/item-bank.md` |
+| **A** | `labs/week18-final-written/exam.md` | **Public** — in the student-facing repo, and served on learn.zcr.ai | Assume the cohort has seen it. A sitting only for a cohort that cannot have seen it |
+| **B** | `instructor/exams/week18-final-written-formB.md` | Instructor-only (git-ignored) | **The recommended sitting.** Pre-assembled parallel form, same section weights as Form A; drawn from the FINAL POOL of `instructor/exams/item-bank.md` |
 
 - Form B is built to the **same section weights and the same 150 min / 100 pts** as Form A, so a
   Form B sitting needs no scaling. It matches on weights and duration only — it distributes topics
   differently across its sections, so the *Weeks drawn on* column in §2 does **not** describe Form B.
-- **Running both forms in the same term needs a hand-edit first.** Form B's own header records that
-  its Sections A, C and D are cleanly differentiated from Form A, but that **two of its Section B
-  code snippets are close in topic to two of Form A's**, and that those two should be varied
-  further in wording before both forms are sat in the same term — which is exactly the case when a
-  cohort is split across two sections. Do that edit before printing, not after the first sitting.
+- **Sit Form B.** Form A is public and served on learn.zcr.ai, so assume every student has read it.
+  Form B was revised on 26 Oct 2026 to cut its overlap with Form A: it no longer shares Form A's
+  Section B code snippets, so the snippet hand-edit an earlier version of this plan asked for is no
+  longer needed. Form B's own header records the small topic-level overlap that remains, which is
+  deliberate; read that header, not this plan, before printing.
 - Once Form B is deployed it becomes as public as Form A and must itself be rotated next cohort;
   `instructor/exams/item-bank.md` records that the public exam files are static and leak between
   cohorts.
-- **Make-up sittings:** run the form the main cohort did *not* sit. Which form the main sitting used
-  therefore has to be recorded on the day.
+- **Record which form was sat, on the day.** Write the form letter — per section, if the cohort sits
+  in more than one — in the invigilation record (§9) before the scripts leave the room. Marking (§7),
+  make-ups and next cohort's rotation (§8) all depend on it.
+- **Make-up sittings:** run the form the main cohort did *not* sit. With Form B as the main sitting,
+  that is the public Form A, which this cohort is assumed to have seen. Whether a make-up sits Form A
+  anyway or a paper rebuilt from the FINAL POOL of `instructor/exams/item-bank.md` (the remedy §11
+  gives for a leaked Form A) is **⬚** — not decided in this repository.
 - **⬚** Make-up sitting date, eligibility rules and any cap on the make-up mark are institutional
   and not recorded in this repository.
 
@@ -237,8 +242,7 @@ marked ⬚ rather than guessed.
    how the items performed.
 5. **Write the ruling back.** Every borderline-answer ruling made in §7 is evidence that an item is
    ambiguous. Add it to the item's marking note in the bank, or reword the item, before it is used
-   again. While you are there, deal with the Section B overlap noted in §5 — it is a bank-depth
-   problem, not a wording problem, and the fix is more Section B snippets in the FINAL POOL.
+   again.
 6. **Close the loop on the forms.** Record which form this cohort sat, so the next cohort's Form A
    is not the paper this cohort has photographed.
 
@@ -278,8 +282,8 @@ No worksheet, no weekly quiz and no flag this week — nothing is submitted to C
 
 | Risk | Mitigation |
 |---|---|
-| **Form A is published in the public repo** and, as `instructor/exams/item-bank.md` states, the public exam files are static and leak between cohorts — a repeating student or a shared drive from last year has the paper | Decide Form A vs Form B *before* the sitting; if there is any chance the cohort holds the paper, deploy Form B or rebuild Form A's items from the FINAL POOL (`instructor/anti-cheating.md` §E) |
-| **The cohort is split across sections and both forms are sat in the same term** — Form B's header records that two of its Section B snippets are topically close to Form A's | Hand-vary those two snippets' wording *before printing*, as the Form B header instructs. Sections A, C and D need no such edit |
+| **Form A is published in the public repo** and, as `instructor/exams/item-bank.md` states, the public exam files are static and leak between cohorts — a repeating student or a shared drive from last year has the paper | For this cohort it is certain: Form A is served on learn.zcr.ai, so sit Form B (§5). In general, decide Form A vs Form B *before* the sitting; if there is any chance the cohort holds the paper, deploy Form B or rebuild Form A's items from the FINAL POOL (`instructor/anti-cheating.md` §E) |
+| **The cohort is split across sections and both forms are sat in the same term** — one section then sits Form A, which is public (first row) | Sit Form B in every section that sits at the same time. If a second paper is unavoidable, it is the public Form A unless it is rebuilt from the FINAL POOL (the first row's remedy) — the same open decision as make-ups (§5, **⬚**). Form B itself no longer needs a snippet hand-edit (revised 26 Oct 2026, §5) |
 | **The paper states no materials rule** — unlike the Week 8 paper, `exam.md` carries no closed-book line, so a cohort that sat Week 8 will assume the Week 8 rule | Decide at the Week 17 debrief, state it aloud before the clock, write it on the board, and add the line to the paper before it is used again |
 | **Open-note is chosen but no aid exists for the right half of the course** — the one-page cheat sheet is a Week 7 deliverable covering Weeks 1–6; Week 17 asks for no equivalent | Decide open/closed *before* Week 17 and, if open-note, add the cheat-sheet deliverable to `labs/week17-review-final-prep/README.md` so students produce one covering Weeks 10–16 |
 | A Form B sitting marked against Form A's key — the two share section titles, weights and duration, so the mismatch is not obvious until the marks look strange | Write the form letter on the board and on the script header; open only the deployed form's key while marking |
@@ -287,8 +291,8 @@ No worksheet, no weekly quiz and no flag this week — nothing is submitted to C
 | Printing a Markdown paper: Section B is a set of fenced code blocks in several languages, and later sections cross-reference them. A wrapped or page-broken snippet changes what a "spot the vuln" item actually shows, and a snippet printed on a different page from the item that refers back to it is worse | Export to PDF once, read the printed proof line by line, confirm no snippet wraps or splits across a page, and check that each cross-referenced snippet is visible from the item that cites it, before duplicating |
 | The README's *Scope assumption* is left unresolved, so half the cohort revises Weeks 10–16 only and half revises all nineteen weeks | Announce the scope decision at the Week 17 debrief, in the same slot as the form and materials decisions |
 | No lab block this week, so nothing is checked on a machine — Week 19 is a 240-min team CTF **plus graded demos**, and the first time a team discovers their project will not build is at its start | Use the deck's closing note at collection: state the Week 19 *Bring* list (threat model, vuln report, fixed code, SBOM, signed artifact, CI pipeline) and tell teams to do a dry run before they leave |
-| A student misses the sitting | Run the other form (§5); eligibility and date are **⬚** (institutional) |
-| Multiple sections / multiple sittings of the same cohort | The later sitting must not sit the same form as the earlier one; record which form each section sat, and apply the Section B hand-edit above. Section and seating arrangements are **⬚** |
+| A student misses the sitting | Run the other form (§5) — with Form B as the main sitting that is the public Form A, so see §5 for the open decision; eligibility and date are **⬚** (institutional) |
+| Multiple sections / multiple sittings of the same cohort | The later sitting must not sit the same form as the earlier one; record which form each section sat (§5). If the earlier sitting used Form B, the form left is the public Form A — see the first row. Section and seating arrangements are **⬚** |
 
 ## 12. Post-teaching reflection
 

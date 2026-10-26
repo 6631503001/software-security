@@ -102,7 +102,7 @@ afl-fuzz -i seeds -o out -- ./vuln @@                                  # AFL++
 
 ## Mitigations raise the bar
 
-- **FORTIFY_SOURCE** — checks the copy itself, at call time (`__strcpy_chk`)
+- **FORTIFY_SOURCE** — checks the copy itself, at call time (`__stpcpy_chk` or `__strcpy_chk`, depending on the compiler)
 - **Stack canaries** — detect overwrite at function return, *after* the copy already happened
 - **ASLR** / **PIE** — randomize addresses
 - **NX/DEP** — blocks executing shellcode planted *on the stack* — irrelevant to this exploit, which returns into existing code (`win()`), never injects shellcode

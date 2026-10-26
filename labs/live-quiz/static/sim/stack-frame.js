@@ -4,7 +4,7 @@
  * Students can recite "the canary stops the overflow". It does not. It detects
  * a frame that has ALREADY been smashed, in the epilogue, after every byte was
  * written. And on this lab's own `make vuln-hardened` binary the canary never
- * even gets to speak: FORTIFY_SOURCE's __strcpy_chk aborts at copy time, so the
+ * even gets to speak: FORTIFY_SOURCE's checked copy aborts at copy time, so the
  * message students actually see is "buffer overflow detected", not "stack
  * smashing detected". That mix-up is the week's most reliable wrong answer.
  *
@@ -12,11 +12,17 @@
  * steps (copy -> epilogue canary check -> ret) and marks which one aborted.
  *
  * COUNTING. The slider counts BYTES WRITTEN INTO buf, including the NUL that
- * strcpy always appends. That is not a cosmetic choice: glibc's __strcpy_chk
+ * strcpy always appends. That is not a cosmetic choice: glibc's checked copy
  * does `if (strlen(src) >= destlen) __chk_fail()`, i.e. it aborts exactly when
  * more than 64 bytes would be written. Counting string LENGTH instead would
  * make "64 bytes fits" a lie — a 64-character string needs 65 bytes and already
  * spills one past the end.
+ *
+ * NAME. The checked copy is __stpcpy_chk in the toolbox's gcc build (at -O2
+ * gcc merges parse_input's strcpy and the strlen(buf) after it into one
+ * stpcpy) and __strcpy_chk under clang. Both abort at strlen(src) >= 64 with
+ * zero bytes written (run in the toolbox, glibc 2.36, amd64 + arm64,
+ * 26 Oct 2026), so everything below holds for either name.
  *
  * FRAME LAYOUT. With no canary: buf 0-63, saved RBP 64-71, return address
  * 72-79 — which is exactly `OFFSET = 72` in the lab's exploit_skeleton.py, and
@@ -114,13 +120,14 @@
       out.aborted = true;
       out.status = "*** buffer overflow detected ***: terminated";
       out.why.push("-O2 lets the compiler see that the destination is 64 bytes, so "
-        + "strcpy becomes __strcpy_chk(buf, src, 64). It measures the source first "
+        + "strcpy becomes a checked copy: __stpcpy_chk(buf, src, 64) in this lab's gcc "
+        + "build, __strcpy_chk under clang. It measures the source first "
         + "and aborts when the copy would not fit — before writing a single byte.");
       out.why.push("Look at the frame: nothing changed. FORTIFY is the only mitigation "
         + "here that PREVENTS the write. It is also what make vuln-hardened actually "
         + "trips on, so the message you get is this one, not the canary's.");
       out.steps = [
-        { t: tCopy, s: "abort", note: "__strcpy_chk compares LENGTHS: strlen(src) = " + (n - 1)
+        { t: tCopy, s: "abort", note: "The checked copy compares LENGTHS: strlen(src) = " + (n - 1)
             + " against 64 bytes of room, and it fails when that length reaches 64. "
             + (n - 1) + " >= 64, so it calls __chk_fail() instead of copying."
             /* Only true at exactly BUF+1 — past that the characters themselves
@@ -155,10 +162,10 @@
       if (fortifyOn) {
         /* Phrased in the CHECK's own units — strlen(src) against destlen — not
            in bytes-written. "64 needed, 64 available" would teach the boundary
-           as needed == available, when __strcpy_chk fails at strlen >= 64, one
+           as needed == available, when the checked copy fails at strlen >= 64, one
            byte lower in its own terms. Compare this note with the abort note
            below at n = 65: same two numbers, opposite outcome. */
-        fitNote = "__strcpy_chk(buf, src, 64) runs first and compares LENGTHS, not "
+        fitNote = "The checked copy runs first and compares LENGTHS, not "
           + "bytes written: strlen(src) = " + Math.max(0, n - 1) + " against 64 bytes "
           + "of room, and it fails only when that length reaches 64. "
           + Math.max(0, n - 1) + " < 64, so it hands off to the real copy. " + fitNote;
