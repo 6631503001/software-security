@@ -27,8 +27,8 @@ explanations and demonstrations support it.
 | 0:10–0:25 | **Brief explanation + live demo** of the week's flaw and its fix — the full concepts are pre-class |
 | 0:25–2:30 | **Supervised lab:** the worksheet's *in class* tasks — the signature game, then the defend/fix task (≤125 min). The instructor circulates, checks evidence and reasoning, and runs 2–3 **viva spot-checks** |
 
-Submission (worksheet PDF → `learn.zcr.ai/submit`, fix → GitHub) is due **before the start of the next week's
-class**, homework tasks included. Late work loses 10% per started day and reaches 0 after 10 days
+Submission (worksheet PDF → `learn.zcr.ai/submit`, fix → GitHub) is due at **23:59 the night before the next
+week's class** (Monday 23:59 for the Tuesday class), homework tasks included. Late work loses 10% per started day and reaches 0 after 10 days
 (`syllabus.md` §6).
 
 > **Why there is no in-class micro-demo any more.** In a 150-min class the time goes to the lab.

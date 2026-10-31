@@ -82,7 +82,7 @@ aes-modes
 | Defense (working `solution_skeleton.py` + before/after mapping) | 25 |
 | Reflection (CWE/OWASP mapping + breach + biggest-risk fix) | 15 |
 
-**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
+**Due:** 23:59 (Thai time) the night before next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

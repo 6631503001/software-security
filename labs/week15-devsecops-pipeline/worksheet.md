@@ -114,7 +114,7 @@ curl -s localhost:5001/admin -H 'Authorization: alice-token'  # 200 (admin)
 | Defense (gate + fail-closed) | 25 | Gate shown to fail closed on a planted defect; fail-closed path explained |
 | Part 4 — Reflection | 15 | Accurate mapping, relevant incident, well-argued best mitigation |
 
-**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
+**Due:** 23:59 (Thai time) the night before next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

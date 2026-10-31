@@ -101,7 +101,7 @@ docker compose up          # INSECURE on :8082, GUARDED on :8083
 | Defense (Task 5 guardrails) | 25 | Guarded bot shown to block prior attacks; each block mapped to its mechanism |
 | Part 4 — Reflection | 15 | Accurate mapping, relevant incident, well-argued best mitigation |
 
-**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
+**Due:** 23:59 (Thai time) the night before next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

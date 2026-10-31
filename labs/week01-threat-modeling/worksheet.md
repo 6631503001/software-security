@@ -106,7 +106,7 @@ trust-boundary
 | Defense (top-5 ranking + mitigations) | 25 |
 | Reflection (CWE/OWASP mapping + breach + best mitigation) | 15 |
 
-**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
+**Due:** 23:59 (Thai time) the night before next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 **Assessed within the rows above** (they are not extra points — they are what those points are for):
 - **Systems-level reasoning** (inside *Exploitation + evidence*, Task 3b): does the model reach past single elements to boundaries, reachability and chains? Scored with the STRIDE + systems-thinking rubrics of [Joshi et al. 2024](https://arxiv.org/abs/2404.16632).

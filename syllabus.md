@@ -225,8 +225,8 @@ No new content and nothing graded. Review your assessment feedback, work through
 - **Houses** — large, persistent, **mixed-ability** groups for the whole term. They drive the season-long **CTFd leaderboard**, Hall of Fame, and the weekly games. **Houses are not graded** (pure engagement — free-riding can't affect anyone's grade).
 - **Project teams of 2–3** **nest inside** a House. This is the only *graded* group unit, protected by per-student flags + the peer-contribution evaluation.
 
-**Deadlines and late submissions.** Each week's worksheet and code fix are due **before the start of
-the next week's class**, in Thai time (ICT); the exact time is shown on `learn.zcr.ai/submit`. The term
+**Deadlines and late submissions.** Each week's worksheet and code fix are due at **23:59 (Thai time,
+ICT) the night before the next week's class**, i.e. **Monday 23:59** for the Tuesday class; the exact time is shown on `learn.zcr.ai/submit`. The term
 project's deadlines are in [project/README.md](project/README.md). Late work loses **10% of that
 item's score for each started 24 hours** after the deadline, so it reaches **0 after 10 days**, and the
 portal stops accepting it after day 10. Weekly quizzes are the exception — they're timed and taken

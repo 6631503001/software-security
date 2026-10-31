@@ -60,7 +60,7 @@ machine before Week 1. Nothing on the website will work without this step.**
 > answer posted on GitHub before the deadline can be copied by anyone.
 
 **File name:** `Wk<NN>_<StudentID>.pdf`  (e.g. `Wk04_65123456.pdf`)
-**Deadline:** before the start of the next week's class — the exact time (Thai time) is on **`learn.zcr.ai/submit`**.
+**Deadline:** 23:59 (Thai time) the night before the next week's class — for KOSEN's Tuesday class that is **Monday 23:59**; the exact time is on **`learn.zcr.ai/submit`**.
 **Grading:** the 100-pt rubric in each worksheet (Lecture Qs 20 / Tasks+evidence 40 / Defense 25 / Reflection 15).
 
 ---
