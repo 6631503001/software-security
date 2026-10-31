@@ -32,6 +32,11 @@ CREATE TABLE IF NOT EXISTS assignments (
   week_slug    TEXT,
   instructions TEXT NOT NULL DEFAULT '',
   due_at       TEXT,                      -- ISO-8601 UTC; NULL = no deadline
+  -- Days after due_at that uploads are still taken, flagged late. NULL/0 = close at
+  -- due_at (the original behaviour). A course whose rule is "-10% per day late, down
+  -- to 0" sets 10: staying open past the day the score reaches 0 gains nothing.
+  -- Also added to existing databases by db.migrate (_ADDED_COLUMNS).
+  late_days    INTEGER,
   -- The real rubric, from the worksheets themselves:
   --   Lecture questions 20 / Exploitation+evidence 40 / Defense 25 / Reflection 15
   -- Stored per-assignment rather than hard-coded because W16 (capstone) and the

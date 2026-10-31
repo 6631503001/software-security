@@ -47,6 +47,10 @@ _ADDED_COLUMNS = (
     ("assessments", "course_slug", "TEXT"),
     ("assignments", "course_slug", "TEXT"),
     ("question_sets", "course_slug", "TEXT"),
+    # (table, column, type) — days after the deadline a worksheet still takes
+    # uploads, flagged late. NULL is the meaning for every row written before it
+    # existed: close at due_at, exactly as those assignments always did.
+    ("assignments", "late_days", "INTEGER"),
 )
 
 

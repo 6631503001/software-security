@@ -115,6 +115,12 @@ def new():
             return _new_form(error=f"“{name.strip()}” needs points above 0."), 200
         rubric.append({"criterion": name.strip()[:120], "max": weight})
 
+    raw_late = (f.get("late_days") or "0").strip()
+    try:
+        late_days = int(raw_late)
+    except ValueError:
+        return _new_form(error=f"“{raw_late}” isn't a whole number of days."), 200
+
     try:
         aid = S.create_assignment(
             _db(), teacher_id=auth.current_teacher_id(),
@@ -123,7 +129,8 @@ def new():
             instructions=f.get("instructions", "").strip()[:8000],
             due_at=S.due_from_local(f.get("due_at")),
             rubric=rubric or None, now=_now(),
-            course_slug=(f.get("course_slug") or "").strip() or None)
+            course_slug=(f.get("course_slug") or "").strip() or None,
+            late_days=late_days)
     except ValueError as exc:
         return _new_form(error=str(exc)), 200
     return redirect(url_for("submit.detail", assignment_id=aid))
@@ -137,7 +144,7 @@ def _new_form(error=None):
     # weeks would let an assignment link to another course's material — so it is
     # scoped to the default and the picker is the thing that narrows it.
     return render_template("work_new.html", weeks=C.list_weeks(),
-                           courses=courses,
+                           courses=courses, max_late_days=S.MAX_LATE_DAYS,
                            rubric=S.DEFAULT_RUBRIC, csrf_token=_csrf(), error=error)
 
 
@@ -146,7 +153,8 @@ def _new_form(error=None):
 def detail(assignment_id):
     a = _owned(assignment_id)
     return render_template("work_detail.html", a=a, rubric=S.rubric_of(a),
-                           total=S.total_points(a),
+                           total=S.total_points(a), late_days=S.late_days_of(a),
+                           closes=S.closes_at(a),
                            rows=S.gradebook_rows(_db(), assignment_id),
                            csrf_token=_csrf())
 
@@ -205,7 +213,7 @@ def mark(assignment_id, submission_id):
     return render_template("work_mark.html", a=a, sub=sub,
                            rubric=S.rubric_of(a), marks=marks,
                            files=S.list_files(_db(), submission_id),
-                           late=S.is_late(_db(), sub),
+                           late=S.is_late(_db(), sub), days_late=S.days_late(_db(), sub),
                            score=(earned, possible, complete),
                            csrf_token=_csrf())
 
@@ -216,14 +224,15 @@ def results_csv(assignment_id):
     _owned(assignment_id)
     buf = io.StringIO()
     w = safe_csv.writer(buf)
+    # days_late is appended, not inserted, so a reader that goes by column position still works.
     w.writerow(["student_id", "submitted", "late", "files", "earned", "possible",
-                "percent", "fully_graded"])
+                "percent", "fully_graded", "days_late"])
     for r in S.gradebook_rows(_db(), assignment_id):
         w.writerow([r["student_id"], int(r["submitted"]), int(r["late"]), r["files"],
                     "" if r["earned"] is None else f"{r['earned']:.2f}",
                     "" if r["possible"] is None else f"{r['possible']:.2f}",
                     "" if r["percent"] is None else f"{r['percent']:.2f}",
-                    int(r["fully_graded"])])
+                    int(r["fully_graded"]), r["days_late"]])
     return Response(buf.getvalue(), mimetype="text/csv", headers={
         "Content-Disposition": f'attachment; filename="work-{assignment_id}.csv"'})
 
@@ -457,6 +466,9 @@ def workspace():
     return render_template(
         "submit_work.html", a=a, sub=sub, files=S.list_files(_db(), sub["id"]),
         can_upload=S.can_upload(_db(), sub, now), late=S.is_late(_db(), sub),
+        days_late=S.days_late(_db(), sub),
+        late_until=S.closes_at(a) if S.late_days_of(a) else None,
+        past_due=bool(a["due_at"] and now > a["due_at"]),
         rubric=S.rubric_of(a), marks={m["criterion"]: m for m in marks},
         released=bool(a["released"]),
         score=(earned, possible, complete) if a["released"] else None,

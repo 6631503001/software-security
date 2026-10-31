@@ -169,3 +169,50 @@ def test_the_student_page_shows_the_deadline_in_thai_time(teacher, appmod):
                         follow_redirects=True).get_data(as_text=True)
     assert "2099-11-07 23:59 ICT" in page
     assert "2099-11-07T16:59:00" not in page
+
+
+# --- late window through the routes ------------------------------------------
+
+def test_the_form_stores_a_late_window(teacher, appmod):
+    html = teacher.get("/work/new").get_data(as_text=True)
+    assert 'name="late_days"' in html
+    r = teacher.post("/work/new", data={
+        "csrf_token": _csrf(html), "title": "Week 1 Worksheet", "due_at": "2026-11-07T23:59",
+        "late_days": "10", "criterion": ["Lecture"], "max": ["100"]})
+    assert r.status_code in (302, 303)
+    row = appmod.get_db().execute("SELECT late_days FROM assignments ORDER BY id DESC").fetchone()
+    assert row["late_days"] == 10
+    detail = teacher.get(r.headers["Location"]).get_data(as_text=True)
+    assert "late uploads until 2026-11-17 23:59 ICT (10 days)" in detail
+
+
+@pytest.mark.parametrize("typed", ["ten", "-1", "31"])
+def test_a_bad_late_window_re_shows_the_form(teacher, appmod, typed):
+    html = teacher.get("/work/new").get_data(as_text=True)
+    r = teacher.post("/work/new", data={
+        "csrf_token": _csrf(html), "title": "W", "due_at": "2026-11-07T23:59",
+        "late_days": typed, "criterion": ["Lecture"], "max": ["100"]})
+    assert r.status_code == 200
+    page = r.get_data(as_text=True)
+    assert "whole number of days" in page or "late window" in page
+    assert appmod.get_db().execute("SELECT COUNT(*) FROM assignments").fetchone()[0] == 0
+
+
+def test_a_student_past_the_deadline_inside_the_window_can_still_upload(teacher, appmod):
+    import datetime
+    client = appmod.app.test_client()          # the student, in their own browser
+    conn = appmod.get_db()
+    tid = conn.execute("SELECT id FROM teachers WHERE username='teach1'").fetchone()["id"]
+    now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None, microsecond=0)
+    due = (now - datetime.timedelta(days=2)).isoformat()
+    t0 = (now - datetime.timedelta(days=5)).isoformat()
+    aid = S.create_assignment(conn, teacher_id=tid, title="W1", now=t0, due_at=due, late_days=10)
+    code = S.issue_codes(conn, aid, ["65310001"], t0)["65310001"]
+    html = client.get("/submit").get_data(as_text=True)
+    r = client.post("/submit", data={"csrf_token": _csrf(html), "code": code})
+    assert r.status_code in (302, 303), "a code must still open inside the late window"
+    page = client.get("/submit/work").get_data(as_text=True)
+    assert "Uploads are still accepted" in page
+    assert 'type="file"' in page
+    csv_text = teacher.get(f"/work/{aid}/results.csv").get_data(as_text=True)
+    assert csv_text.splitlines()[0].endswith(",days_late")

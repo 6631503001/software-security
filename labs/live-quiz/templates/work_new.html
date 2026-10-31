@@ -27,6 +27,8 @@
         </select></div>
       <div class="lx-field"><label class="lx-label" for="due_at">Due (Thai time, ICT — e.g. 2026-11-07T23:59)</label>
         <input class="lx-input" id="due_at" name="due_at" placeholder="blank = no deadline"></div>
+      <div class="lx-field"><label class="lx-label" for="late_days">Late uploads accepted for (days after the deadline; 0 = close at the deadline)</label>
+        <input class="lx-input" id="late_days" name="late_days" type="number" min="0" max="{{ max_late_days }}" value="0"></div>
       <div class="lx-field"><label class="lx-label" for="instructions">Instructions</label>
         <textarea class="lx-textarea" id="instructions" name="instructions" rows="4"></textarea></div>
       <h2 class="lx-h2">Rubric</h2>

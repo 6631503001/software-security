@@ -39,6 +39,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import json
+import math
 import os
 import re
 import secrets
@@ -104,20 +105,22 @@ def safe_display_name(raw: str) -> str:
 
 def create_assignment(conn, *, teacher_id, title, now, week_slug=None,
                       instructions="", due_at=None, rubric=None,
-                      course_slug=None):
+                      course_slug=None, late_days=0):
     rubric = rubric or DEFAULT_RUBRIC
     if not rubric:
         raise ValueError("an assignment needs a rubric")
     for r in rubric:
         if "criterion" not in r or float(r.get("max", 0)) <= 0:
             raise ValueError(f"bad rubric row: {r!r}")
+    if not 0 <= int(late_days) <= MAX_LATE_DAYS:
+        raise ValueError(f"The late window must be 0–{MAX_LATE_DAYS} days.")
     import course_scope
     course = course_scope.check(course_slug)
     cur = conn.execute(
         "INSERT INTO assignments (teacher_id, course_slug, title, week_slug,"
-        " instructions, due_at, rubric_json, released, created_at)"
-        " VALUES (?,?,?,?,?,?,?,0,?)",
-        (teacher_id, course, title, week_slug, instructions, due_at,
+        " instructions, due_at, late_days, rubric_json, released, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,0,?)",
+        (teacher_id, course, title, week_slug, instructions, due_at, int(late_days),
          json.dumps(rubric, ensure_ascii=False), now))
     conn.commit()
     return cur.lastrowid
@@ -298,10 +301,34 @@ def due_label(due_at) -> str:
     return local.strftime("%Y-%m-%d %H:%M:%S ICT" if local.second else "%Y-%m-%d %H:%M ICT")
 
 
+# A late window longer than this is a typo, not a policy.
+MAX_LATE_DAYS = 30
+
+
+def late_days_of(assignment) -> int:
+    """Days uploads stay open after due_at; 0 when unset or on a row from before the column."""
+    try:
+        return int(assignment["late_days"] or 0)
+    except (IndexError, KeyError):
+        return 0
+
+
+def closes_at(assignment):
+    """When uploads actually stop (stored UTC): due_at plus the late window. None = never."""
+    due = assignment["due_at"]
+    days = late_days_of(assignment)
+    if not due or not days:
+        return due
+    return (datetime.datetime.fromisoformat(due)
+            + datetime.timedelta(days=days)).isoformat(timespec="seconds")
+
+
 def _is_open(assignment, now) -> bool:
-    """Before (or at) the deadline. redeem() and can_upload() both ask this, so a code stops
-    opening the worksheet at the same instant the upload form disappears."""
-    return not assignment["due_at"] or now <= assignment["due_at"]
+    """Before (or at) the close: the deadline, or the end of its late window. redeem() and
+    can_upload() both ask this, so a code stops opening the worksheet at the same instant
+    the upload form disappears."""
+    close = closes_at(assignment)
+    return not close or now <= close
 
 
 def can_upload(conn, submission, now) -> bool:
@@ -312,6 +339,19 @@ def is_late(conn, submission) -> bool:
     a = get_assignment(conn, submission["assignment_id"])
     return bool(a["due_at"] and submission["submitted_at"]
                 and submission["submitted_at"] > a["due_at"])
+
+
+def days_late(conn, submission) -> int:
+    """Days past due_at, a part day counting as a whole one (one second over = 1). 0 if on time.
+
+    A count, not a deduction: each course's late rule (and any extension) is the teacher's to
+    apply, so this travels alongside the score exactly as `late` does."""
+    a = get_assignment(conn, submission["assignment_id"])
+    if not (a["due_at"] and submission["submitted_at"]):
+        return 0
+    over = (datetime.datetime.fromisoformat(submission["submitted_at"])
+            - datetime.datetime.fromisoformat(a["due_at"])).total_seconds()
+    return max(0, math.ceil(over / 86400))
 
 
 def store_file(conn, submission, *, display_name, data: bytes, now, upload_dir):
@@ -464,7 +504,7 @@ def gradebook_rows(conn, assignment_id):
             (assignment_id, c["student_id"])).fetchone()
         if sub is None or not sub["submitted_at"]:
             out.append({"student_id": c["student_id"], "submission_id": None,
-                        "submitted": False, "late": False, "files": 0,
+                        "submitted": False, "late": False, "days_late": 0, "files": 0,
                         "earned": None, "possible": None, "percent": None,
                         "fully_graded": False})
             continue
@@ -474,6 +514,7 @@ def gradebook_rows(conn, assignment_id):
             "submission_id": sub["id"],
             "submitted": True,
             "late": is_late(conn, sub),
+            "days_late": days_late(conn, sub),
             "files": len(list_files(conn, sub["id"])),
             "earned": earned,
             "possible": possible,

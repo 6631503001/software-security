@@ -8,16 +8,19 @@
     <h1>Your submission</h1>
     <p class="lead">{{ sub.student_id }}
       {%- if a.due_at %} · due {{ a.due_at|due_ict }}{% endif %}
-      {%- if late %} · <b>late</b>{% endif %}
+      {%- if late_until %} · late uploads accepted until {{ late_until|due_ict }}{% endif %}
+      {%- if late %} · <b>late {{ days_late }} day{{ '' if days_late == 1 else 's' }}</b>{% endif %}
       {%- if a.week_slug %} · <a href="/learn/{{ a.week_slug }}">read the worksheet</a>{% endif %}</p>
     {% if a.instructions %}<p class="lead">{{ a.instructions }}</p>{% endif %}
     {% if error %}<div class="join-err">{{ error }}</div>{% endif %}
     {% if saved_action == 'note' %}<div class="join-ok">✓ Note saved.</div>
     {% elif saved_action == 'delete' %}<div class="join-ok">✓ File removed.</div>
     {% elif saved_action %}<div class="join-ok">✓ Saved — you can come back to this page in this
-      browser and add or change files any time before the deadline.</div>{% endif %}
+      browser and add or change files any time until uploads close.</div>{% endif %}
     {% if not can_upload %}<p class="lead"><b>The deadline has passed.</b> You can still
-      read your feedback here.</p>{% endif %}
+      read your feedback here.</p>
+    {% elif past_due %}<p class="lead"><b>The deadline has passed.</b> Uploads are still accepted
+      until {{ late_until|due_ict }} and are marked late; the course's late-work rule applies.</p>{% endif %}
   </div>
 
   {% if worksheets|length > 1 %}

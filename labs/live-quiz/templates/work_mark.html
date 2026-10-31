@@ -8,7 +8,7 @@
     <div class="lx-panel">
       <h1>{{ sub.student_id }}</h1>
       <p class="lx-lead"><a class="lx-link" href="/work/{{ a.id }}">← hand-ins</a> ·
-        handed in {{ sub.submitted_at or '—' }}{% if late %} · <span class="lx-badge lx-badge--warn">late</span>{% endif %}</p>
+        handed in {{ sub.submitted_at or '—' }}{% if late %} · <span class="lx-badge lx-badge--warn">late {{ days_late }} day{{ '' if days_late == 1 else 's' }}</span>{% endif %}</p>
       <h2>Files</h2>
       {% if not files %}<p class="lx-lead">Nothing attached.</p>{% endif %}
       <ul class="lx-list">{% for f in files %}

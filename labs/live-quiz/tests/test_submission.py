@@ -470,3 +470,75 @@ def test_partial_grading_is_flagged_in_the_export(conn, uploads):
     S.store_file(conn, sub, display_name="a.pdf", data=b"x", now=T0, upload_dir=uploads)
     (row,) = S.gradebook_rows(conn, aid)
     assert row["fully_graded"] is False
+
+
+# --- late window ------------------------------------------------------------
+# A course whose rule is "-10% per day late, down to 0" needs the portal to take
+# late work at all; before late_days existed the upload form vanished at due_at.
+
+def test_a_late_window_keeps_uploads_open_and_flags_them_late(conn, uploads):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    assert S.can_upload(conn, sub, LATE)
+    S.store_file(conn, sub, display_name="a.pdf", data=b"x", now=LATE, upload_dir=uploads)
+    sub = conn.execute("SELECT * FROM submissions WHERE id=?", (sub["id"],)).fetchone()
+    assert S.is_late(conn, sub)
+    assert S.days_late(conn, sub) == 1
+
+
+def test_a_late_window_closes_after_its_days(conn, uploads):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    assert S.closes_at(S.get_assignment(conn, aid)) == "2026-08-30T23:59:00"
+    assert S.can_upload(conn, sub, "2026-08-30T23:59:00")
+    assert not S.can_upload(conn, sub, "2026-08-30T23:59:01")
+    with pytest.raises(S.SubmitError, match="deadline"):
+        S.store_file(conn, sub, display_name="a.pdf", data=b"x",
+                     now="2026-08-31T00:00:00", upload_dir=uploads)
+
+
+def test_no_late_window_still_closes_at_the_deadline(conn):
+    a = S.get_assignment(conn, make(conn))
+    assert S.late_days_of(a) == 0
+    assert S.closes_at(a) == DUE
+
+
+@pytest.mark.parametrize("submitted, expected", [
+    (DUE, 0),                        # on the deadline is on time
+    ("2026-08-20T23:59:01", 1),      # one second over is a day late
+    ("2026-08-21T23:59:00", 1),
+    ("2026-08-21T23:59:01", 2),
+    ("2026-08-15T09:00:00", 0),      # early
+])
+def test_days_late_counts_a_part_day_as_a_day(conn, submitted, expected):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    conn.execute("UPDATE submissions SET submitted_at=? WHERE id=?", (submitted, sub["id"]))
+    conn.commit()
+    sub = conn.execute("SELECT * FROM submissions WHERE id=?", (sub["id"],)).fetchone()
+    assert S.days_late(conn, sub) == expected
+
+
+def test_a_code_opens_inside_the_late_window_and_not_after_it(conn):
+    aid = make(conn, late_days=10)
+    codes = S.issue_codes(conn, aid, ["65310001", "65310002"], T0)
+    assert S.redeem(conn, codes["65310001"], LATE)["student_id"] == "65310001"
+    _deadline_passed(conn, codes["65310002"], now="2026-08-31T00:00:00")
+
+
+@pytest.mark.parametrize("bad", [-1, S.MAX_LATE_DAYS + 1])
+def test_a_late_window_out_of_range_is_refused(conn, bad):
+    with pytest.raises(ValueError, match="late"):
+        make(conn, late_days=bad)
+
+
+def test_the_gradebook_row_carries_days_late_without_deducting(conn, uploads):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    S.store_file(conn, sub, display_name="a.pdf", data=b"x",
+                 now="2026-08-22T08:00:00", upload_dir=uploads)
+    for r in S.rubric_of(S.get_assignment(conn, aid)):
+        S.grade(conn, sub["id"], r["criterion"], r["max"], "", T0)
+    (row,) = S.gradebook_rows(conn, aid)
+    assert row["late"] is True and row["days_late"] == 2
+    assert row["percent"] == pytest.approx(100.0), "the penalty stays the teacher's call"

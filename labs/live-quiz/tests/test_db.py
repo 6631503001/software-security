@@ -57,3 +57,20 @@ def test_delete_teacher_cascades_sets(tmp_path):
     db.create_set(d, a, "W1", "## T\n1. q a) x ✓ · b) y", now="t")
     d.execute("DELETE FROM teachers WHERE id = ?", (a,)); d.commit()
     assert d.execute("SELECT COUNT(*) FROM question_sets").fetchone()[0] == 0
+
+
+def test_migrate_adds_late_days_to_an_existing_assignments_table(tmp_path):
+    """A live DB created before late_days must gain it, with old rows reading as 0."""
+    p = str(tmp_path / "old.db")
+    d = db.connect(p)
+    db.init_db(d)
+    d.execute("ALTER TABLE assignments DROP COLUMN late_days")
+    d.execute("INSERT INTO teachers (id, username, password_hash, created_at) VALUES (1,'t','x','t0')")
+    d.execute("INSERT INTO assignments (teacher_id, title, rubric_json, created_at)"
+              " VALUES (1, 'old', '[]', 't0')")
+    d.commit()
+    db.migrate(d)
+    row = d.execute("SELECT * FROM assignments").fetchone()
+    assert "late_days" in row.keys()
+    import submission as S
+    assert S.late_days_of(row) == 0
