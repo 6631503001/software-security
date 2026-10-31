@@ -2,14 +2,17 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 7 · ⬚ |
-| **Contact time** | 300 min (course specification §6 records 2 lecture + 3 laboratory hours; AGENDA.md runs the review weeks as one continuous block) |
+| **Contact time** | 150 min, one continuous block (`AGENDA.md`, *Week 7 & 17 — Review*): review quiz 25 + Security Jeopardy 40 + mock CTF 75 (ungraded; finished at home) + debrief 10 |
 | **Lab folder** | `labs/week07-review-midterm-prep` |
 | **Slides** | `slides/week07.md` |
 | **Type** | Review — **no new content**. Consolidates Weeks 1–6 |
 | **Standards consolidated** | OWASP 2025 **A01** Broken Access Control · **A02** Security Misconfiguration · **A04** Cryptographic Failures · **A05** Injection · **A06** Insecure Design · **A07** Authentication Failures · CWE-501, 798, 489, 327, 916, 330, 89, 78, 434, 79, 352, 1004, 639, 287, 347, 321 |
 | **CLOs addressed** | **CLO1–CLO4** (course specification §6, week 7 row) |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** The timings below were
+> written for a longer block; the 150-min agenda is in [AGENDA.md](../../AGENDA.md).
 
 ---
 

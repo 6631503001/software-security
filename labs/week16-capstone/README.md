@@ -2,7 +2,7 @@
 
 ## ✅ This week — what to do
 1. **Before class** — bring your [term project](../../project/README.md) runnable (work-in-progress).
-2. **In class (300 min)** — present WIP live (attack → root cause → fix) + peer review; play the **practice CTF** (`scrimmage.md`) that previews the final.
+2. **In class (150 min)** — present WIP live (attack → root cause → fix) + peer review; play the **practice CTF** (`scrimmage.md`) that previews the final.
 3. **Worksheet 16** — project checklist (`worksheet.md`).
 4. **After** — finish the project: the final demo is a **recorded video walkthrough** linked in your report and due with it — not a repeat of today's live format (see *Format*, below).
 

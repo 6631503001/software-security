@@ -185,7 +185,7 @@ Same weighting as the KOSEN-KMITL offering — content and grading are unchanged
 | CI pipeline (works, fails build appropriately) | 10 |
 | Presentation & report clarity | 5 |
 
-**Late submissions.** Same policy as the KOSEN offering: −10% of that item's score per day late,
+**Late submissions.** −10% of that item's score per day late,
 up to 3 days; not accepted after day 3 without an approved extension. In-session quizzes have no
 late window (an absence is covered by the drop-lowest rule above). Documented emergencies get a
 case-by-case extension at the instructor's discretion.

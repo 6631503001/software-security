@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 8 · ⬚ |
-| **Contact time** | 120 min — a single written-exam block. No lecture, no lab (`AGENDA.md`, *Week 8 / 18 — Written exam*) |
+| **Contact time** | 120 min — a single written-exam block inside the 150-min class. No lecture, no lab (`AGENDA.md`, *Week 8 / 18 — Written exam*) |
 | **Lab folder** | `labs/week08-midterm-written` (holds the paper, not a target) |
 | **Slides** | `slides/week08.md` — proctor deck, not a teaching deck |
 | **Covers** | Weeks 1–6 |
@@ -64,7 +64,7 @@ CLO5 to the midterm row. Weighting is injection-heavy: Week 4 material carries S
 plus one Section B item and one Section D item.
 
 > **Known drift — reconcile before the cohort revises.** `labs/week08-midterm-written/README.md`'s
-> *Format* list and `course-plan-19weeks.md:91` both summarise this exam as four things — threat
+> *Format* list and `course-plan-19weeks.md:92` both summarise this exam as four things — threat
 > modelling, CWE/OWASP mapping, spot-the-vuln, secure-design short answers — and neither mentions
 > **Section C (30 pts)**. `slides/week08.md`'s *What's assessed* slide repeats the same four-item
 > list, but that deck's separate *Format* slide already names all four sections in its presenter
@@ -235,7 +235,7 @@ No worksheet, no quiz and no flag this week — nothing is submitted to Classroo
 | The open-note decision is taken after Week 7 | The cheat sheet is a Week 7 deliverable; announcing the rule late makes that work either wasted or an unfair advantage for students who guessed right. Announce it in the Week 7 debrief slot |
 | Printing a Markdown paper: Sections B and C are fenced code blocks. A wrapped or page-broken snippet changes what a "spot the vuln" item actually shows | Export to PDF once, read the printed proof line by line, and confirm no snippet wraps or splits across a page before duplicating |
 | No lab block this week, so nothing is checked on a machine — Week 9 is a 150-min CTF practical and the first time anyone discovers a broken Docker install is at its start | Use the deck's closing note at collection: state that Week 9 tools must be ready, and post the Week 9 target check before students leave |
-| Students revised from the README (`Format` list) or `course-plan-19weeks.md:91`, both of which omit Section C (30 pts) — see §2 | Say the section list aloud in the Week 7 debrief and at the pre-clock briefing (§4); reconcile the README and course-plan summaries afterwards |
+| Students revised from the README (`Format` list) or `course-plan-19weeks.md:92`, both of which omit Section C (30 pts) — see §2 | Say the section list aloud in the Week 7 debrief and at the pre-clock briefing (§4); reconcile the README and course-plan summaries afterwards |
 | A student misses the sitting | Run the other form (§5); eligibility and date are **⬚** (institutional) |
 | Multiple sections / multiple sittings of the same cohort | The later sitting must not sit the same form as the earlier one; record which form each section sat. Section and seating arrangements are **⬚** |
 

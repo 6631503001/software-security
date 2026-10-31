@@ -1,4 +1,4 @@
-# Worksheet 6 — Authentication, Sessions & Access Control (3 hrs)
+# Worksheet 6 — Authentication, Sessions & Access Control
 
 > **Course:** Software Security (KOSEN69) · **Week 6**
 > **Aligned:** OWASP 2025 **A01 Broken Access Control**, **A07 Authentication Failures** · **CWE-639** (IDOR), **CWE-347** (improper signature verification), **CWE-321** (weak hardcoded key)
@@ -24,7 +24,17 @@ Answer in 2–4 sentences each.
 4. Why is the hardcoded HMAC secret `"secret"` (CWE-321) dangerous even if `alg:none` were disabled? How does a strong random secret + pinned algorithm defend the token?
 5. What do the JWT claims **`exp`** and **`aud`** add, and why does the secure version reject tokens that lack them?
 
-## Part 3 — Hands-on Lab (150 min)
+## Part 3 — Hands-on Lab (125 min in class + 25 min homework)
+
+> **In class or homework.** Tasks marked *in class* are done during the lab, where the instructor
+> checks your evidence and reasoning. Tasks marked *homework* are finished after class and submitted
+> with the rest of this worksheet, before the next class. Every task keeps its time and its marks.
+> Answer Part 2 before class, from this week's slides; Part 4, *Audit the AI* and *Comprehension &
+> Prompt* are homework.
+>
+> **In class (125 min):** Tasks 0, 1, 2, 3 and 5 · **Homework (25 min):** Task 4
+>
+> Task 5's re-test of the forged admin token on `/api/admin` goes with Task 4.
 
 **Learning goals:** exploit IDOR, forge JWTs two ways (`alg:none` and weak secret), then prove `solution_app.py` enforces ownership and rejects forged tokens. Steps mirror `attack.md`.
 
@@ -52,7 +62,7 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 
 ---
 
-**Task 0 — Onboarding (5 min).** Get alice's token (from `attack.md`):
+**Task 0 — Onboarding (5 min, in class).** Get alice's token (from `attack.md`):
 ```bash
 TOKEN=$(curl -s -X POST http://localhost:8080/login \
   -H 'Content-Type: application/json' \
@@ -61,7 +71,7 @@ echo "$TOKEN"
 ```
 Confirm `/api/orders/1` returns alice's Laptop order. *Deliverable: screenshot of the token + order 1.*
 
-**Task 1 — IDOR Treasure Hunt (30 min) 🗺️.**
+**Task 1 — IDOR Treasure Hunt (30 min, in class) 🗺️.**
 - *Goal:* read **bob's** order with **alice's** token.
 - *Steps:*
   ```bash
@@ -74,7 +84,7 @@ Confirm `/api/orders/1` returns alice's Laptop order. *Deliverable: screenshot o
 jwt-forge
 ```
 
-**Task 2 — JWT Forgery via alg:none (30 min) 🔏.**
+**Task 2 — JWT Forgery via alg:none (30 min, in class) 🔏.**
 - *Goal:* impersonate bob with an **unsigned** token (no secret needed).
 - *Steps:*
   ```bash
@@ -87,7 +97,7 @@ jwt-forge
   ```
 - *Deliverable:* the forged token + screenshot of the accepted response + explanation of the `none` flaw (CWE-347).
 
-**Task 3 — JWT Forgery via weak secret (30 min) 🔏.**
+**Task 3 — JWT Forgery via weak secret (30 min, in class) 🔏.**
 - *Goal:* sign a *valid* HS256 token because the secret is the guessable string `secret` (CWE-321).
 - *Steps:*
   ```bash
@@ -101,7 +111,7 @@ jwt-forge
 - *Note:* recent PyJWT prints an `InsecureKeyLengthWarning` to **stderr** because `"secret"` is only 6 bytes — that is expected, the token still mints and is accepted.
 - *Deliverable:* token + screenshot + 2–3 sentences on why secret strength + key management matter.
 
-**Task 4 — Privilege escalation to admin via a forged token (25 min) 🔏.**
+**Task 4 — Privilege escalation to admin via a forged token (25 min, homework) 🔏.**
 - *Goal:* read the admin-only flag at `/api/admin` — a page **IDOR cannot reach**: there is no object id to walk, and there is no `admin` account you could log in as (`USERS` has only alice and bob). The only way in is to forge your identity.
 - *Steps:* forge a token claiming `sub=admin` (either technique from Task 2/3 works — `alg:none` or the weak `"secret"`), then call `/api/admin`:
   ```bash
@@ -115,7 +125,7 @@ jwt-forge
   You should get `FLAG{...}`. Then confirm alice's **real** token gets `403 forbidden` on the same endpoint — proof the server's role check (`if user != "admin"`) is fine; the break is purely that authentication accepted a forged identity.
 - *Deliverable:* the forged token + screenshot of the flag + the `403` for alice's real token, and 2–3 sentences: why IDOR can't reach this (horizontal access vs. **vertical** privilege escalation), and why the app's own `if user != "admin"` check didn't save it.
 
-**Task 5 — Defend / fix it (30 min) 🛡️.**
+**Task 5 — Defend / fix it (30 min, in class) 🛡️.**
 - *Goal:* prove `solution_app.py` blocks Tasks 1–4.
 - *Steps:* stop the vulnerable container (`Ctrl-C`), then:
   ```bash
@@ -139,6 +149,8 @@ jwt-forge
 | Part 3 — Defense (Task 5: fixes proven, lines cited) | 25 |
 | Part 4 — Reflection (CWE/OWASP mapping, breach, mitigation) | 15 |
 | **Total** | **100** |
+
+**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

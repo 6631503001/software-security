@@ -4,9 +4,9 @@
 
 ## ✅ This week — what to do
 1. **Before class** — Docker Desktop working (Week 1 *Lab 0*); skim last week's recap.
-2. **Lecture (120 min)** — weekly quiz first (~10 min), then the lecture. Slides: `slides/week13.md`.
-3. **Lab (180 min)** — play this week's game, then complete **Worksheet 13** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `bash scan.sh`.
-4. **Submit** — worksheet PDF → `learn.zcr.ai/submit` · code → GitHub · weekly quiz → `learn.zcr.ai/quiz`. (How: [SUBMISSION.md](../../SUBMISSION.md).)
+2. **Slides, then class** — read `slides/week13.md` and answer the worksheet's **Part 2** before class; class opens with the weekly quiz (~10 min) and a short explanation + demo (~15 min).
+3. **Lab (in class)** — play this week's game, then complete **Worksheet 13** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `bash scan.sh`. Part 3 marks each task *in class* or *homework*.
+4. **Submit before the next class** (homework tasks included) — worksheet PDF → `learn.zcr.ai/submit` · code → GitHub · weekly quiz → `learn.zcr.ai/quiz`. (How: [SUBMISSION.md](../../SUBMISSION.md).)
 5. **Project** — apply this week's lesson to your [NoteVault project](../../project/README.md) where it fits.
 
 *Time breakdown: [AGENDA.md](../../AGENDA.md). Grading: see the worksheet rubric.*

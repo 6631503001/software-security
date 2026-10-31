@@ -2,14 +2,17 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 17 · ⬚ |
-| **Contact time** | 300 min (course specification §6 records 2 lecture + 3 laboratory hours; AGENDA.md runs the review weeks as one continuous block) |
+| **Contact time** | 150 min, one continuous block (`AGENDA.md`, *Week 7 & 17 — Review*): review quiz 25 + Security Jeopardy: Champions 40 + mock final CTF 75 (ungraded; finished at home) + debrief 10 |
 | **Lab folder** | `labs/week17-review-final-prep` |
 | **Slides** | `slides/week17.md` |
 | **Type** | Review — **no new content**. Consolidates Weeks 10–16 (+ first-half callbacks) |
 | **Standards consolidated** | OWASP **API Security Top 10:2023** — API1 BOLA · API3 BOPLA (mass assignment) · API4 Unrestricted Resource Consumption · OWASP **2025** — A02 Security Misconfiguration · A03 Software Supply Chain Failures · A08 Software or Data Integrity Failures · A09 Security Logging & Alerting Failures · A10 Mishandling of Exceptional Conditions · OWASP **Top 10 for LLM Applications (2025)** — LLM01, LLM02, LLM05, LLM06, LLM08, LLM10 · CWE-121, 787, 134, 242, 416, 193, 1104, 829, 1357, 1395, 321, 732, 16, 798, 250, 538, 269, 200 |
 | **CLOs addressed** | **CLO1–CLO5** (course specification §6, week 17 row) |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** The timings below were
+> written for a longer block; the 150-min agenda is in [AGENDA.md](../../AGENDA.md).
 
 ---
 

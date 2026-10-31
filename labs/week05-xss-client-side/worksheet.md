@@ -1,4 +1,4 @@
-# Worksheet 5 — Cross-Site Scripting & Client-Side Risks (3 hrs)
+# Worksheet 5 — Cross-Site Scripting & Client-Side Risks
 
 > **Course:** Software Security (KOSEN69) · **Week 5**
 > **Aligned:** OWASP 2025 **A05 Injection** · **CWE-79** (XSS), **CWE-352** (CSRF), **CWE-1004** (cookie without HttpOnly)
@@ -22,7 +22,15 @@ Answer in 2–4 sentences each.
 4. What do the cookie flags **HttpOnly**, **SameSite**, and **Secure** each protect against? Map each to a concrete attack (cookie theft via XSS, CSRF, network sniffing).
 5. Why does **CSRF** (CWE-352) work even without any script injection, and how does `SameSite=Strict` plus the same-origin policy blunt it?
 
-## Part 3 — Hands-on Lab (150 min)
+## Part 3 — Hands-on Lab (125 min in class + 25 min homework)
+
+> **In class or homework.** Tasks marked *in class* are done during the lab, where the instructor
+> checks your evidence and reasoning. Tasks marked *homework* are finished after class and submitted
+> with the rest of this worksheet, before the next class. Every task keeps its time and its marks.
+> Answer Part 2 before class, from this week's slides; Part 4, *Audit the AI* and *Comprehension &
+> Prompt* are homework.
+>
+> **In class (125 min):** Tasks 0, 1, 2, 4 and 5 · **Homework (25 min):** Task 3
 
 ![Stored XSS carries the attacker's payload through the server to the victim, where it runs in the victim's origin and reads the cookie, while CSRF runs the opposite way and has the victim's own browser attach that cookie to the attacker's forged POST.](img/xss-and-csrf.svg)
 
@@ -46,24 +54,24 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 
 ---
 
-**Task 0 — Onboarding (5 min).** Browse `http://localhost:8080/`. Open DevTools → Application → Cookies and confirm `session=abc123` is set with **no HttpOnly / SameSite**. Screenshot it. *Deliverable: screenshot.*
+**Task 0 — Onboarding (5 min, in class).** Browse `http://localhost:8080/`. Open DevTools → Application → Cookies and confirm `session=abc123` is set with **no HttpOnly / SameSite**. Screenshot it. *Deliverable: screenshot.*
 
-**Task 1 — Reflected XSS + XSS Golf (30 min) ⛳.**
+**Task 1 — Reflected XSS + XSS Golf (30 min, in class) ⛳.**
 - *Goal:* execute JS via `/hello`, then minimize the payload.
 - *Steps:* visit `/hello?name=<script>alert(1)</script>`, then the alternate `/hello?name=<img src=x onerror=alert(1)>` (useful when `<script>` tags specifically are filtered — note it's actually 3 characters longer, not shorter). Record each payload's character count for your golf score.
 - *Deliverable:* both payloads + char counts + screenshot of `alert(1)` + your lowest score.
 
-**Task 2 — Stored XSS (30 min) ⛳.**
+**Task 2 — Stored XSS (30 min, in class) ⛳.**
 - *Goal:* persist a script that runs for every visitor of `/comments`.
 - *Steps:* POST a comment with body `<script>alert(document.cookie)</script>` (use the form or `curl -d 'body=...'`). Reload `/comments` and watch the cookie pop.
 - *Deliverable:* payload + screenshot of the alert showing `session=abc123` + why stored XSS is more dangerous than reflected.
 
-**Task 3 — Cookie theft via XSS (25 min).**
+**Task 3 — Cookie theft via XSS (25 min, homework).**
 - *Goal:* show the cookie is readable by injected JS because **HttpOnly is missing** (CWE-1004).
 - *Steps:* store `<script>new Image().src='http://localhost:8080/hello?name='+document.cookie</script>` (a beacon), or simply `<img src=x onerror=alert(document.cookie)>`. Observe the cookie value being exfiltrated/displayed.
 - *Deliverable:* payload + screenshot + 2–3 sentences on how HttpOnly would have stopped this.
 
-**Task 4 — CSRF PoC (30 min).**
+**Task 4 — CSRF PoC (30 min, in class).**
 - *Goal:* make a third-party page force a state-changing POST to `/comments`.
 - *Steps:* create a local `csrf.html` with an auto-submitting form targeting the board (no token exists, cookie has no SameSite, so the browser attaches `session` cross-site):
   ```html
@@ -80,7 +88,7 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 xss-context
 ```
 
-**Task 5 — Defend / fix it (30 min) 🛡️.**
+**Task 5 — Defend / fix it (30 min, in class) 🛡️.**
 - *Goal:* prove `fixed_app.py` blocks Tasks 1–3, then show that Task 4's CSRF PoC still gets through and explain why.
 - *Steps:* stop the vulnerable container (`Ctrl-C`), then:
   ```bash
@@ -104,6 +112,8 @@ xss-context
 | Part 3 — Defense (Task 5: fixes proven, lines cited) | 25 |
 | Part 4 — Reflection (CWE/OWASP mapping, breach, mitigation) | 15 |
 | **Total** | **100** |
+
+**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

@@ -1,4 +1,4 @@
-# Worksheet 15 — DevSecOps: Putting It Together (4 hrs)
+# Worksheet 15 — DevSecOps: Putting It Together
 
 > **Course:** Software Security (KOSEN69) · Week 15
 > **Aligned to:** OWASP 2025 **A09 Security Logging & Alerting Failures** · **A10 Mishandling of Exceptional Conditions** (scanners also cover A02/A03/A07) · **CWE-636** (fail open), CWE-532 (logging sensitive data), CWE-209, CWE-489, CWE-798
@@ -28,11 +28,19 @@ Answer in your own words (2–4 sentences each).
 
 ---
 
-## Part 3 — Hands-on Lab (180 min in class)
+## Part 3 — Hands-on Lab (110 min in class + 95 min homework)
 
 > The task budgets below add up to 205 min. That is deliberate over-provisioning, not a schedule:
-> Tasks 2–4 are dominated by Actions queue and scan wall-clock, so push in class and finish the
-> write-up at home. Your instructor will say which task runs as homework.
+> Tasks 2–4 are dominated by Actions queue and scan wall-clock. Push the gate in class (Task 2);
+> Tasks 3–5 wait on Actions runs and the Red/Blue results, so they are homework.
+>
+> **In class or homework.** Tasks marked *in class* are done during the lab, where the instructor
+> checks your evidence and reasoning. Tasks marked *homework* are finished after class and submitted
+> with the rest of this worksheet, before the next class. Every task keeps its time and its marks.
+> Answer Part 2 before class, from this week's slides; Part 4, *Audit the AI* and *Comprehension &
+> Prompt* are homework.
+>
+> **In class (110 min):** Tasks 0, 1, 1b and 2 · **Homework (95 min):** Tasks 3, 4 and 5
 
 ![Two panels: the CI gate in security-ci.yml, where a MEDIUM DS-0001 finding slips past the HIGH,CRITICAL threshold and the build goes green, and the /admin handler, where one except branch returns 200 with the flag while the other returns 403 and logs it.](img/fail-closed.svg)
 
@@ -66,11 +74,11 @@ curl -s localhost:5001/admin -H 'Authorization: alice-token'  # 200 (admin)
 
 ### Tasks
 
-- **Task 0 — Onboarding (15 min).** Run the sample service; trigger the three curls above. **Deliverable:** screenshot of the structured `event=...` security log lines for authn_failure, authz_failure, and authz_success.
+- **Task 0 — Onboarding (15 min, in class).** Run the sample service; trigger the three curls above. **Deliverable:** screenshot of the structured `event=...` security log lines for authn_failure, authz_failure, and authz_success.
 
-- **Task 1 — Logging & fail-closed (35 min, A09/A10).** *Goal:* prove fail-closed behavior. *Steps:* read `/admin` in `sample-service.py`; explain why the broad `except Exception` returns **403, not the secret**, and why `type(exc).__name__` (not the message) is logged (CWE-209). Identify the line that would make it fail *open* (the commented INSECURE variant). *Deliverable:* the log lines + a 2–3 sentence explanation of fail-closed vs fail-open.
+- **Task 1 — Logging & fail-closed (35 min, in class, A09/A10).** *Goal:* prove fail-closed behavior. *Steps:* read `/admin` in `sample-service.py`; explain why the broad `except Exception` returns **403, not the secret**, and why `type(exc).__name__` (not the message) is logged (CWE-209). Identify the line that would make it fail *open* (the commented INSECURE variant). *Deliverable:* the log lines + a 2–3 sentence explanation of fail-closed vs fail-open.
 
-- **Task 1b — Break the Build, live (25 min, A10 / CWE-636).** *Goal:* exploit a real fail-open, then prove the fix. *Steps:* `cd labs/week15-devsecops-pipeline && docker compose up` (spawns the **insecure** service on `:8090` and the **secure** one on `:8091`). As **Red**, hit the insecure admin route with **no** Authorization header — the fail-open path leaks the admin panel *and* the flag (a local run returns the public demo flag; your graded per-student flag comes from your hosted instance):
+- **Task 1b — Break the Build, live (25 min, in class, A10 / CWE-636).** *Goal:* exploit a real fail-open, then prove the fix. *Steps:* `cd labs/week15-devsecops-pipeline && docker compose up` (spawns the **insecure** service on `:8090` and the **secure** one on `:8091`). As **Red**, hit the insecure admin route with **no** Authorization header — the fail-open path leaks the admin panel *and* the flag (a local run returns the public demo flag; your graded per-student flag comes from your hosted instance):
   ```
   curl -s localhost:8090/admin                                  # {"panel":"UNLOCKED","secret":"FLAG{devsecops_...}"}  <- fail OPEN
   curl -s localhost:8091/admin                                  # {"error":"forbidden"}   (403)  <- fail CLOSED + logged
@@ -78,14 +86,14 @@ curl -s localhost:5001/admin -H 'Authorization: alice-token'  # 200 (admin)
   ```
   Submit the leaked `FLAG{...}`. *Deliverable:* the flag, the two contrasting `/admin` responses (`:8090` leak vs `:8091` deny), and the exact line in `insecure_service.py` that fails open. *(The instructor auto-grader re-runs these exploits against your hardened box — you pass only if every bypass is blocked **and** a valid admin token still works.)*
 
-- **Task 2 — Stand up the gate (35 min).** *Goal:* get the workflow running. *Steps:* push `security-ci.yml`, open the Actions run, confirm the three jobs (`semgrep`, `trivy`, `gitleaks`) execute and SARIF appears in the Security tab. *Deliverable:* screenshot of the Actions run + the Code scanning alerts page.
+- **Task 2 — Stand up the gate (35 min, in class).** *Goal:* get the workflow running. *Steps:* push `security-ci.yml`, open the Actions run, confirm the three jobs (`semgrep`, `trivy`, `gitleaks`) execute and SARIF appears in the Security tab. *Deliverable:* screenshot of the Actions run + the Code scanning alerts page.
 
-- **Task 3 — Blue team: pass the gate (30 min).** *Goal:* a green build. *Steps:* ensure the protected repo has no HIGH/CRITICAL findings and no secrets; fix or justify-and-document any (no blanket-ignore, per README §4). Expect a red baseline before you change anything: Semgrep flags every `uses: …@vN` tag (pin it to a commit SHA) and `host="0.0.0.0"` (needed so Docker can publish the port — justify it with a `# nosemgrep` comment and a reason); Gitleaks flags the docs' own `-H 'Authorization: alice-token'` examples (`curl-auth-header`, a false positive — add those fingerprints to `.gitleaksignore` with a comment). *Deliverable:* link to the passing run.
+- **Task 3 — Blue team: pass the gate (30 min, homework).** *Goal:* a green build. *Steps:* ensure the protected repo has no HIGH/CRITICAL findings and no secrets; fix or justify-and-document any (no blanket-ignore, per README §4). Expect a red baseline before you change anything: Semgrep flags every `uses: …@vN` tag (pin it to a commit SHA) and `host="0.0.0.0"` (needed so Docker can publish the port — justify it with a `# nosemgrep` comment and a reason); Gitleaks flags the docs' own `-H 'Authorization: alice-token'` examples (`curl-auth-header`, a false positive — add those fingerprints to `.gitleaksignore` with a comment). *Deliverable:* link to the passing run.
 
-- **Task 4 — Red team: Break the Build (40 min).** *Goal:* make the gate say **no**. *Steps:* on a branch/PR, inject *one* planted defect (per README §5), each aimed at a different gate step (a root Dockerfile also trips Semgrep, and a token also trips Trivy's secret scan): an outdated vulnerable dependency (e.g. an old `urllib3`) → Trivy SCA; a Dockerfile that runs as **root** — drop the `USER` line, or write `USER root` → Trivy config (`DS-0002`, HIGH); or a hard-coded token → Gitleaks. Open the PR and watch the matching gate step fail. *Deliverable:* screenshot of the **failing** gate step + which job caught it (Trivy SCA / Trivy config / Gitleaks) and which `exit-code: "1"` / `--error` step enforced it.
+- **Task 4 — Red team: Break the Build (40 min, homework).** *Goal:* make the gate say **no**. *Steps:* on a branch/PR, inject *one* planted defect (per README §5), each aimed at a different gate step (a root Dockerfile also trips Semgrep, and a token also trips Trivy's secret scan): an outdated vulnerable dependency (e.g. an old `urllib3`) → Trivy SCA; a Dockerfile that runs as **root** — drop the `USER` line, or write `USER root` → Trivy config (`DS-0002`, HIGH); or a hard-coded token → Gitleaks. Open the PR and watch the matching gate step fail. *Deliverable:* screenshot of the **failing** gate step + which job caught it (Trivy SCA / Trivy config / Gitleaks) and which `exit-code: "1"` / `--error` step enforced it.
   > **Why root and not `chmod 777`.** Both gate steps filter to `--severity HIGH,CRITICAL`, and Trivy's Dockerfile scanner has no rule for `chmod` at all — it checks instruction-level `RUN`/`COPY` semantics, exactly as Week 13 Task 1 says. `chmod 777` therefore returns **nothing**, at any severity, and the build goes green: a defect that slips the gate is a Task 5 *Red point*, not a Task 4 screenshot. `:latest` is no good either — that is `DS-0001` and Trivy rates it MEDIUM, which this gate filters out. Running as root is `DS-0002` HIGH, so it fails the build for real.
 
-- **Task 5 — Score Break-the-Build (25 min).** *Goal:* tally Red vs Blue. *Steps:* one Blue point per finding the gate caught, one Red point per finding that slipped through; for any bypass, propose the rule that would have caught it. *Deliverable:* scoreboard + one proposed gate improvement.
+- **Task 5 — Score Break-the-Build (25 min, homework).** *Goal:* tally Red vs Blue. *Steps:* one Blue point per finding the gate caught, one Red point per finding that slipped through; for any bypass, propose the rule that would have caught it. *Deliverable:* scoreboard + one proposed gate improvement.
 
 ---
 
@@ -105,6 +113,8 @@ curl -s localhost:5001/admin -H 'Authorization: alice-token'  # 200 (admin)
 | Part 3 — Tasks + evidence | 40 | Tasks 0–5 complete; PR/run links, log lines, screenshots present |
 | Defense (gate + fail-closed) | 25 | Gate shown to fail closed on a planted defect; fail-closed path explained |
 | Part 4 — Reflection | 15 | Accurate mapping, relevant incident, well-argued best mitigation |
+
+**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

@@ -1,7 +1,7 @@
 # Week 16 — CTF Scrimmage (Final tournament warm-up)
 
 A friendly **cross-team** practice tournament that previews the Week 19 finale.
-**Ungraded** (bragging rights + a leaderboard) · ~150 min · Sandbox only (ethics policy applies).
+**Ungraded** (bragging rights + a leaderboard) · ~150 min of challenges — about 75 min in class, and the scrimmage stays open online afterwards · Sandbox only (ethics policy applies).
 
 > Same shape as the Week 19 tournament, lighter and with hints — so teams calibrate
 > strategy, division of labor, and the submit format before it counts.

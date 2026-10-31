@@ -1,4 +1,4 @@
-# Worksheet 10 — API Security (3 hrs)
+# Worksheet 10 — API Security
 
 > **Course:** Software Security (KOSEN69) · Week 10
 > **Aligned:** OWASP API Security Top 10:2023 — API1 BOLA · API3 Broken Object Property Level Auth (Mass Assignment) · API4 Unrestricted Resource Consumption
@@ -20,7 +20,15 @@
 4. In `vulnerable_api.py`, `current_user()` trusts the `X-User-Id` header. Why is a client-supplied header NOT authentication, and what should replace it?
 5. Why does object-level authorization have to be checked **per request, per object** rather than once at login?
 
-## Part 3 — Hands-on Lab (145 min)
+## Part 3 — Hands-on Lab (125 min in class)
+
+> **In class or homework.** Tasks marked *in class* are done during the lab, where the instructor
+> checks your evidence and reasoning. Tasks marked *homework* are finished after class and submitted
+> with the rest of this worksheet, before the next class. Every task keeps its time and its marks.
+> Answer Part 2 before class, from this week's slides; Part 4, *Audit the AI* and *Comprehension &
+> Prompt* are homework.
+>
+> **In class (125 min):** Tasks 0, 1, 2, 3 and 5 · **Optional homework (20 min):** Task 4
 
 **Learning goals:** Exploit BOLA, mass assignment, and a missing rate limit against a live API; then read the secure version and explain each fix.
 
@@ -35,13 +43,13 @@ docker compose up         # INSECURE API on :8080, SECURE API on :8081
 
 **What to submit per task:** the exact command(s) + raw response/HTTP status, a screenshot, and a 2–3 sentence mitigation note mapping the bug to its OWASP API id.
 
-### Task 0 — Onboarding (15 min)
+### Task 0 — Onboarding (15 min, in class)
 Confirm both APIs respond: `curl http://localhost:8080/` and `curl http://localhost:8081/`. Note which port is insecure. Record the three seeded users.
 **Deliverable:** both root responses + the user table.
 
 ![One REST API with three flaws — reading another user's orders by id, smuggling an admin field into user creation, and an unthrottled login — each shown at the handler where it occurs, next to its one-line fix.](img/api-flaws.svg)
 
-### Task 1 — BOLA: read another user's orders (35 min)
+### Task 1 — BOLA: read another user's orders (35 min, in class)
 **Goal:** Read carol's (admin) orders without being carol — API1:2023.
 **Steps:**
 1. `curl http://localhost:8080/api/users/3/orders` — note you receive the "Server rack" order with no auth.
@@ -49,7 +57,7 @@ Confirm both APIs respond: `curl http://localhost:8080/` and `curl http://localh
 3. On the secure API observe the ladder: `curl -i http://localhost:8081/api/users/3/orders` (401), `curl -i -H "X-User-Id: 1" http://localhost:8081/api/users/3/orders` (403), `curl -i -H "X-User-Id: 1" http://localhost:8081/api/users/1/orders` (200).
 **Deliverable:** the leaked order JSON + the 401/403/200 transcript + mitigation note.
 
-### Task 2 — Mass assignment: self-promote to admin (30 min)
+### Task 2 — Mass assignment: self-promote to admin (30 min, in class)
 **Goal:** Smuggle `is_admin` + `balance` into user creation — API3:2023.
 **Steps:**
 1. `curl -X POST http://localhost:8080/api/users -H "Content-Type: application/json" -d '{"username":"mallory","password":"x","is_admin":true,"balance":1000000}'`
@@ -57,7 +65,7 @@ Confirm both APIs respond: `curl http://localhost:8080/` and `curl http://localh
 3. Repeat against `:8081` and confirm the smuggled fields are forced to `is_admin:false, balance:0`.
 **Deliverable:** both responses side by side + mitigation note (allow-list in `solution_api.py`).
 
-### Task 3 — Unrestricted resource consumption: brute-force login (25 min)
+### Task 3 — Unrestricted resource consumption: brute-force login (25 min, in class)
 **Goal:** Show `/api/login` has no throttle — API4:2023.
 **Steps:**
 1. Run the brute-force loop from `attack.md` against `:8080` (guesses incl. `alice123`) — all attempts processed.
@@ -65,11 +73,11 @@ Confirm both APIs respond: `curl http://localhost:8080/` and `curl http://localh
 3. Confirm the 6th/7th attempt returns `429`.
 **Deliverable:** the `401 401 401 401 401 429 429` sequence + mitigation note.
 
-### Task 4 — Bonus: crAPI Raid (optional, 20 min)
+### Task 4 — Bonus: crAPI Raid (optional, 20 min, homework)
 Against your own OWASP crAPI instance (`git clone https://github.com/OWASP/crAPI.git`), capture one BOLA or mass-assignment flag.
 **Deliverable:** flag + endpoint + which API Top 10 id it maps to.
 
-### Task 5 — Defend / fix it (20 min)
+### Task 5 — Defend / fix it (20 min, in class)
 **Goal:** Explain the fixes using the secure reference `solution_api.py`.
 **Steps:** Read the three `# --- FIX ...` blocks. For each, quote the line(s) that defeat your Task 1–3 exploit: the per-object ownership check (`caller["id"] != uid and not caller["is_admin"]`), `ALLOWED_CREATE_FIELDS` binding, and the `RATE_LIMIT=5 / RATE_WINDOW=60` limiter.
 **Deliverable:** for each of API1/API3/API4 — the exploit that worked on `:8080`, the line in `solution_api.py` that blocks it, and the new HTTP status on `:8081`.
@@ -89,6 +97,8 @@ Against your own OWASP crAPI instance (`git clone https://github.com/OWASP/crAPI
 | Defense (Task 5: fixes mapped to `solution_api.py`) | 25 |
 | Reflection (Part 4: mapping, breach, best mitigation) | 15 |
 | **Total** | **100** |
+
+**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

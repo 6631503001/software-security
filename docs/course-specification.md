@@ -1,4 +1,4 @@
-# Course Specification — Software Security
+# Course Specification — Software Security 2 (KOSEN-KMITL 02005094)
 
 Outcome-based (OBE) course specification. It maps what students are expected to be able to do
 (CLOs) to how they are taught and how each outcome is evidenced and graded. Written to satisfy
@@ -7,8 +7,8 @@ without being tied to one institutional template — sections can be lifted into
 faculty issues.
 
 > **Fill before submission.** Fields marked ⬚ are institution-specific and are not recorded
-> anywhere in this repository: course code, semester/academic year, section, room, and the
-> programme's own PLO list.
+> anywhere in this repository: section, room, and the programme's own PLO list. Course code, term,
+> credits, class time and instructors follow the official KOSEN-KMITL subject sheet for 02005094.
 
 ---
 
@@ -16,14 +16,14 @@ faculty issues.
 
 | Field | Value |
 |---|---|
-| Course title | Software Security |
-| Course code | ⬚ |
-| Credits | 3 (2 lecture hours + 3 laboratory hours per week, 19 weeks) |
-| Level | Undergraduate, 3rd–4th year |
+| Course title | Software Security 2 |
+| Course code | 02005094 (Compulsory, Department of Computer) |
+| Credits | 1.5 (150 minutes of class per week in 3 slots, 20 weeks) |
+| Level | Undergraduate, Year 4 |
 | Prerequisites | Programming (Python/C), Data Structures, Operating Systems basics; Computer Networks recommended |
-| Delivery | On-site lecture + hands-on laboratory; all lab targets run locally in Docker |
-| Instructor | Nutthakorn Chalaemwongwan |
-| Semester / Year | ⬚ |
+| Delivery | On-site supervised laboratory practice with brief explanations and demonstrations; concept material is studied before class; all lab targets run locally in Docker |
+| Instructors | Nutthakorn Chalaemwongwan · Shinya Oyama |
+| Semester / Year | Semester 2, AY2026 |
 | Programme | ⬚ |
 
 ## 2. Course description
@@ -33,9 +33,11 @@ course pairs timeless fundamentals — memory safety, injection, authentication,
 misuse — with the threats that dominate current systems: software supply-chain attacks, cloud and
 container misconfiguration, API abuse, and the security of AI/LLM-powered applications.
 
-Each teaching week follows the same rhythm: a 120-minute lecture, then a 180-minute laboratory
-built around one *signature exercise* in which students first break a deliberately vulnerable
-target, then defend it and prove the defence holds. All exploitation is performed against targets
+Each teaching week is one 150-minute class: a short quiz, a brief explanation and demonstration,
+then about 125 minutes of supervised laboratory built around one *signature exercise* in which
+students first break a deliberately vulnerable target, then defend it and prove the defence holds.
+The concept material is studied before class, and worksheet tasks that do not fit the class are
+homework ([AGENDA.md](../AGENDA.md)). All exploitation is performed against targets
 supplied by the course, inside containers on the student's own machine, under the rules in
 [ETHICS.md](../ETHICS.md).
 
@@ -74,7 +76,7 @@ Within each weekly worksheet, four graded parts recur and carry specific outcome
 | **Audit the AI** — critique an AI-generated exploit or fix | CLO5 |
 | **Explain-in-Plain-English + Prompt Problem** | CLO5 |
 | **Evidence & Integrity** — identity-stamped proof, per-student flags | CLO6 |
-| Viva spot-check / rotating micro-demo | CLO2, CLO3, CLO5 |
+| Viva spot-check during the lab | CLO2, CLO3, CLO5 |
 
 ## 5. CLO → PLO mapping
 
@@ -92,32 +94,34 @@ Within each weekly worksheet, four graded parts recur and carry specific outcome
 
 ## 6. Weekly schedule
 
-5 contact hours per week (2 lecture + 3 lab). Lab folder names are the canonical reference; each
-folder holds the week's README, worksheet and runnable target.
+150 minutes of class per week (3 slots), mostly supervised lab practice; the in-class / homework
+split of each worksheet is in [AGENDA.md](../AGENDA.md). Lab folder names are the canonical
+reference; each folder holds the week's README, worksheet and runnable target.
 
-| Wk | Topic | L / Lab | Lab folder | Signature exercise | CLOs |
+| Wk | Topic | Class (min) | Lab folder | Signature exercise | CLOs |
 |---:|---|:--:|---|---|---|
-| 1 | Security mindset & threat modelling | 2 / 3 | `labs/week01-threat-modeling` | "Elevation of Privilege" STRIDE card game | 1, 6 |
-| 2 | Secure SDLC, tooling & fuzzing | 2 / 3 | `labs/week02-sdlc-tooling` | "Bug Triage Race" | 4 |
-| 3 | Cryptography used correctly (and misused) | 2 / 3 | `labs/week03-cryptography` | "Capture the Hash" speedrun | 2, 3 |
-| 4 | Injection & input handling | 2 / 3 | `labs/week04-injection` | "SQLi Warm-up" | 2, 3 |
-| 5 | XSS & client-side risks | 2 / 3 | `labs/week05-xss-client-side` | "XSS Golf" | 2, 3 |
-| 6 | Authentication, sessions & access control | 2 / 3 | `labs/week06-authn-authz` | "IDOR Treasure Hunt + JWT Forgery" | 2, 3 |
-| 7 | **Reflection & review** (pre-midterm) | 2 / 3 | `labs/week07-review-midterm-prep` | Mock CTF + cumulative quiz | 1–4 |
-| 8 | **Midterm — written** | — | `labs/week08-midterm-written` | — | 1–4, 6 |
-| 9 | **Midterm — CTF practical** | — | `labs/week09-midterm-practical` | — | 2, 3, 6 |
-| 10 | API security | 2 / 3 | `labs/week10-api-security` | "crAPI Raid" (BOLA + mass assignment) | 2, 3 |
-| 11 | Memory safety & exploitation | 2 / 3 | `labs/week11-memory-safety-exploitation` | "Fuzzing Race → Pwn the Binary" | 2, 3, 4 |
-| 12 | Software supply-chain security | 2 / 3 | `labs/week12-supply-chain` | "Dependency Confusion Heist" | 4, 5 |
-| 13 | Cloud & container security | 2 / 3 | `labs/week13-cloud-container` | "Misconfig Hunt" (CloudGoat-style) | 3, 4 |
-| 14 | AI / LLM application security | 2 / 3 | `labs/week14-ai-llm-security` | "Gandalf Challenge" + tool poisoning | 2, 3, 5 |
-| 15 | DevSecOps: putting it together | 2 / 3 | `labs/week15-devsecops-pipeline` | "Break the Build" (Red vs Blue) | 4, 5 |
-| 16 | Capstone studio & CTF warm-up | 2 / 3 | `labs/week16-capstone` | Project work-in-progress review | 1, 3, 5 |
-| 17 | **Reflection & review** (pre-final) | 2 / 3 | `labs/week17-review-final-prep` | Mock CTF + cumulative quiz | 1–5 |
-| 18 | **Final — written** (cumulative) | — | `labs/week18-final-written` | — | 1–5 |
-| 19 | **Final — capstone CTF + project demos** | — | `labs/week19-final-ctf-capstone` | Team tournament + demo | 2, 3, 5, 6 |
+| 1 | Security mindset & threat modelling | 150 | `labs/week01-threat-modeling` | "Elevation of Privilege" STRIDE card game | 1, 6 |
+| 2 | Secure SDLC, tooling & fuzzing | 150 | `labs/week02-sdlc-tooling` | "Bug Triage Race" | 4 |
+| 3 | Cryptography used correctly (and misused) | 150 | `labs/week03-cryptography` | "Capture the Hash" speedrun | 2, 3 |
+| 4 | Injection & input handling | 150 | `labs/week04-injection` | "SQLi Warm-up" | 2, 3 |
+| 5 | XSS & client-side risks | 150 | `labs/week05-xss-client-side` | "XSS Golf" | 2, 3 |
+| 6 | Authentication, sessions & access control | 150 | `labs/week06-authn-authz` | "IDOR Treasure Hunt + JWT Forgery" | 2, 3 |
+| 7 | **Reflection & review** (pre-midterm) | 150 | `labs/week07-review-midterm-prep` | Mock CTF + cumulative quiz | 1–4 |
+| 8 | **Midterm — written** | 150 | `labs/week08-midterm-written` | — | 1–4, 6 |
+| 9 | **Midterm — CTF practical** | 150 | `labs/week09-midterm-practical` | — | 2, 3, 6 |
+| 10 | API security | 150 | `labs/week10-api-security` | "crAPI Raid" (BOLA + mass assignment) | 2, 3 |
+| 11 | Memory safety & exploitation | 150 | `labs/week11-memory-safety-exploitation` | "Fuzzing Race → Pwn the Binary" | 2, 3, 4 |
+| 12 | Software supply-chain security | 150 | `labs/week12-supply-chain` | "Dependency Confusion Heist" | 4, 5 |
+| 13 | Cloud & container security | 150 | `labs/week13-cloud-container` | "Misconfig Hunt" (CloudGoat-style) | 3, 4 |
+| 14 | AI / LLM application security | 150 | `labs/week14-ai-llm-security` | "Gandalf Challenge" + tool poisoning | 2, 3, 5 |
+| 15 | DevSecOps: putting it together | 150 | `labs/week15-devsecops-pipeline` | "Break the Build" (Red vs Blue) | 4, 5 |
+| 16 | Capstone studio & CTF warm-up | 150 | `labs/week16-capstone` | Project work-in-progress review | 1, 3, 5 |
+| 17 | **Reflection & review** (pre-final) | 150 | `labs/week17-review-final-prep` | Mock CTF + cumulative quiz | 1–5 |
+| 18 | **Final — written** (cumulative) | 150 | `labs/week18-final-written` | — | 1–5 |
+| 19 | **Final — capstone CTF + project demos** | 150 | `labs/week19-final-ctf-capstone` | Team tournament + demo | 2, 3, 5, 6 |
+| 20 | **Examination feedback & course reflection** | 150 | — | Corrections + reflection on the CLOs | 5 |
 
-12 teaching weeks (1–6, 10–15) · 1 capstone week (16) · 2 review weeks (7, 17) · 2 exam blocks (8–9, 18–19).
+12 teaching weeks (1–6, 10–15) · 1 capstone week (16) · 2 review weeks (7, 17) · 2 exam blocks (8–9, 18–19) · 1 feedback week (20).
 
 ## 7. Teaching and learning methods
 
@@ -128,8 +132,8 @@ folder holds the week's README, worksheet and runnable target.
 - **AI-resilient tasks.** Each worksheet asks students to critique an AI-generated answer
   (*Audit the AI*), restate a mechanism in plain English, and write a prompt that would have
   produced a correct answer — engaging AI use directly rather than pretending it is absent.
-- **Live accountability.** Rotating 2–3 minute micro-demos and random viva spot-checks require
-  students to reproduce and explain their own submitted work.
+- **Live accountability.** Random viva spot-checks during the supervised lab require students to
+  reproduce and explain their own submitted work.
 - **Per-student evidence.** Flags are minted per student, so a submitted flag identifies who
   produced it; screenshots are identity-stamped.
 - **Engagement layer.** Points feed a season-long scoreboard and non-graded Houses, keeping
@@ -150,7 +154,7 @@ folder holds the week's README, worksheet and runnable target.
   against the published worksheet whenever lab content changes.
 - Exams exist in two parallel forms (A/B) drawn from a maintained item bank, supporting make-up
   sittings and reducing answer sharing.
-- Viva spot-checks and micro-demos sample submitted work live each week; a student who cannot
+- Viva spot-checks during the lab sample submitted work live each week; a student who cannot
   reproduce their own submission is followed up individually.
 - Flag values are per-student, so a duplicate flag is detectable rather than a matter of judgement.
 - Outcome attainment is reviewed at the end of term by mapping the assessment scores back to the
@@ -169,7 +173,7 @@ folder holds the week's README, worksheet and runnable target.
 
 AI assistants are permitted and are addressed explicitly by the *Audit the AI*, *Explain-in-Plain-English*
 and *Prompt Problem* tasks. What is assessed is the student's own understanding, which is why
-per-student flags, identity-stamped evidence, live viva spot-checks and micro-demos exist. Passing
+per-student flags, identity-stamped evidence and live viva spot-checks exist. Passing
 off unverified AI output as one's own work — in particular, submitting a fix a student cannot
 explain or reproduce — is treated as an academic-integrity matter under ⬚ (institutional policy).
 

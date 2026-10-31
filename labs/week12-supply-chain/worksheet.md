@@ -1,4 +1,4 @@
-# Worksheet 12 — Software Supply-Chain Security (3 hrs)
+# Worksheet 12 — Software Supply-Chain Security
 
 > **Course:** Software Security (KOSEN69) · Week 12
 > **Aligned:** OWASP 2025 — A03 Software Supply Chain Failures · A08 Software or Data Integrity Failures · **CWE:** CWE-1104, CWE-829, CWE-1357, CWE-1395
@@ -22,7 +22,15 @@
 
 ![Six hops a dependency crosses from a public registry into production, each with its own attack and the control that answers it.](img/supply-chain.svg)
 
-## Part 3 — Hands-on Lab (150 min)
+## Part 3 — Hands-on Lab (115 min in class + 35 min homework)
+
+> **In class or homework.** Tasks marked *in class* are done during the lab, where the instructor
+> checks your evidence and reasoning. Tasks marked *homework* are finished after class and submitted
+> with the rest of this worksheet, before the next class. Every task keeps its time and its marks.
+> Answer Part 2 before class, from this week's slides; Part 4, *Audit the AI* and *Comprehension &
+> Prompt* are homework.
+>
+> **In class (115 min):** Tasks 0, 2, 3 and 4 · **Homework (35 min):** Task 1
 
 **Learning goals:** Run SCA on intentionally-outdated dependencies, generate an SBOM, sign/verify an image, and defend against dependency confusion.
 
@@ -38,18 +46,18 @@ bash sign.sh week12-supplychain:lab   # CycloneDX SBOM -> sbom.cdx.json, then co
 
 **What to submit per task:** the exact command(s) + output, a screenshot, and a 2–3 sentence remediation note mapping the finding to A03/A08 or the CWE.
 
-### Task 0 — Onboarding (15 min)
+### Task 0 — Onboarding (15 min, in class)
 Read `requirements.txt` and list the pinned packages with their versions. Note why they are intentionally outdated (each is deliberately an old release so SCA tools flag its known CVEs).
 **Deliverable:** the package/version table + which OWASP/CWE this maps to.
 
-### Task 1 — SCA scan: build the remediation worklist (35 min)
+### Task 1 — SCA scan: build the remediation worklist (35 min, homework)
 **Goal:** Flag the known-vulnerable dependencies — A03.
 **Steps:**
 1. `bash sca_scan.sh` — read the `trivy fs` table (CVE, installed vs. fixed version) and the `pip-audit` advisory IDs (GHSA-/PYSEC-).
 2. Pick three findings; record CVE/advisory id, severity, and the fixed version.
 **Deliverable:** the SCA output + a 3-row remediation table (package → current → fixed).
 
-### Task 2 — Dependency Confusion Heist (35 min)
+### Task 2 — Dependency Confusion Heist (35 min, in class)
 **Goal:** Watch the wrong package win — A03 / CWE-1357.
 
 **Reality check:** this lab does **not** stand up a live private/public registry. `acme-internal-utils` is
@@ -75,7 +83,7 @@ resolver-confusion
 same version pair, plus one sentence on why an attacker defeats the "keep my internal version number high"
 idea.
 
-### Task 3 — SBOM + signing/verification (30 min)
+### Task 3 — SBOM + signing/verification (30 min, in class)
 **Goal:** Produce a component inventory and prove integrity — A08.
 **Steps:**
 1. After `bash sign.sh week12-supplychain:lab`, open `sbom.cdx.json` and find Flask's entry.
@@ -87,7 +95,7 @@ idea.
    error, which is *not* the same thing as proving the image is unsigned.)
 **Deliverable:** the SBOM Flask component entry + the verify PASS + the negative-test failure.
 
-### Task 4 — Defend / fix it (35 min)
+### Task 4 — Defend / fix it (35 min, in class)
 **Goal:** Stop dependency confusion and lock integrity — defenses from `dependency-confusion.md` + `sign.sh`.
 **Steps:**
 1. **Pin + hashes:** run `pip install --require-hashes -r requirements.txt` against this lab's own
@@ -115,6 +123,8 @@ idea.
 | Defense (Task 4: pinning/hashes, single index, scoping, provenance gate) | 25 |
 | Reflection (Part 4: mapping, XZ breach, SLSA self-assessment) | 15 |
 | **Total** | **100** |
+
+**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

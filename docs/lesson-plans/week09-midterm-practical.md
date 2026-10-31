@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 9 · ⬚ |
-| **Contact time** | 150 min — a single practical-exam block. No lecture, no lab (`AGENDA.md`, *Week 9 — Midterm CTF practical (150 min)*) |
+| **Contact time** | 150 min — a single practical-exam block that fills the class. No lecture, no lab (`AGENDA.md`, *Week 9 — Midterm CTF practical (150 min)*) |
 | **Lab folder** | `labs/week09-midterm-practical` — holds `README.md` and `ctf.md` (the student paper); it ships no target of its own |
 | **Slides** | `slides/week09.md` — proctor deck, not a teaching deck |
 | **Covers** | Weeks 1–6 (`labs/week09-midterm-practical/README.md`). The seven challenges themselves draw on Weeks 3–6; threat modelling and CWE/OWASP mapping (W1–W2 material) are examined in the Week 8 written paper |

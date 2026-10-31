@@ -2,13 +2,19 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 12 · ⬚ |
-| **Contact time** | 300 min = 120 lecture + 180 laboratory |
+| **Contact time** | 150 min = 10 quiz + 15 explanation & demo + 115 supervised lab (in class: Tasks 0, 2, 3, 4; homework: Tasks 1) |
 | **Lab folder** | `labs/week12-supply-chain` |
 | **Slides** | `slides/week12.md` |
 | **Standards** | OWASP 2025 **A03 Software Supply Chain Failures** · **A08 Software or Data Integrity Failures** · CWE-1104 (unmaintained third-party component), CWE-829 (inclusion of functionality from untrusted control sphere), CWE-1357 (reliance on insufficiently trustworthy component), CWE-1395 (dependency on vulnerable third-party component) |
 | **CLOs addressed** | **CLO4** operate security tooling across the SDLC · **CLO5** evaluate & communicate · **CLO6** evidence & ethics |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** §4's lecture is now
+> pre-class material (the week's slides), shown in class only as a 15-min explanation + demo; §5
+> runs only the worksheet's *in class* tasks, and the rest are homework. The tables below keep the
+> original 120 + 180-min layout as the content reference — the class-time plan is in
+> [AGENDA.md](../../AGENDA.md) and each worksheet's Part 3.
 
 ---
 

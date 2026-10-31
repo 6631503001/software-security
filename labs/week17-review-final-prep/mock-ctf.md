@@ -1,7 +1,7 @@
 # Week 17 — Mock CTF (Final dry-run)
 
 **Covers:** whole term, emphasis Weeks 10–16 · **Format:** same as the Week 19 final CTF · **Ungraded** (participation).
-**Time:** ~165 min · teams · Sandbox targets only (ethics policy applies).
+**Time:** ~165 min of challenges — about 75 min in class, finish the rest at home (it is ungraded practice) · teams · Sandbox targets only (ethics policy applies).
 
 > Practice run with **hints**; solutions point back to the labs. No real exam flags.
 

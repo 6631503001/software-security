@@ -112,4 +112,6 @@ Per finding: the fix, **before/after** code, and the commit that implements it.
 | CI pipeline — works, fails build appropriately (§7) | 10 |
 | Presentation & report clarity (§1, §8) | 5 |
 
+**Due:** before Week 19 (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
+
 *All work stays within the [ethics policy](../ETHICS.md).*

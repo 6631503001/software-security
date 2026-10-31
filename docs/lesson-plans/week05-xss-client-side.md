@@ -2,13 +2,19 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 5 · ⬚ |
-| **Contact time** | 300 min = 120 lecture + 180 laboratory |
+| **Contact time** | 150 min = 10 quiz + 15 explanation & demo + 125 supervised lab (in class: Tasks 0, 1, 2, 4, 5; homework: Tasks 3) |
 | **Lab folder** | `labs/week05-xss-client-side` |
 | **Slides** | `slides/week05.md` |
 | **Standards** | OWASP 2025 **A05 Injection** · CWE-79 (XSS), CWE-352 (CSRF), CWE-1004 (cookie without HttpOnly) |
 | **CLOs addressed** | **CLO2** exploit · **CLO3** remediate (course specification §6, Week 5 row: "2, 3"). The recurring *Audit the AI* / *EiPE* + *Prompt Problem* parts carry **CLO5**, and *Evidence & Integrity* carries **CLO6** (course-spec §4). |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** §4's lecture is now
+> pre-class material (the week's slides), shown in class only as a 15-min explanation + demo; §5
+> runs only the worksheet's *in class* tasks, and the rest are homework. The tables below keep the
+> original 120 + 180-min layout as the content reference — the class-time plan is in
+> [AGENDA.md](../../AGENDA.md) and each worksheet's Part 3.
 
 ---
 

@@ -2,13 +2,19 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 13 · ⬚ |
-| **Contact time** | 300 min = 120 lecture + 180 laboratory |
+| **Contact time** | 150 min = 10 quiz + 15 explanation & demo + 120 supervised lab (in class: Tasks 1, 2, 4; homework: Tasks 0 (before class), 3, 5) |
 | **Lab folder** | `labs/week13-cloud-container` |
 | **Slides** | `slides/week13.md` |
 | **Standards** | OWASP 2025 **A02 Security Misconfiguration** · CWE-732 (incorrect permission assignment), CWE-16 (configuration), CWE-526 (secret in an environment variable), CWE-798 (hard-coded credential — OWASP files this under A07), CWE-250, CWE-538, CWE-269, CWE-1104 |
 | **CLOs addressed** | **CLO3** remediate · **CLO4** operate security tooling (the course specification's weekly-schedule row for Week 13), plus **CLO5** evaluate & communicate and **CLO6** evidence & ethics through the recurring worksheet parts |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** §4's lecture is now
+> pre-class material (the week's slides), shown in class only as a 15-min explanation + demo; §5
+> runs only the worksheet's *in class* tasks, and the rest are homework. The tables below keep the
+> original 120 + 180-min layout as the content reference — the class-time plan is in
+> [AGENDA.md](../../AGENDA.md) and each worksheet's Part 3.
 
 ---
 

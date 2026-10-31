@@ -4,7 +4,7 @@ No new content. Consolidate **Weeks 10–16** (with a quick callback to first-ha
 
 ## ✅ This week — what to do
 1. **Before class** — review **Weeks 10–16** (+ first-half callbacks).
-2. **In class (300 min)** — cumulative review quiz (`../../quizzes/quiz2.md`) → **Security Jeopardy: Champions** → **mock CTF** (`mock-ctf.md`) → debrief.
+2. **In class (150 min)** — cumulative review quiz (`../../quizzes/quiz2.md`) → **Security Jeopardy: Champions** → **mock CTF** (`mock-ctf.md`) → debrief.
 3. **Prepare** — the **final is Weeks 18–19**.
 
 *Time breakdown: [AGENDA.md](../../AGENDA.md).*

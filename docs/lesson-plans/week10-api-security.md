@@ -2,13 +2,19 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 10 · ⬚ |
-| **Contact time** | 300 min = 120 lecture + 180 laboratory |
+| **Contact time** | 150 min = 10 quiz + 15 explanation & demo + 125 supervised lab (in class: Tasks 0, 1, 2, 3, 5; homework: Tasks 4 (optional bonus)) |
 | **Lab folder** | `labs/week10-api-security` |
 | **Slides** | `slides/week10.md` |
 | **Standards** | OWASP API Security Top 10:2023 — **API1 BOLA** · **API3 Broken Object Property Level Authorization** (mass assignment) · **API4 Unrestricted Resource Consumption** |
 | **CLOs addressed** | **CLO2** exploit · **CLO3** remediate · **CLO5** evaluate & communicate · **CLO6** evidence & ethics |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** §4's lecture is now
+> pre-class material (the week's slides), shown in class only as a 15-min explanation + demo; §5
+> runs only the worksheet's *in class* tasks, and the rest are homework. The tables below keep the
+> original 120 + 180-min layout as the content reference — the class-time plan is in
+> [AGENDA.md](../../AGENDA.md) and each worksheet's Part 3.
 
 ---
 

@@ -1,4 +1,4 @@
-# Worksheet 16 — Capstone Studio & CTF Warm-up (4 hrs)
+# Worksheet 16 — Capstone Studio & CTF Warm-up
 
 > **Course:** Software Security (KOSEN69) · Week 16
 > **Aligned to:** All prior weeks + OWASP Top 10 (2025) — https://owasp.org/Top10/2025/ ; CWE mapping required throughout.
@@ -95,6 +95,8 @@ Answer as a team (2–4 sentences each).
 | SBOM & signing | 15 | Complete SBOM + verifiable signed artifact |
 | CI pipeline | 15 | Security gate fails closed on HIGH/CRITICAL; run linked |
 | Demo & Q&A | 15 | Clear 10-min demo, handles 5-min Q&A; CWE/OWASP mapping throughout |
+
+**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

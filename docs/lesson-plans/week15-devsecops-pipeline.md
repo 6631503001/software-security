@@ -2,13 +2,19 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 15 · ⬚ |
-| **Contact time** | 300 min = 120 lecture + 180 laboratory |
+| **Contact time** | 150 min = 10 quiz + 15 explanation & demo + 110 supervised lab (in class: Tasks 0, 1, 1b, 2; homework: Tasks 3, 4, 5) |
 | **Lab folder** | `labs/week15-devsecops-pipeline` |
 | **Slides** | `slides/week15.md` |
 | **Standards** | OWASP 2025 **A09 Security Logging & Alerting Failures** · **A10 Mishandling of Exceptional Conditions** (the scanners also cover A02/A03/A07) · CWE-636 (fail open), CWE-532 (logging sensitive data), CWE-209, CWE-489, CWE-798 · CISA **"Secure by Design"** |
 | **CLOs addressed** | **CLO4** operate security tooling across the SDLC · **CLO5** evaluate & communicate (course-spec §6). The recurring *Audit the AI* / *EiPE* + *Prompt Problem* parts carry **CLO5**, and *Evidence & Integrity* carries **CLO6** (course-spec §4). |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** §4's lecture is now
+> pre-class material (the week's slides), shown in class only as a 15-min explanation + demo; §5
+> runs only the worksheet's *in class* tasks, and the rest are homework. The tables below keep the
+> original 120 + 180-min layout as the content reference — the class-time plan is in
+> [AGENDA.md](../../AGENDA.md) and each worksheet's Part 3.
 
 ---
 

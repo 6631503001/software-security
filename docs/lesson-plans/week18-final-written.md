@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 18 · ⬚ |
-| **Contact time** | 150 min — a single written-exam block. No lecture, no lab (`AGENDA.md` per-week table row 18, and *Week 8 / 18 — Written exam*: "120 min (midterm) / 150 min (final)") |
+| **Contact time** | 150 min — a single written-exam block that fills the class. No lecture, no lab (`AGENDA.md`, *Week 8 / 18 — Written exam*: "120 min (midterm) / 150 min (final)") |
 | **Lab folder** | `labs/week18-final-written` (holds the paper, not a target) |
 | **Slides** | `slides/week18.md` — proctor deck, not a teaching deck |
 | **Covers** | Cumulative, emphasis on **Weeks 10–16** (API, memory safety, supply chain, cloud/container, AI/LLM, DevSecOps) |

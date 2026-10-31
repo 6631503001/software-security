@@ -46,6 +46,12 @@ To reach the CTF arena's private-network challenges you'll also need WireGuard �
 | 16 | Capstone studio & CTF warm-up | — | Practice CTF + peer review |
 | **17** | **🔁 Reflection & Review (pre-final)** | — | "Jeopardy: Champions Edition" + mock final |
 | **18–19** | **📝 Final** (Wk18 written · Wk19 capstone CTF) | — | cumulative, emphasis Wk 10–16 |
+| **20** | **🗒️ Examination feedback & course reflection** | — | corrections + reflection |
+
+**KOSEN-KMITL** runs this as **02005094 Software Security 2** (1.5 credits): one 150-minute class a
+week for 20 weeks, mostly supervised lab — each worksheet marks which tasks are done in class and
+which are homework ([AGENDA.md](AGENDA.md)). **MFU** runs the same material as 1305315 in seven
+all-day sessions ([syllabus-mfu.md](syllabus-mfu.md)).
 
 Full details: [syllabus.md](syllabus.md). Expanded design rationale: [course-plan-19weeks.md](course-plan-19weeks.md) · curriculum benchmark vs. top universities: [curriculum-review.md](curriculum-review.md) · per-week readings & resources: [readings.md](readings.md).
 

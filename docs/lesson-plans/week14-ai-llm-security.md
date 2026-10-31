@@ -2,13 +2,19 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 14 · ⬚ |
-| **Contact time** | 300 min = 120 lecture + 180 laboratory |
+| **Contact time** | 150 min = 10 quiz + 15 explanation & demo + 120 supervised lab (in class: Tasks 0, 1, 2, 5; homework: Tasks 3, 4) |
 | **Lab folder** | `labs/week14-ai-llm-security` |
 | **Slides** | `slides/week14.md` |
 | **Standards** | OWASP **Top 10 for LLM Applications (2025)** — **LLM01** Prompt Injection · **LLM02** Sensitive Information Disclosure · **LLM05** Improper Output Handling · **LLM06** Excessive Agency · **LLM08** Vector/Embedding Weaknesses · **LLM10** Unbounded Consumption |
 | **CLOs addressed** | **CLO2** exploit · **CLO3** remediate · **CLO5** evaluate & communicate · **CLO6** evidence & ethics |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** §4's lecture is now
+> pre-class material (the week's slides), shown in class only as a 15-min explanation + demo; §5
+> runs only the worksheet's *in class* tasks, and the rest are homework. The tables below keep the
+> original 120 + 180-min layout as the content reference — the class-time plan is in
+> [AGENDA.md](../../AGENDA.md) and each worksheet's Part 3.
 
 ---
 

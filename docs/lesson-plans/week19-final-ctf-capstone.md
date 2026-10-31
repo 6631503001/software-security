@@ -2,15 +2,18 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 19 · ⬚ |
-| **Contact time** | 240 min — a single final block: **150 min capstone CTF + 90 min for viva spot-checks of flagged teams and wrap-up** (demo videos are graded beforehand). No lecture, no lab (`AGENDA.md`, *Week 19 — Final CTF + project demos (240 min)*) |
+| **Contact time** | 150 min — the capstone CTF fills the class; demo videos are graded beforehand and flagged teams' short Q&A happens outside the CTF time. No lecture, no lab (`AGENDA.md`, *Week 19 — Final CTF + project demos (150 min)*) |
 | **Lab folder** | `labs/week19-final-ctf-capstone` — holds `README.md` and `ctf.md` (the student paper); it ships no target of its own |
 | **Slides** | `slides/week19.md` — proctor/compère deck, not a teaching deck |
 | **Covers** | The whole term (`ctf.md`, *Covers*): web, API, memory safety, supply chain, cloud, LLM/agentic and DevSecOps challenges — 14 challenges, 165 pts (`ctf.md`; `labs/week19-final-ctf-capstone/README.md`) |
 | **Targets** | `labs/week04-injection` · `labs/week05-xss-client-side` · `labs/week06-authn-authz` · `labs/week10-api-security` · `labs/week11-memory-safety-exploitation` · `labs/week12-supply-chain` · `labs/week13-cloud-container` · `labs/week14-ai-llm-security` · `labs/week15-devsecops-pipeline` (the week named against each challenge in `ctf.md`) · `project/starter-app` for the demos. **Graded flags for challenges 1–8, 12 and 14 come from hosted instances at `ctf.zcr.ai` (§3.1); the local lab folders are practice copies for those, and the only targets for challenges 9, 10, 11 and 13, which have no hosted instance** |
 | **Standards** | The ids the source weeks' READMEs attach: **A05** Injection · CWE-89, CWE-78 (W4) · **A05** Injection · CWE-79, CWE-352 (W5) · **A01** Broken Access Control, **A07** Authentication Failures · CWE-639, CWE-287 (W6) · **API1** BOLA, **API3** broken object property level auth (mass assignment), **API4** unrestricted resource consumption (W10) · CWE-787, CWE-121, CWE-416, CWE-134, CWE-193 (W11) · **A03** Software Supply Chain Failures, **A08** Software or Data Integrity Failures · CWE-1104, CWE-829 (W12) · **A02** Security Misconfiguration · CWE-732, CWE-16 (W13) · **LLM01** Prompt Injection, **LLM02** Sensitive Info Disclosure, **LLM05** Improper Output Handling, **LLM06** Excessive Agency, **LLM08** Vector/Embedding Weaknesses, **LLM10** Unbounded Consumption (W14) · **A09** Security Logging & Alerting Failures, **A10** Mishandling of Exceptional Conditions (W15) |
 | **CLOs addressed** | **CLO2** exploit · **CLO3** remediate · **CLO5** evaluate & communicate · **CLO6** evidence & ethics (course specification §6, row 19) |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** The timings below were
+> written for a longer block; the 150-min agenda is in [AGENDA.md](../../AGENDA.md).
 
 ---
 
@@ -365,7 +368,7 @@ components are the project (15%) and this capstone CTF. Two consequences to sett
 **Make-up sittings.** `instructor/exams/` holds a parallel **Form B for the written papers only**
 (W8 and W18); there is no Form B for a practical. The rotation pool is `instructor/exams/item-bank.md`.
 Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The general late rule
-(−10%/day, up to 3 days) is `syllabus.md` §6.
+(KOSEN: −10% per started day, 0 after 10 days) is `syllabus.md` §6.
 
 ## 6. Academic-integrity controls actually used
 

@@ -4,7 +4,7 @@ The grand finale.
 
 ## ✅ This week — what to do
 1. **Before class** — project report + demo video link submitted (see below); team ready for the CTF.
-2. **In class (240 min)** — **Capstone CTF tournament** (`ctf.md`, whole term); the instructor may call a team aside for a short project Q&A.
+2. **In class (150 min)** — **Capstone CTF tournament** (`ctf.md`, whole term); the instructor may call a team aside for a short project Q&A.
 3. **Submit** — final project + report (see [project/README.md](../../project/README.md)).
 
 *Time breakdown: [AGENDA.md](../../AGENDA.md).*

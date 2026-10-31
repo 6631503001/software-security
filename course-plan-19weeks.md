@@ -1,4 +1,4 @@
-# Software Security — 19-Week Course Plan (KOSEN69)
+# Software Security 2 — Course Plan (KOSEN69 · 02005094, 20 weeks)
 
 > **Theme:** Every teaching week is built around **one signature game, lab, or competition** — students learn by *breaking* and *defending*, scored on a leaderboard. Lecture is the warm-up; the activity is the main event.
 
@@ -17,8 +17,9 @@
 | **Unit C — Systems & Modern Stack** | 10–16 | API, memory safety, supply chain, cloud, AI/LLM, DevSecOps, capstone |
 | **🔁 Reflection & Review** | **17** | Consolidate Wk 10–16, mock CTF, exam prep |
 | **📝 FINAL EXAM** | **18–19** | Wk18 = written (cumulative, emphasis Wk10–16) · Wk19 = capstone CTF tournament + project demos |
+| **🗒️ Feedback** | **20** | Exam feedback, corrections, recurring misconceptions, course reflection |
 
-**12 teaching weeks** (1–6, 10–15) · **1 capstone week** (16) · **2 review weeks** (7, 17) · **2 exam blocks** (8–9, 18–19).
+**12 teaching weeks** (1–6, 10–15) · **1 capstone week** (16) · **2 review weeks** (7, 17) · **2 exam blocks** (8–9, 18–19) · **1 feedback week** (20).
 
 ---
 
@@ -27,7 +28,7 @@
 Beyond the signature game, each teaching week's worksheet carries the same evidence-based,
 AI-resilient structure (see [AGENDA.md](AGENDA.md) for time-boxing):
 
-- **Lecture (120 min)** → **lab (180 min)** = a signature game (break) + a defend/fix task.
+- **One 150-min class:** ~10-min quiz → ~15-min explanation + demo → ~125 min of supervised lab = a signature game (break) + a defend/fix task. The concept material is pre-class; tasks that don't fit the class are homework, marked on each worksheet.
 - **Evidence & Integrity** — identity-stamped screenshots; **per-student flags** make copying traceable.
 - **🤖 Audit the AI** — students critique an AI-generated exploit/fix (find the insecure/hallucinated parts).
 - **🧠 Explain-in-Plain-English + Prompt Problem** — comprehension + AI-literacy (Denny et al. 2024).
@@ -141,6 +142,11 @@ AI-resilient structure (see [AGENDA.md](AGENDA.md) for time-boxing):
 ## 📝 Weeks 18–19 — FINAL EXAM
 - **Week 18 — Written exam:** cumulative, with emphasis on Weeks 10–16 (API, memory safety, supply chain, cloud, AI/LLM, DevSecOps) — this is what `labs/week18-final-written/exam.md` implements.
 - **Week 19 — Capstone CTF tournament + final project demos:** the big finale — a full CTF covering the whole term, plus each team's secured-build demo video, submitted with the report (threat model → vulns → remediation → SBOM/signing → CI pipeline).
+
+---
+
+## 🗒️ Week 20 — Examination Feedback & Course Reflection
+- **Format:** No new content, nothing graded. Review assessment feedback, work through corrections, discuss recurring misconceptions, and connect assessment evidence to the course learning outcomes (the subject sheet's Week 20).
 
 ---
 

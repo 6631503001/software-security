@@ -1,150 +1,166 @@
-# Weekly Agenda & Time Plan
+# Weekly Agenda & Time Plan — KOSEN-KMITL 02005094
 
-**Standard contact time:** 5 hrs/week = **120 min lecture + 180 min lab** (per syllabus: 2 lecture + 3 lab hrs).
-**Quizzes:** a short **weekly quiz (~10 min) at the start of every teaching week** (retrieval
-practice, low-stakes, drop lowest 1–2). Two **cumulative review quizzes** (25 pts) run in the
-review weeks (W7 pre-midterm, W17 pre-final).
+**Class time:** **150 min/week** (3 slots) over **20 weeks**, per the official subject sheet
+(Software Security 2, 1.5 credits). Most of the class is supervised lab practice; brief
+explanations and demonstrations support it.
+
+- **Before class:** the week's slides (the full concept material — what used to be a 120-min
+  lecture) and the worksheet's **Part 2** questions.
+- **In class:** a short quiz, a brief explanation + demo, then the worksheet's *in class* tasks.
+- **After class (homework):** the worksheet's *homework* tasks, Part 4, *Audit the AI* and
+  *Comprehension & Prompt*. Everything is submitted before the next class.
+- **Quizzes:** a short **weekly quiz (~10 min) at the start of every teaching week** (retrieval
+  practice, low-stakes, drop lowest 1–2). Two **cumulative review quizzes** (25 pts) run in the
+  review weeks (W7 pre-midterm, W17 pre-final).
+
+> **Timetable: one contiguous 150-min block** (3 consecutive slots; confirmed by the owner
+> 2026-10-31). Everything below — the teaching-week template, the Docker start-up, and the 150-min
+> exams in Weeks 9, 18 and 19 — depends on it; re-plan if the timetable ever splits the slots.
 
 ---
 
-## Standard teaching-week template (Weeks 1–6, 10–15)
+## Standard teaching-week template (Weeks 1–6, 10–15) — 150 min
 
-### Lecture — 120 min
 | Time | Block |
 |------|-------|
-| 0:00–0:10 | **Weekly quiz** (retrieval) + recap + today's agenda |
-| 0:10–0:55 | Core concepts |
-| 0:55–1:05 | Break |
-| 1:05–1:35 | Vulnerability deep-dive + real-world cases |
-| 1:35–1:55 | Defenses / secure coding |
-| 1:55–2:00 | Signature-game briefing → to lab |
+| 0:00–0:10 | **Weekly quiz** (retrieval) + today's goal |
+| 0:10–0:25 | **Brief explanation + live demo** of the week's flaw and its fix — the full concepts are pre-class |
+| 0:25–2:30 | **Supervised lab:** the worksheet's *in class* tasks — the signature game, then the defend/fix task (≤125 min). The instructor circulates, checks evidence and reasoning, and runs 2–3 **viva spot-checks** |
 
-### Lab — 180 min
-| Time | Block |
-|------|-------|
-| 0:00–0:15 | Onboarding: stand up target (`docker compose up`), confirm it runs |
-| 0:15–1:45 | Exploitation tasks (the signature game) — ~4–5 tasks |
-| 1:45–2:25 | Defend / fix task (apply the secure version, prove exploit fails) |
-| 2:25–2:45 | **AI-resilient tasks:** Audit-the-AI + EiPE + Prompt Problem (start in class, finish as homework) |
-| 2:45–2:55 | **Rotating micro-demo:** 2–3 students give a 2–3 min "show your exploit/fix" (different students each week → everyone presents ~1–2× per term) |
-| 2:55–3:00 | Submit worksheet (PDF → Classroom) + push fix (GitHub) + wrap-up |
+Submission (worksheet PDF → `learn.zcr.ai/submit`, fix → GitHub) is due **before the start of the next week's
+class**, homework tasks included. Late work loses 10% per started day and reaches 0 after 10 days
+(`syllabus.md` §6).
 
-> **No formal weekly presentation** (impossible for N≈80–120 in the time budget). Instead,
-> "explain it live" is delivered by the **rotating micro-demo** above + random **viva spot-checks**
-> (2–3 students reproduce/explain their own work) — which also double as anti-AI controls.
-> Full presentations are reserved for the **capstone** (W16 WIP + W19 demo).
+> **Why there is no in-class micro-demo any more.** In a 150-min class the time goes to the lab.
+> "Explain it live" is carried by the **viva spot-checks** during the lab — which double as the
+> anti-AI control — and by the capstone (W16 WIP studio + the W19 demo video).
 >
 > **Every teaching week's worksheet** has four graded parts beyond the lab tasks:
 > **Evidence & Integrity** (identity-stamped proof), **Audit the AI** (critique an AI answer),
 > **Explain-in-Plain-English** + **Prompt Problem**. The live **CTFd / Houses scoreboard**
 > (if running) is shown at the start/end of class.
 
-> The **weekly quiz** is the first ~10 min of the lecture block (every teaching week) — no
-> separate session needed. The two **cumulative review quizzes** run in the review weeks (7, 17).
+### How each worksheet is split
+
+Each worksheet's Part 3 now says which tasks are **in class** and which are **homework**. The rule:
+the tasks the subject sheet's *Method* line for that week says happen in class, plus the defend/fix
+task, stay in class; project-target tasks, extensions and write-ups go home. **Week 1 is the
+exception:** its Method line is modelling only (sandbox, trust boundaries, the card exercise), so its
+rank-and-fix Task 8 is homework. **No task's minutes and no rubric changed** — only where each task
+is done.
+
+| Wk | Worksheet budget | In class | Before class | Homework |
+|----|:---:|---|---|---|
+| 1 | 220 | Tasks 0, 1, 2, 3, 3b, 4 — **125** | — | Tasks 5, 6, 7, 8 — **95** |
+| 2 | 180 | Tasks 0, 1, 2, 3, 4, 7, 8 — **115** | — | Tasks 5, 6 — **65** |
+| 3 | 180 | Tasks 0, 1, 2, 3, 4, 7, 9 — **115** | — | Tasks 5, 6, 8 — **65** |
+| 4 | 150 | Tasks 0, 1, 2, 3, 5 — **125** | — | Task 4 — **25** (Task 5's upload re-test goes with it) |
+| 5 | 150 | Tasks 0, 1, 2, 4, 5 — **125** | — | Task 3 — **25** |
+| 6 | 150 | Tasks 0, 1, 2, 3, 5 — **125** | — | Task 4 — **25** (Task 5's `/api/admin` re-test goes with it) |
+| 10 | 145 | Tasks 0, 1, 2, 3, 5 — **125** | — | Task 4 — optional bonus, **20** |
+| 11 | 145 | Tasks 0, 1, 2, 4 — **120** | — | Task 3 — **25** |
+| 12 | 150 | Tasks 0, 2, 3, 4 — **115** | — | Task 1 — **35** |
+| 13 | 180 | Tasks 1, 2, 4 — **120** | Task 0 — **15** | Tasks 3, 5 — **45** |
+| 14 | 180 | Tasks 0, 1, 2, 5 — **120** | — | Tasks 3, 4 — **60** |
+| 15 | 205 | Tasks 0, 1, 1b, 2 — **110** | — | Tasks 3, 4, 5 — **95** (see the Week 15 note below) |
+
+Weeks with less than 125 min in class use the slack for feedback and for students who fell behind.
 
 ---
 
 ## Per-week time table
 
-| Wk | Type | Lecture | Lab | Quiz | Exam | Total |
-|----|------|:---:|:---:|:---:|:---:|:---:|
-| 1 | Teach — Threat Modeling | 120 | 180* | 10† | — | 300 |
-| 2 | Teach — SDLC + Fuzzing | 120 | 180 | 10† | — | 300 |
-| 3 | Teach — Cryptography | 120 | 180 | 10† | — | 300 |
-| 4 | Teach — Injection | 120 | 180 | 10† | — | 300 |
-| 5 | Teach — XSS | 120 | 180 | 10† | — | 300 |
-| 6 | Teach — Auth & Access | 120 | 180 | 10† | — | 300 |
-| 7 | 🔁 Review (pre-midterm) | — | — | 25‡ | — | 300 |
-| 8 | 📝 Midterm — Written | — | — | — | 120 | 120 |
-| 9 | 📝 Midterm — CTF | — | — | — | 150 | 150 |
-| 10 | Teach — API Security | 120 | 180 | 10† | — | 300 |
-| 11 | Teach — Memory Safety | 120 | 180 | 10† | — | 300 |
-| 12 | Teach — Supply Chain | 120 | 180 | 10† | — | 300 |
-| 13 | Teach — Cloud/Container | 120 | 180 | 10† | — | 300 |
-| 14 | Teach — AI/LLM | 120 | 180 | 10† | — | 300 |
-| 15 | Teach — DevSecOps | 120 | 180 | 10† | — | 300 |
-| 16 | Capstone Studio | — | 300 | — | — | 300 |
-| 17 | 🔁 Review (pre-final) | — | — | 25‡ | — | 300 |
-| 18 | 📝 Final — Written | — | — | — | 150 | 150 |
-| 19 | 📝 Final — CTF + Demos | — | — | — | 240 | 240 |
+| Wk | Type | Quiz | Demo | Lab (in class) | Exam | Class total | Worksheet homework |
+|----|------|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1 | Teach — Threat Modeling | 10 | 15 | 125 | — | 150 | 95 |
+| 2 | Teach — SDLC + Fuzzing | 10 | 15 | 115 | — | 150 | 65 |
+| 3 | Teach — Cryptography | 10 | 15 | 115 | — | 150 | 65 |
+| 4 | Teach — Injection | 10 | 15 | 125 | — | 150 | 25 |
+| 5 | Teach — XSS | 10 | 15 | 125 | — | 150 | 25 |
+| 6 | Teach — Auth & Access | 10 | 15 | 125 | — | 150 | 25 |
+| 7 | 🔁 Review (pre-midterm) | 30‡ | — | — | — | 150 | — |
+| 8 | 📝 Midterm — Written | — | — | — | 120 | 150 | — |
+| 9 | 📝 Midterm — CTF | — | — | — | 150 | 150 | — |
+| 10 | Teach — API Security | 10 | 15 | 125 | — | 150 | 0 (+20 optional) |
+| 11 | Teach — Memory Safety | 10 | 15 | 120 | — | 150 | 25 |
+| 12 | Teach — Supply Chain | 10 | 15 | 115 | — | 150 | 35 |
+| 13 | Teach — Cloud/Container | 10 | 15 | 120 | — | 150 | 60 (15 before class) |
+| 14 | Teach — AI/LLM | 10 | 15 | 120 | — | 150 | 60 |
+| 15 | Teach — DevSecOps | 10 | 15 | 110 | — | 150 | 95 |
+| 16 | Capstone Studio | — | — | 150 | — | 150 | project |
+| 17 | 🔁 Review (pre-final) | 30‡ | — | — | — | 150 | — |
+| 18 | 📝 Final — Written | — | — | — | 150 | 150 | — |
+| 19 | 📝 Final — CTF + Demos | — | — | — | 150 | 150 | — |
+| 20 | 🗒️ Exam feedback & reflection | — | — | — | — | 150 | — |
 
-*W1 lab includes Lab 0 environment setup (~45 min) — onboarding block is longer.
-†Weekly quiz (~10 min) is the first part of the 120-min lecture block — not extra time.
-‡Cumulative review quiz (25 pts) used to prep for the exam.
+‡Cumulative review quiz (25 pts, 30 min) used to prep for the exam.
+"Worksheet homework" counts only the Part 3 tasks marked homework; Part 2 (before class), Part 4
+and the AI-resilient parts come on top.
 
 ---
 
 ## Special-week agendas
 
-### Week 7 & 17 — Review (300 min)
+### Week 7 & 17 — Review (150 min)
 | Time | Block |
 |------|-------|
-| 0:00–0:30 | **Cumulative review quiz** (quiz1 / quiz2 — 25 pts) |
-| 0:30–1:45 | Security Jeopardy team review |
-| 1:45–2:00 | Break |
-| 2:00–4:30 | Mock CTF (exact format of the upcoming exam) |
-| 4:30–5:00 | Debrief: common mistakes + exam logistics |
+| 0:00–0:30 | **Cumulative review quiz** (quiz1 / quiz2 — 25 pts, 30 min as the quiz files state) |
+| 0:30–1:05 | Security Jeopardy team review |
+| 1:05–2:20 | Mock CTF in the format of the upcoming exam — the first 75 min in class. It is ungraded practice, so students finish the remaining challenges at home |
+| 2:20–2:30 | Debrief: common mistakes + exam logistics |
 
 ### Week 8 / 18 — Written exam
-- Single block: **120 min (midterm) / 150 min (final)**. No lab.
+- **120 min (midterm) / 150 min (final)**, unchanged — both are graded, so their length is the
+  instructor's decision, not this plan's. The Week 18 paper fills the class exactly: seat students
+  and hand out papers before the slot starts.
 
 ### Week 9 — Midterm CTF practical (150 min)
-- 0:00–0:10 rules + target check · 0:10–2:30 solve challenges · submit flags.
+- 0:00–0:10 rules + target check · 0:10–2:30 solve challenges · submit flags. This fills the class
+  exactly (graded, length unchanged): bring the targets up before the slot starts.
 
-### Week 16 — Capstone Studio (300 min)
+### Week 16 — Capstone Studio (150 min)
 | Time | Block |
 |------|-------|
-| 0:00–2:00 | Team WIP demos (attack → root cause → fix) + peer review |
-| 2:00–2:15 | Break |
-| 2:15–4:45 | Practice CTF tournament (previews Week 19) |
-| 4:45–5:00 | Feedback + finalize checklist before the final |
+| 0:00–1:00 | Team WIP demos (attack → root cause → fix) + peer review, run as **paired stations**: each team gives its 10-min demo + 5-min Q&A to one other team, then they swap; the instructor circulates |
+| 1:00–2:15 | Practice CTF scrimmage (ungraded; stays open online after class) |
+| 2:15–2:30 | Feedback + finalize checklist before the final |
 
-### Week 19 — Final CTF + project demos (240 min)
+### Week 19 — Final CTF + project demos (150 min)
 | Time | Block |
 |------|-------|
-| 0:00–2:30 | Capstone CTF tournament (whole term) |
-| 2:30–4:00 | Project demo videos are **graded beforehand** (link in the report, due with it); use this block for short live Q&A with **flagged teams only**, feedback and wrap-up — see the note below |
-> **Demo format — read before timetabling.** 90 min ÷ (10-min demo + 5-min Q&A) is **six team
-> slots**. At N≈80–120 in teams of 2–3 that is 27–60 teams, so the live-demo-for-everyone format
-> cannot run as written. The format actually used: each team **submits a pre-recorded demo video
-> before the session** (graded asynchronously against the project rubric), and the in-class block
-> is **3 minutes of live Q&A per team** — which is what the rubric's understanding checks and the
-> anti-AI controls actually need. 90 min covers ~30 teams; above that, run two parallel rooms with
-> a second assessor, or split Q&A across the Week 16 studio and Week 19.
->
-> **Decision 2026-10-24 (supersedes the per-team Q&A above):** there is no per-team Q&A slot. The
-> demo video is linked in the report and due with it, and graded asynchronously on the project
-> rubric; only teams the instructor flags (report ≠ repo, a similarity hit, work the team can't
-> account for) are called for a short live Q&A. Reason: the MFU final day (Session 7) already holds
-> the written exam (AM) and the capstone CTF (PM).
+| 0:00–2:30 | Capstone CTF tournament (whole term, graded, length unchanged) — fills the class |
 
+> **Demo format (decision 2026-10-24).** There is no per-team live demo or Q&A slot. The demo video
+> is linked in the report and due with it, and graded asynchronously on the project rubric; only
+> teams the instructor flags (report ≠ repo, a similarity hit, work the team can't account for) are
+> called for a short live Q&A, outside the CTF time.
+
+### Week 20 — Examination feedback & course reflection (150 min)
+| Time | Block |
+|------|-------|
+| 0:00–0:45 | Assessment feedback: walk through the final written exam and the capstone CTF |
+| 0:45–1:30 | Corrections: students rework their weakest items and explain the corrected reasoning |
+| 1:30–2:05 | Recurring misconceptions — class discussion |
+| 2:05–2:30 | Course reflection: connect your assessment evidence to the course learning outcomes |
+
+No new content and nothing graded.
 
 ---
 
-## ⚠️ Note (drift to resolve)
-Current `worksheet.md` Part-3 durations vary (145–205 min) against the **lab = 180 min** this plan
-standardizes. Checked week by week against each worksheet's own task budgets:
+## ⚠️ Note — worksheet budgets vs the 150-min class
 
-| Task budget | Weeks | Status |
-|---|---|---|
-| 180 min | 1, 2, 3, 13, 14 | Matches the block exactly |
-| 150 min | 4, 5, 6, 12 | Lighter — would need a few more tasks / extension activities to fill the block |
-| 145 min | 10, 11 | Lighter — same. Week 10's 145 includes a 20-min **optional** bonus (Task 4 crAPI Raid), so its required content is only 125 |
-| 205 min | 15 | **Deliberate exception — see below** |
+Worksheet Part 3 budgets run from 145 to 220 min, and none of them fits a 150-min class whole. They
+are not trimmed: each worksheet marks its tasks *in class* or *homework* (table above).
 
-**Week 15 over-books on purpose.** Its Part 3 is headed *"180 min in class"* while its task budgets
-total 205, because Tasks 2–4 are dominated by GitHub Actions queue and scan wall-clock rather than
-classroom work: students push in class and finish the write-up at home. Do **not** "fix" this by
+- **Week 1 adds up to 220 min, not 180.** Task 3b (the systems-level pass) was added after the
+  rest of the worksheet was timed; this file used to list Week 1 as matching a 180-min block.
+- **Week 10's 145 includes a 20-min optional bonus** (Task 4, crAPI Raid), now optional homework,
+  so its required content is 125 — exactly the lab block.
+
+**Week 15 over-books on purpose.** Its task budgets total 205, because Tasks 2–4 are dominated by
+GitHub Actions queue and scan wall-clock rather than classroom work. Do **not** "fix" this by
 re-timing the tasks — Task 4 feeds the Defense score and Task 5 produces the Break-the-Build
 scoreboard, so trimming them silently changes graded work.
-[The lesson plan](docs/lesson-plans/week15-devsecops-pipeline.md) leaves Task 5 unplaced (⬚) and
-lists the three ways to absorb the overrun — run Task 5 as homework, compress Tasks 2–4, or demo
-Task 1b from the front — one of which the instructor picks before the session.
-
-**The 180-min weeks fill the block entirely.** Weeks 1–3 and 13–14 leave no dedicated slot for the
-*AI-resilient* (2:25–2:45) and *micro-demo/submit* (2:45–3:00) rows of the template above. They run
-to the fallback the worksheets already state: the AI-resilient tasks start in class and finish as
-homework, the last minutes of the final task's slot double as the submit-and-wrap window, and the
-rotating micro-demo rolls to the next week or is sampled by viva. Each affected lesson plan carries
-this as a timing/scheduling note under its laboratory table. Resolving that tension in the template
-itself — trim tasks to ~145 to fit, or drop the in-class micro-demo — is still open.
+[The lesson plan](docs/lesson-plans/week15-devsecops-pipeline.md) lists three ways to absorb the
+overrun. This plan combines the first two: Tasks 0, 1, 1b and 2 (push the gate) run in class; Tasks
+3–5 wait on Actions runs and the Red/Blue results and are homework. Task 1b stays in class.

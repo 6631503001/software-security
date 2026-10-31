@@ -2,13 +2,19 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 1 · ⬚ |
-| **Contact time** | 300 min = 120 lecture + 180 laboratory |
+| **Contact time** | 150 min = 10 quiz + 15 explanation & demo + 125 supervised lab (in class: Tasks 0, 1, 2, 3, 3b, 4; homework: Tasks 5, 6, 7, 8) |
 | **Lab folder** | `labs/week01-threat-modeling` |
 | **Slides** | `slides/week01.md` |
 | **Standards** | OWASP 2025 **A06 Insecure Design** · CWE-501 (Trust Boundary Violation) |
 | **CLOs addressed** | **CLO1** model · **CLO6** ethics & evidence (course specification §6, Week 1 row: "1, 6"). The worksheet's recurring *Audit the AI* and *EiPE + Prompt Problem* parts additionally carry **CLO5** per specification §4. |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** §4's lecture is now
+> pre-class material (the week's slides), shown in class only as a 15-min explanation + demo; §5
+> runs only the worksheet's *in class* tasks, and the rest are homework. The tables below keep the
+> original 120 + 180-min layout as the content reference — the class-time plan is in
+> [AGENDA.md](../../AGENDA.md) and each worksheet's Part 3.
 
 ---
 

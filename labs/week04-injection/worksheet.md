@@ -1,4 +1,4 @@
-# Worksheet 4 — Injection & Input Handling (3 hrs)
+# Worksheet 4 — Injection & Input Handling
 
 > **Course:** Software Security (KOSEN69) · **Week 4**
 > **Aligned:** OWASP 2025 **A05 Injection** · **CWE-89** (SQLi), **CWE-78** (OS command injection), **CWE-434** (unrestricted upload)
@@ -24,7 +24,17 @@ Answer in 2–4 sentences each.
 
 ![One untrusted request value in the Week 4 lab fans out to three interpreters — the SQL engine (CWE-89), the OS shell (CWE-78) and the filesystem (CWE-434) — with the specific control that stops it at each sink: a parameterised query, an argument vector without a shell, and an extension allow-list.](img/injection-sinks.svg)
 
-## Part 3 — Hands-on Lab (150 min)
+## Part 3 — Hands-on Lab (125 min in class + 25 min homework)
+
+> **In class or homework.** Tasks marked *in class* are done during the lab, where the instructor
+> checks your evidence and reasoning. Tasks marked *homework* are finished after class and submitted
+> with the rest of this worksheet, before the next class. Every task keeps its time and its marks.
+> Answer Part 2 before class, from this week's slides; Part 4, *Audit the AI* and *Comprehension &
+> Prompt* are homework.
+>
+> **In class (125 min):** Tasks 0, 1, 2, 3 and 5 · **Homework (25 min):** Task 4
+>
+> Task 5's re-test of the upload payload goes with Task 4.
 
 **Learning goals:** extract data via SQLi, achieve OS command injection, exploit an unrestricted upload, then prove each fix in `solution_app.py` blocks the payload.
 
@@ -47,7 +57,7 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # Juice Shop -> http://
 
 ---
 
-**Task 0 — Onboarding (5 min).** Browse to `http://localhost:8080/login?user=alice&pw=alicepw` and confirm `Welcome alice`. Note the seeded users (`alice`, `bob`). Screenshot the working app. *Deliverable: screenshot.*
+**Task 0 — Onboarding (5 min, in class).** Browse to `http://localhost:8080/login?user=alice&pw=alicepw` and confirm `Welcome alice`. Note the seeded users (`alice`, `bob`). Screenshot the working app. *Deliverable: screenshot.*
 
 **Before you start — see why concatenation is the flaw** 🔬 Type any input and watch which characters the database will parse as *SQL* rather than as a name. The point is not the payload; it is that with concatenation the input becomes syntax, and with a parameterised query it structurally cannot. You will be asked to state that difference in your own words in Task 5.
 
@@ -55,18 +65,18 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # Juice Shop -> http://
 sqli-parse
 ```
 
-**Task 1 — Auth bypass via SQLi (25 min) 🐉 Hit #1.**
+**Task 1 — Auth bypass via SQLi (25 min, in class) 🐉 Hit #1.**
 - *Goal:* log in as `alice` with **no valid password**.
 - *Steps:* hit `/login?user=alice'--&pw=x`, then `/login?user=x' OR '1'='1'--&pw=x` (the trailing `--` is required: without it, SQL binds `AND` tighter than `OR`, so `... OR '1'='1' AND password='x'` matches no row). Observe the comment in the query at lines 61–63 of `vulnerable_app.py`.
 - *Note — browser vs `curl`:* pasted into a **browser**, the space in `x' OR '1'='1'--` is encoded for you; with **`curl`** an unencoded space silently returns a **blank page (no error)**. Use `curl -G "http://localhost:8080/login" --data-urlencode "user=x' OR '1'='1'--" --data-urlencode "pw=x"` — same `-G --data-urlencode` form for Task 2's `q=`.
 - *Deliverable:* both URLs + screenshot of `Welcome alice` + explain why `--` and `OR '1'='1` work.
 
-**Task 2 — Credential dump via UNION SQLi (30 min) 🐉 Hit #2.**
+**Task 2 — Credential dump via UNION SQLi (30 min, in class) 🐉 Hit #2.**
 - *Goal:* exfiltrate every username **and password** from the `users` table.
 - *Steps:* request `/search?q=' UNION SELECT username,password FROM users--`. Confirm `alice:alicepw` and `bob:bobpw` appear.
 - *Deliverable:* payload + screenshot of dumped credentials + note on why column count must match.
 
-**Task 3 — OS command injection (30 min) 🐉 Hit #3.**
+**Task 3 — OS command injection (30 min, in class) 🐉 Hit #3.**
 - *Goal:* run an arbitrary command through `/ping`, then read this lab's command-injection flag with it.
 - *Steps:* request `/ping?host=127.0.0.1;id` then `/ping?host=127.0.0.1;whoami` (URL-encode if needed). Capture the injected command's output. Then use the same injection to read the flag file the server keeps at `/flag.txt` (the space needs `--data-urlencode`, see the note on Task 1):
   ```bash
@@ -74,12 +84,12 @@ sqli-parse
   ```
 - *Deliverable:* the three payloads + screenshot of the `id`/`whoami` output **and** the `FLAG{...}` from `/flag.txt` + explanation of the `shell=True` flaw (CWE-78).
 
-**Task 4 — Unrestricted upload (25 min) 🐉 Hit #4.**
+**Task 4 — Unrestricted upload (25 min, homework) 🐉 Hit #4.**
 - *Goal:* show the upload accepts a dangerous file type with no checks (CWE-434).
 - *Steps:* `GET /upload` (form), then upload a file named `shell.py`. Confirm `saved to /tmp/uploads/shell.py`. Via the browser form this just works; via `curl` the file field is named **`f`**: `curl -F "f=@shell.py" "http://localhost:8080/upload"`. Discuss: if `UPLOAD_DIR` were web-served or executed, this is the RCE chain (here the dir is **not** served, so document the missing control rather than claiming auto-RCE).
 - *Deliverable:* upload command/screenshot + 2–3 sentences on why extension allow-listing matters.
 
-**Task 5 — Defend / fix it (35 min) 🛡️ Warm-up cleared.**
+**Task 5 — Defend / fix it (35 min, in class) 🛡️ Warm-up cleared.**
 - *Goal:* prove `solution_app.py` blocks Tasks 1–4.
 - *Steps:* stop the vulnerable container (`Ctrl-C`), then run the fixed app on the same compose env:
   ```bash
@@ -103,6 +113,8 @@ sqli-parse
 | Part 3 — Defense (Task 5: fixes proven, lines cited) | 25 |
 | Part 4 — Reflection (CWE/OWASP mapping, breach, mitigation) | 15 |
 | **Total** | **100** |
+
+**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
 
 ---
 

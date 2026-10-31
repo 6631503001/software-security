@@ -2,13 +2,19 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 3 · ⬚ |
-| **Contact time** | 300 min = 120 lecture + 180 laboratory |
+| **Contact time** | 150 min = 10 quiz + 15 explanation & demo + 115 supervised lab (in class: Tasks 0, 1, 2, 3, 4, 7, 9; homework: Tasks 5, 6, 8) |
 | **Lab folder** | `labs/week03-cryptography` |
 | **Slides** | `slides/week03.md` |
 | **Standards** | OWASP 2025 **A04 Cryptographic Failures** · CWE-327 (broken/risky crypto algorithm — MD5, AES-ECB) · CWE-916 (weak password hashing — unsalted/fast) · CWE-330 (insufficiently random values — predictable token) · CWE-321 (hard-coded cryptographic key) · **A07 Authentication Failures** · CWE-798 (hard-coded credentials — the general case of the hardcoded key) |
 | **CLOs addressed** | **CLO2** exploit · **CLO3** remediate · **CLO5** evaluate & communicate · **CLO6** evidence & ethics |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** §4's lecture is now
+> pre-class material (the week's slides), shown in class only as a 15-min explanation + demo; §5
+> runs only the worksheet's *in class* tasks, and the rest are homework. The tables below keep the
+> original 120 + 180-min layout as the content reference — the class-time plan is in
+> [AGENDA.md](../../AGENDA.md) and each worksheet's Part 3.
 
 > The course-specification schedule row for Week 3 names **CLO2, CLO3**; CLO5 and CLO6 enter through the worksheet's *Audit the AI* and *Evidence & Integrity* sections, which every teaching week carries.
 

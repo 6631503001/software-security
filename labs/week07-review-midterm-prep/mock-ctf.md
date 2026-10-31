@@ -1,7 +1,7 @@
 # Week 7 — Mock CTF (Midterm dry-run)
 
 **Covers:** Weeks 1–6 · **Format:** same as the Week 9 midterm practical · **Ungraded** (participation).
-**Time:** ~150 min · individual or pairs · Sandbox targets only (ethics policy applies).
+**Time:** ~150 min of challenges — about 75 min in class, finish the rest at home (it is ungraded practice) · individual or pairs · Sandbox targets only (ethics policy applies).
 
 > This is practice — **hints are included** and solutions point back to the labs. No real
 > exam flags here. Goal: get comfortable with the format so Week 9 has no surprises.

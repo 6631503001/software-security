@@ -37,6 +37,8 @@ Take a small web/API application (provided starter, or your own with instructor 
 | CI pipeline (works, fails build appropriately) | 10 |
 | Presentation & report clarity | 5 |
 
+**Due:** before Week 19 (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
+
 ## Peer-contribution evaluation (individual fairness)
 
 The project is the only *graded* team work, so each member's mark is adjusted for actual

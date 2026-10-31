@@ -2,15 +2,18 @@
 
 | | |
 |---|---|
-| **Course** | Software Security (⬚ course code) |
+| **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 16 · ⬚ |
-| **Contact time** | 300 min (course specification §1 records 2 lecture + 3 laboratory hours; `AGENDA.md` runs Week 16 as one continuous studio block — its per-week table gives lecture "—" and lab 300) |
+| **Contact time** | 150 min, one continuous studio block (`AGENDA.md`, *Week 16 — Capstone Studio*): WIP demos at paired stations 60 + practice CTF 75 (stays open online) + feedback 15 |
 | **Lab folder** | `labs/week16-capstone` — `README.md`, `worksheet.md`, `scrimmage.md`; it ships no target of its own |
 | **Slides** | `slides/week16.md` — studio deck, not a teaching deck |
 | **Type** | **Capstone studio — no new content.** Project work-in-progress + practice CTF |
 | **Targets** | The teams' own term-project builds (`project/README.md`, default `project/starter-app` — *NoteVault*) plus the prior weeks' lab targets used by `scrimmage.md` |
 | **Standards** | `worksheet.md` header: "All prior weeks + OWASP Top 10 (2025) — https://owasp.org/Top10/2025/ ; CWE mapping required throughout". Week 16 introduces no ids of its own |
 | **CLOs addressed** | **CLO1** model · **CLO3** remediate · **CLO5** evaluate & communicate (course specification §6, row 16) |
+
+> **KOSEN-KMITL 02005094 runs a 150-min class (subject sheet, Oct 2026).** The timings below were
+> written for a longer block; the 150-min agenda is in [AGENDA.md](../../AGENDA.md).
 
 ---
 
