@@ -5,7 +5,7 @@
 ## ✅ This week — what to do
 1. **Before class** — **Set up your environment** — install **Docker Desktop** + Burp/ZAP (a Linux VM is an optional fallback). This *is* **Lab 0**.
 2. **Slides, then class** — read `slides/week01.md` and answer the worksheet's **Part 2** before class; class opens with the weekly quiz (~10 min) and a short explanation + demo (~15 min).
-3. **Lab (in class)** — play this week's game, then complete **Worksheet 1** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up → http://localhost:8080`. Part 3 marks each task *in class* or *homework*.
+3. **Lab (in class)** — play this week's game, then complete **Worksheet 1** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up` → `http://localhost:8080/notes` (the bare `/` is a 404 by design — see Task 0). Part 3 marks each task *in class* or *homework*.
 4. **Submit before the next class** (homework tasks included) — worksheet PDF → `learn.zcr.ai/submit` · code → GitHub · weekly quiz → `learn.zcr.ai/quiz`. (How: [SUBMISSION.md](../../SUBMISSION.md).)
 5. **Project** — apply this week's lesson to your [NoteVault project](../../project/README.md) where it fits.
 
@@ -21,10 +21,10 @@
 Play Microsoft's free STRIDE threat-modeling card deck against the sample app's DFD — each valid threat scores a point. Get the deck (print-and-play PDF, free, Creative Commons): [github.com/adamshostack/eop](https://github.com/adamshostack/eop). No printer? Worksheet Task 3 embeds a digital deck — same 78 cards, playable in-browser.
 
 ## Lab 0 — Environment setup (do once)
-1. Install **Docker Desktop** (macOS/Windows) or Docker Engine + Compose (Linux).
+1. Install **Docker Desktop** (macOS/Windows) or Docker Engine + Compose (Linux). On Windows also install **Git for Windows** and run the course's commands in **Git Bash** (or WSL), not PowerShell or cmd.
 2. Install a browser proxy: Burp Suite Community **or** OWASP ZAP.
 3. Verify: `docker run hello-world` and `git --version`.
-4. *Fallback only, if Docker will not run on your machine* — install VirtualBox/UTM with a Kali or Ubuntu VM and put Docker inside it. Every later unit states its prerequisite as Docker working from Lab 0, so this is the exception, not the normal path.
+4. *Fallback only, if Docker will not run on your machine* — install VirtualBox/UTM with a Kali or Ubuntu VM and put Docker inside it. Every later unit states its prerequisite as Docker working from Lab 0, so this is the exception, not the normal path. The labs listen on the VM's own `localhost` only (so nobody else on the network can reach them), which means you open them in a browser *inside* the VM.
 
 ## Lab 1 — Threat-model a sample app
 You are given a small web app (source provided by instructor).

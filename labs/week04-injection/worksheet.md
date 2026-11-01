@@ -49,8 +49,8 @@ docker compose up            # builds python:3.12-slim, installs flask, runs vul
 ```
 Optional secondary targets:
 ```bash
-docker run --rm -it -p 80:80 vulnerables/web-dvwa        # DVWA  -> http://localhost
-docker run --rm -p 3000:3000 bkimminich/juice-shop       # Juice Shop -> http://localhost:3000
+docker run --rm -it -p 127.0.0.1:80:80 vulnerables/web-dvwa   # DVWA  -> http://localhost
+docker run --rm -p 127.0.0.1:3000:3000 bkimminich/juice-shop  # Juice Shop -> http://localhost:3000
 ```
 
 **What to submit per task:** the exact **payload/command**, a **screenshot** of the response proving success, and a **2–3 sentence mitigation** in your own words.

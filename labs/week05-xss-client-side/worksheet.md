@@ -47,7 +47,7 @@ docker compose up            # python:3.12-slim + flask, runs vulnerable_app.py
 ```
 Optional secondary target (for DOM XSS, which our app does not expose):
 ```bash
-docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3000
+docker run --rm -p 127.0.0.1:3000:3000 bkimminich/juice-shop  # -> http://localhost:3000
 ```
 
 **What to submit per task:** the exact **payload**, a **screenshot** of the alert/effect, and a **2–3 sentence mitigation**.

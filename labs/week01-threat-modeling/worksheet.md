@@ -4,12 +4,14 @@
 > **Aligned to:** OWASP 2025 A06 Insecure Design · CWE-501 (Trust Boundary Violation)
 > **Signature game:** "Elevation of Privilege" (Microsoft STRIDE card deck)
 
-> **Ethics note:** This week is *modeling only* — you analyze design, you do **not** attack the app. Run the sample app only on your own VM/localhost. Never apply these techniques to systems you do not own or lack written permission to test.
+> **Ethics note:** This week is *modeling only* — you analyze design, you do **not** attack the app. Run the sample app only on your own laptop — it listens on `localhost` only, so nobody else on the classroom network can reach it. Never apply these techniques to systems you do not own or lack written permission to test.
 
 ## Part 1 — Student Information
-| Name | Student ID | Date | Group |
-|---|---|---|---|
-| | | | |
+| Name | Student ID | Date | Group | AI tools used |
+|---|---|---|---|---|
+| | | | | |
+
+*AI tools used:* every AI tool you used this week and what for (e.g. "ChatGPT — explained STRIDE"), or "none". Using AI is allowed when you disclose it; *Audit the AI* below builds on this entry.
 
 ## Part 2 — Lecture Questions
 Answer in your own words (2–4 sentences each).
@@ -29,12 +31,18 @@ Answer in your own words (2–4 sentences each).
 >
 > **In class (125 min):** Tasks 0, 1, 2, 3, 3b and 4 · **Homework (95 min):** Tasks 5, 6, 7 and 8
 **Learning goals:** build a data-flow diagram (DFD), apply STRIDE to a real Flask app, rank risks, and propose mitigations.
-**Prerequisites:** Docker + Docker Compose in your VM; a drawing tool (draw.io / paper + photo); the Elevation of Privilege deck (print or virtual) — free print-and-play PDF at [github.com/adamshostack/eop](https://github.com/adamshostack/eop).
+**Prerequisites:** Docker Desktop (or Docker Engine + Compose) on your laptop; on Windows, Git for Windows (for Git Bash) or WSL; a drawing tool (draw.io / paper + photo); the Elevation of Privilege deck (print or virtual) — free print-and-play PDF at [github.com/adamshostack/eop](https://github.com/adamshostack/eop).
 
 **Environment setup**
+
+> **Windows:** run every command in this worksheet — including the identity stamp under *Evidence &
+> Integrity* — in **Git Bash** (installed with Git for Windows) or a **WSL** terminal. PowerShell and cmd
+> handle `curl`, the `\` line breaks, the quoting and `printf` differently, so the commands below will not
+> run there as written.
+
 ```bash
 cd labs/week01-threat-modeling
-docker compose up --build           # starts sample-app on http://localhost:8080
+docker compose up --build           # starts sample-app on http://localhost:8080 — leave it running, use a 2nd terminal below
 curl -s -X POST localhost:8080/notes -H 'Content-Type: application/json' \
      -d '{"owner":"alice","body":"hello"}'   # observe behavior, do not attack
 curl -s localhost:8080/notes
@@ -48,7 +56,7 @@ Source to model lives in `sample-app/app.py`. Template to fill: `THREAT-MODEL-TE
 
 **What to submit per task:** the threat/element identified + a screenshot (DFD, table, or running app) + a 2–3 sentence mitigation.
 
-**Task 0 — Onboarding (5 min, in class)** · *Goal:* prove the environment works. *Steps:* `docker compose up`, hit `/notes` and `/files/<name>`, read `sample-app/app.py`. *Deliverable:* screenshot of the running app + the JSON response.
+**Task 0 — Onboarding (5 min, in class)** · *Goal:* prove the environment works. *Steps:* `docker compose up`, hit `/notes` and `/files/<name>`, read `sample-app/app.py`. Opening `http://localhost:8080/` itself gives **404 Not Found** — that is expected: the app has no home page, only `/notes`, `/upload` and `/files/<name>`. `/files/<name>` also returns 404 until you have uploaded a file with that name. *Deliverable:* screenshot of the running app + the JSON response.
 
 **Task 1 — Draw the DFD (25 min, in class)** · *Goal:* map the system. *Steps:* identify the external entity (web client), the process (Flask app), the data store (`notes.db` SQLite), the `uploads/` store, and the flows for `/notes`, `/upload`, `/files/<name>`; mark the Internet→app trust boundary with a dashed line. *Deliverable:* DFD image embedded in your copy of the template.
 
@@ -80,14 +88,14 @@ trust-boundary
 
 **Task 5 — Path-traversal deep-dive (25 min, homework)** · *Goal:* analyze the riskiest flow. *Steps:* trace `/upload` → `/files/<name>`; explain how `../` in a filename escapes `uploads/`; sketch the secure design (`secure_filename`, store outside web root, allow-list extensions). *Deliverable:* the data flow + secure-design note.
 
-**Task 6 — Threat-model the project target (30 min, homework)** · *Goal:* kick off your term project. *Steps:* stop the sample-app first (`docker compose down` — both apps bind host port 8080), then run **NoteVault** (`cd ../../project/starter-app && docker compose up`), draw a quick DFD, and list the top 3 STRIDE threats you'd investigate. *Deliverable:* NoteVault DFD + top-3 threats (reuse these in your project report — `project/REPORT-TEMPLATE.md` in the repo root).
+**Task 6 — Threat-model the project target (30 min, homework)** · *Goal:* kick off your term project. *Steps:* stop the sample-app first (`docker compose down` — both apps bind host port 8080), then run **NoteVault** (`cd ../../project/starter-app && export TEAM_ID=<your-student-ID> && docker compose up`), draw a quick DFD, and list the top 3 STRIDE threats you'd investigate. *Deliverable:* NoteVault DFD + top-3 threats (reuse these in your project report — `project/REPORT-TEMPLATE.md` in the repo root). *Why `TEAM_ID`:* it seeds a marker into your copy of NoteVault that makes your evidence traceable to you (see `project/starter-app/README.md`). Teams are not formed yet, so use your own student ID for now and switch to your team name once teams form.
 
 **Task 7 — Security requirements (15 min, homework)** · *Goal:* turn threats into testable requirements. *Steps:* write 3 security requirements as acceptance criteria ("the system must … so that …"), each mapped to a threat from Task 2 or Task 6. *Deliverable:* 3 testable security requirements.
 
 **Task 8 — Defend / fix it: rank & mitigate (25 min, homework) 🛡️** · *Goal:* turn threats into action you can prove. *Steps:* rank the top 5 threats by likelihood × impact; propose one concrete mitigation each (e.g., auth on `/notes`, `secure_filename()` + allowlist for `/upload`, request logging for Repudiation, size/rate limits for DoS). Then **pick one and actually implement it** in your fork.
 
 *Deliverable — the top-5 table, plus for the one you implemented:*
-1. the **diff** (commit hash on your `wk01` branch),
+1. the **diff** — the commit link (or hash) on your fork's `wk01` branch. Push the branch to your fork and paste the link in this worksheet; do **not** open a pull request (a PR from your fork lands on the public course repo),
 2. **evidence it works**: the request that succeeded before your change and is refused after — both outputs,
 3. **why it closes the class, not the instance** (2–3 sentences). `secure_filename()` on one endpoint is an instance fix; *"no user-supplied string ever becomes a path component"* is a class fix. Say which yours is, and if it's an instance fix, say what the class fix would be.
 
@@ -117,7 +125,7 @@ trust-boundary
 
 ## Evidence & Integrity (required)
 
-- **Identity proof:** every screenshot/diagram must show a terminal running `printf '%s | %s | ' "$(whoami)" '<YOUR-STUDENT-ID>'; date '+%F %T %Z'` **in the
+- **Identity proof:** every screenshot/diagram must show a terminal running `printf '%s | %s | ' "$(whoami)" '<YOUR-STUDENT-ID>'; date '+%F %T %Z'` (on Windows, in Git Bash or WSL) **in the
   same image as the evidence**. When the evidence is a browser page, a DevTools panel or a
   rendered response, put that terminal **beside the browser and capture the whole screen** — a
   cropped window carries nothing that identifies you, and the lab's own output is
@@ -138,7 +146,7 @@ AI is a power tool you must **distrust** — you are graded on your *critique*, 
 2. **Find what's wrong or risky** in it — insecure code, a subtly incomplete fix, a hallucinated API/function/CVE, a missed edge case, or wrong reasoning. Quote the exact line(s).
 3. Produce the **correct, verified** version yourself and explain in 2–3 sentences why the AI's output was insufficient.
 
-> Disclose your AI use in the Part 1 table. This task counts toward your **Defense + Reflection** score.
+> Disclose your AI use in the **AI tools used** column of the Part 1 table. This task counts toward your **Defense + Reflection** score.
 
 ---
 

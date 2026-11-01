@@ -3,7 +3,8 @@ services:
     image: python:3.12-slim
     working_dir: /lab
     ports:
-      - "8080:5000"
+      # 127.0.0.1 = this machine only. Lab apps are deliberately vulnerable; keep them off the classroom network.
+      - "127.0.0.1:8080:5000"
     volumes:
       - ./:/lab
     # PRACTICE build: with no .env the app serves public demo flags (FLAG{..._demo}).

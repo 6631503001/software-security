@@ -5,7 +5,8 @@ services:
     volumes:
       - ./:/lab
     ports:
-      - "8080:5000"
+      # 127.0.0.1 = this machine only. Lab apps are deliberately vulnerable; keep them off the classroom network.
+      - "127.0.0.1:8080:5000"
     # PRACTICE build: with no .env the app serves public demo flags (FLAG{..._demo}).
     # Graded flags come only from your hosted CTFd instance, never from this local run.
     environment:
@@ -22,7 +23,8 @@ services:
     volumes:
       - ./:/lab
     ports:
-      - "8081:5001"
+      # 127.0.0.1 = this machine only. Lab apps are deliberately vulnerable; keep them off the classroom network.
+      - "127.0.0.1:8081:5001"
     command: >
       bash -c "pip install --no-cache-dir flask &&
                echo '--- SECURE API on :8081 ---' &&

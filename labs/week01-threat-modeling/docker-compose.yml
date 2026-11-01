@@ -2,4 +2,5 @@ services:
   sample-app:
     build: ./sample-app
     ports:
-      - "8080:5000"
+      # 127.0.0.1 = this machine only. Lab apps are deliberately vulnerable; keep them off the classroom network.
+      - "127.0.0.1:8080:5000"

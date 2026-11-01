@@ -49,9 +49,9 @@ docker compose up            # python:3.12-slim + flask + pyjwt, runs vulnerable
 ```
 Optional secondary target / proxy:
 ```bash
-docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3000
+docker run --rm -p 127.0.0.1:3000:3000 bkimminich/juice-shop  # -> http://localhost:3000
 # Burp Suite: put the proxy listener AND the browser proxy on 127.0.0.1:8081.
-# NOT 8080 — the lab app already owns host 8080 (docker-compose.yml, "8080:5000").
+# NOT 8080 — the lab app already owns host 8080 (docker-compose.yml, "127.0.0.1:8080:5000").
 # Burp's own default listener is 8080, so you must change it: leave it there and
 # either the listener refuses to start ("Address already in use") or, if it does
 # bind, the browser's proxy address is the target's address and every request

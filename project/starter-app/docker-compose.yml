@@ -2,7 +2,8 @@ services:
   notevault:
     build: .
     ports:
-      - "8080:8080"
+      # 127.0.0.1 = this machine only. Lab apps are deliberately vulnerable; keep them off the classroom network.
+      - "127.0.0.1:8080:8080"
     environment:
       # Set your real team ID before building (see project/README.md) — this seeds a
       # per-team traceable marker into the app's data, same purpose as the per-student

@@ -42,10 +42,12 @@ machine before Week 1. Nothing on the website will work without this step.**
 2. Stand up the week's target: `docker compose up` (or the command in that lab's README).
    Most web labs publish on **port 8080**, so **run one lab at a time** — before starting the
    next lab run `docker compose down` in the current lab's folder, or you'll get
-   `Bind for 0.0.0.0:8080 failed: port is already allocated`. To run two at once, change only
-   the **left** number of the port mapping in that lab's `docker-compose.yml` (e.g. `"8081:5000"`)
-   and open `http://localhost:8081` — never change the right side (`5000`); the app listens on
-   5000 *inside* the container, and on macOS port 5000 is taken by AirPlay Receiver.
+   `Bind for 127.0.0.1:8080 failed: port is already allocated`. To run two at once, change only
+   the **middle** number of the port mapping in that lab's `docker-compose.yml` (e.g.
+   `"127.0.0.1:8081:5000"`) and open `http://localhost:8081`. Keep the `127.0.0.1:` in front —
+   it keeps the deliberately vulnerable lab off the classroom network — and never change the
+   right side (`5000`); the app listens on 5000 *inside* the container, and on macOS port 5000
+   is taken by AirPlay Receiver.
 3. Work through the **worksheet** (`labs/week<NN>…/worksheet.md`): for each task record the **payload/command**, a **screenshot** of the result, and a **2–3 sentence mitigation**.
 4. For the **Defend / fix** task: edit the code, **commit to your `wk<NN>` branch**, and note the **commit hash** in the worksheet. Commit **code only** — keep the worksheet, screenshots and flags out of git.
 
