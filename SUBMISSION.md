@@ -6,13 +6,10 @@ All offensive work is on the provided sandbox targets only — see [ETHICS.md](E
 | What | Where |
 |---|---|
 | Course material — worksheets, lab guides | **`learn.zcr.ai/learn`** — no sign-in needed |
-| Weekly quiz | **`learn.zcr.ai/quiz`** — the one-time code on your slip |
+| Weekly quiz | **`learn.zcr.ai/quiz`** — the one-time code on your slip or in your email |
 | Labs / CTF / scoreboard | **`ctf.zcr.ai`** — your account is issued to you, username = your student ID. Private-network challenges need WireGuard: see [docs/arena-vpn-guide.md](docs/arena-vpn-guide.md). |
 | Code fixes | **GitHub** — your own fork |
-| Worksheet PDFs, project report | **`learn.zcr.ai/submit`** — the submission code on your slip |
-
-> **No Google.** Material, quizzes and worksheet submission all run on the course
-> platform. You will not be asked for a Google account.
+| Worksheet PDFs, project report | **`learn.zcr.ai/submit`** — the submission code on your slip or in your email |
 
 ---
 
@@ -30,8 +27,9 @@ machine before Week 1. Nothing on the website will work without this step.**
    ```
 3. Stand up the environment (Docker Desktop, Burp/ZAP; a Linux VM is an optional
    fallback) — this is **Week 1 Lab 0**.
-4. Sign in to **`ctf.zcr.ai`** with the account slip you are given (username = your
-   student ID). All the reading is at **`learn.zcr.ai`** — no sign-in needed.
+4. All the reading is at **`learn.zcr.ai`** — no sign-in needed. You do **not** need
+   **`ctf.zcr.ai`** in Week 1, which has no flag; your arena account (username = your
+   student ID) is issued before the first week that has an arena challenge.
 
 ---
 
@@ -55,11 +53,11 @@ machine before Week 1. Nothing on the website will work without this step.**
 | Part | Where | What |
 |------|-------|------|
 | Worksheet | **`learn.zcr.ai/submit`** | the completed worksheet exported to **PDF** (screenshots embedded). You can replace it any time before the deadline. |
-| Code fix | **GitHub** | push branch `wk<NN>`, open a PR with **only the code you changed** (paste the commit link in the worksheet). No worksheet, screenshots or flags in the PR. |
+| Code fix | **GitHub** (your fork) | push branch `wk<NN>` to your fork and paste the **commit link** in the worksheet. The commit holds **only the code you changed** — no worksheet, screenshots or flags. **Do not open a pull request:** a PR from your fork goes to the public course repo. |
 
-> **Your fork and every PR are public** — anyone can read them. They hold your code fix and
-> nothing else. The worksheet PDF and its screenshots go to **`learn.zcr.ai/submit`** only; an
-> answer posted on GitHub before the deadline can be copied by anyone.
+> **Your fork is public** — anyone can read it. It holds your code fix and nothing else. The
+> worksheet PDF and its screenshots go to **`learn.zcr.ai/submit`** only; an answer posted on
+> GitHub before the deadline can be copied by anyone.
 
 **File name:** `Wk<NN>_<StudentID>.pdf`  (e.g. `Wk04_65123456.pdf`)
 **Deadline:** 23:59 (Thai time) the night before the next week's class — for KOSEN's Tuesday class that is **Monday 23:59**; the exact time is on **`learn.zcr.ai/submit`**.
@@ -69,11 +67,11 @@ machine before Week 1. Nothing on the website will work without this step.**
 
 ## QUIZ — how it works
 - **On the course platform**: go to **`learn.zcr.ai/quiz`** and enter the **one-time
-  code on your slip**. It works once, for you only, and you cannot go back to a
+  code on your slip or in your email**. It works once, for you only, and you cannot go back to a
   previous question once you continue.
 - **Weekly quiz:** a short **~10-min quiz at the start of every teaching week** (6 Q: 5 MCQ + 1 short, **individual**). Low-stakes — the **lowest 1–2 are dropped**.
 - **Cumulative review quizzes:** two bigger 25-pt quizzes in the **review weeks** (W7 pre-midterm, W17 pre-final).
-- No separate file to submit — the Form **is** the submission.
+- No separate file to submit — finishing the quiz **is** the submission.
 
 ---
 
@@ -99,7 +97,6 @@ machine before Week 1. Nothing on the website will work without this step.**
 - **Late (KOSEN):** −10% of the item's score per started day late, reaching 0 after 10 days; the portal stops accepting work after day 10 (see `syllabus.md` §6). Submit what you have.
   - **Handed in on time = final at the deadline.** After the deadline you can't change, replace or add to it, so one stray re-upload can never turn an on-time hand-in late.
   - **Late work: your last upload sets how late it is.** Adding a file on day 5 makes the whole hand-in 5 days late. Each started 24 h after the deadline counts as a day, so 1 minute late is already −10%; after day 10 the worksheet closes.
-- **Late (MFU):** follow [syllabus-mfu.md](syllabus-mfu.md).
 
 ---
 
@@ -108,7 +105,7 @@ machine before Week 1. Nothing on the website will work without this step.**
 This is a security course — we practice the same rigor on your own work. The following controls are in place; assume your submission is checked.
 
 - **Your flags are unique to you.** Each student receives **personalized CTF/lab flags** derived from your student ID. A flag is traceable to the person it was issued to — submitting someone else's flag is detected automatically and counts as a violation for **both** parties.
-- **Your screenshots must show you.** Evidence must include a terminal running `printf '%s | %s | ' "$(whoami)" '<YOUR-STUDENT-ID>'; date '+%F %T %Z'` **in
+- **Your screenshots must show you.** Evidence must include a terminal running `printf '%s | %s | ' "$(whoami)" '<YOUR-STUDENT-ID>'; date '+%F %T %Z'` (on Windows, in Git Bash or WSL) **in
   the same image as the evidence**. When the evidence is a browser page, a DevTools panel or a
   rendered response, put that terminal **beside the browser and capture the whole screen** — a
   cropped window carries nothing that identifies you, and the lab's own output is
